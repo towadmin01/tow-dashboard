@@ -278,6 +278,127 @@
   .bd td.up{color:var(--green); font-weight:700;} .bd td.dn{color:var(--red); font-weight:700;}
   .bd tr.na td{color:#9a927a; font-size:11.5px;} .bd tr.tot td{font-weight:800; border-top:2px solid var(--line);}
   .bdsub{font-size:11px; color:#8a8369; font-weight:400;} .clickrow{cursor:pointer;} .clickrow:hover{background:#F6F2E6;}
+
+  /* ===== v3.2 ===== */
+  .tabs{overflow-x:auto; scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab{flex:1 0 auto; padding:9px 9px; font-size:11.5px;}
+  .rv-banner{background:#FFF2CC; color:#6b4a00; border-bottom:1px solid #E8D58F; padding:9px 16px; font-size:12.5px; line-height:1.4;}
+  .rv-banner b{color:#4d3500;}
+  .rv-banner.urgent{background:#FCE0E0; color:#7a0006; border-bottom-color:#E7B4B4;}
+
+  /* Daily card */
+  .dl .dl-head{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+  .dl-name{background:none; border:none; padding:0; margin:0; font:inherit; font-weight:700; font-size:14.5px; color:var(--navy); cursor:pointer; text-align:left;}
+  .dl-name:hover{text-decoration:underline;}
+  .dl-name .chev{font-size:13px; opacity:.6; margin-left:2px;}
+  .dl-pill{display:inline-block; margin-top:8px; font-size:11.5px; font-weight:600; color:#5B3E9E; background:#EFEAF9; border-radius:20px; padding:3px 10px;}
+  .dl-cols{display:grid; grid-template-columns:1fr; gap:8px; margin-top:10px;}
+  @media (min-width:540px){ .dl-cols{grid-template-columns:1fr 1fr;} }
+  .dl-col{border-radius:9px; padding:9px 11px 10px; min-height:62px;}
+  .dl-col h4{margin:0 0 6px; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; font-weight:800;}
+  .dl-today{background:#EEF3FA; border-left:4px solid var(--navy);} .dl-today h4{color:var(--navy);}
+  .dl-next{background:#FBF5E2; border-left:4px solid var(--gold);} .dl-next h4{color:#8a6d00;}
+  .dl-line{display:flex; gap:8px; font-size:12.5px; line-height:1.45; margin:3px 0;}
+  .dl-k{flex:0 0 66px; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:#7d7763; padding-top:2px;}
+  .dl-v{flex:1; color:#2e2b1f; min-width:0; overflow-wrap:anywhere;}
+  .dl-v i{color:#8a8369;}
+  .dl-none{font-size:12.5px; color:#a39c86;}
+  .dl-note{font-size:12.5px; color:#4b4636;}
+  .dl-remarks{margin-top:8px; font-size:12px; color:#4b4636; background:#F8F6EF; border-radius:8px; padding:7px 10px;}
+  .dl-remarks b{font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:#9a927a; margin-right:6px;}
+
+  /* Full report modal */
+  .fr-sec{margin:0 0 14px;}
+  .fr-sec > h3{margin:0 0 8px; font-size:12px; letter-spacing:.07em; text-transform:uppercase; padding:6px 10px; border-radius:7px;}
+  .fr-sec.today > h3{background:#EEF3FA; color:var(--navy); border-left:4px solid var(--navy);}
+  .fr-sec.next > h3{background:#FBF5E2; color:#8a6d00; border-left:4px solid var(--gold);}
+  .fr-cat{margin:0 0 10px;}
+  .fr-cat > b{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:#9a927a; margin-bottom:3px;}
+  .fr-item{padding:5px 0 5px 10px; border-left:2px solid var(--line); margin:3px 0; font-size:12.5px; line-height:1.45;}
+  .fr-item .st{font-size:10.5px; font-weight:700; border-radius:20px; padding:1px 8px; margin-left:6px; white-space:nowrap;}
+  .st.Completed{background:var(--green-bg); color:var(--green);} .st.InProgress{background:#E4EEF7; color:#1F3864;} .st.Deferred{background:var(--amber-bg); color:var(--amber);} .st.Other{background:#eee; color:#555;}
+  .fr-remark{margin-top:2px; color:#6a6450; font-style:italic;}
+  .fr-meta{font-size:12px; color:#5b5748; line-height:1.5; margin-bottom:10px;}
+
+  /* Score breakdown v2 */
+  .bx-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .bx-top .val{font-size:28px; font-weight:800;}
+  .bx-sub{font-size:12px; color:#5b5748; margin:4px 0 10px; line-height:1.45;}
+  .bx-legend{background:#F4F1E6; border-radius:9px; padding:9px 12px; font-size:11.5px; color:#5b5748; line-height:1.5; margin-bottom:12px;}
+  .bx-legend b{color:#3a3626;}
+  .bx-h{margin:14px 0 6px; font-size:11px; letter-spacing:.07em; text-transform:uppercase; font-weight:800; color:var(--navy); border-bottom:2px solid var(--gold); padding-bottom:4px;}
+  .bx-part{padding:9px 0; border-bottom:1px solid var(--line);}
+  .bx-part:last-child{border-bottom:none;}
+  .bx-row{display:flex; justify-content:space-between; align-items:baseline; gap:10px;}
+  .bx-name{font-weight:700; font-size:13px;}
+  .bx-pts{font-size:13px; font-weight:800; white-space:nowrap;} .bx-pts small{font-weight:600; color:#8a8369; font-size:11.5px;}
+  .bx-bar{height:7px; background:#ECE7D6; border-radius:5px; margin:6px 0 4px; overflow:hidden;}
+  .bx-bar > i{display:block; height:100%; border-radius:5px; background:var(--green);}
+  .bx-bar.mid > i{background:#D49B00;} .bx-bar.low > i{background:#C23B3B;}
+  .bx-what{font-size:11.5px; color:#6b6552; line-height:1.4;}
+  .bx-na{font-size:11.5px; color:#9a927a; padding:6px 0; font-style:italic;}
+  .bx-lost{background:#fff; border:1px solid var(--line); border-left:4px solid #C23B3B; border-radius:8px; padding:9px 12px; margin:8px 0; font-size:12.5px; line-height:1.5;}
+  .bx-lost .t{font-weight:800; margin-bottom:2px;} .bx-lost .t span{color:#C23B3B;}
+  .bx-lost .fix{margin-top:4px; color:#1E7A46; font-size:12px;}
+  .bx-ok{font-size:12.5px; color:#1E7A46; margin:6px 0;}
+  details.bx-det{margin-top:10px; font-size:12.5px;} details.bx-det summary{cursor:pointer; font-weight:700; color:var(--navy); font-size:12px;}
+  .bx-late{font-size:12px; color:#7a0006; margin:6px 0;}
+
+  /* YTD summary */
+  .ys{font-size:12.5px; line-height:1.5; color:#3a3626; margin-top:8px;}
+  .ys b{color:var(--navy);}
+  .ys ul{margin:4px 0 0; padding-left:18px;}
+
+  /* Maintenance reports */
+  .mt-tabs{display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;}
+  .mt-tab{padding:8px 12px; border-radius:20px; border:1px solid var(--line); background:#fff; font-size:12.5px; font-weight:700; color:#5b5748; cursor:pointer;}
+  .mt-tab.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+  .mt-sum{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;}
+  .mt-chip{flex:1 1 90px; background:#F8F6EF; border-radius:9px; padding:8px 10px;} .mt-chip .n{font-size:20px; font-weight:800; color:var(--navy);} .mt-chip .l{font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:#9a927a;}
+  .mt-month{font-weight:800; font-size:13px; color:var(--navy); margin-bottom:6px;}
+  .mt-entry{display:flex; gap:10px; padding:7px 0; border-top:1px solid var(--line); font-size:12.5px; line-height:1.45;}
+  .mt-entry:first-of-type{border-top:none;}
+  .mt-date{flex:0 0 92px; font-weight:700; color:#3a3626;}
+  .mt-what{flex:1;} .mt-what i{color:#8a8369;}
+
+  /* review cloud status */
+  .rv-cloud{font-size:12px; line-height:1.5; color:#5b5748;}
+  .rv-cloud button{margin:4px 6px 0 0; padding:5px 10px; border-radius:7px; border:1px solid var(--line); background:#fff; font-size:11.5px; font-weight:700; cursor:pointer;}
+
+  /* How calc v2 */
+  .hc2-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;}
+  .hc2-part{background:#F8F6EF; border-radius:9px; padding:9px 11px;}
+  .hc2-part .n{font-size:20px; font-weight:800; color:var(--navy);}
+  .hc2-part .t{font-weight:700; font-size:12.5px;} .hc2-part .d{font-size:11.5px; color:#6b6552; line-height:1.4; margin-top:2px;}
+  .hc2-list{margin:6px 0 0; padding-left:18px; font-size:12.5px; line-height:1.55;}
+
+  @media print{
+    .rv-banner{display:none !important;}
+    body.modal-printing .portfolio-group-label{break-after:avoid; page-break-after:avoid;}
+    body.modal-printing .task-row{break-inside:avoid; page-break-inside:avoid;}
+    body.modal-printing .modal-body > *{break-inside:auto !important;}
+    .mt-entry, .fr-item, .bx-part, .bx-lost{break-inside:avoid; page-break-inside:avoid;}
+    .dl-col, .dl-remarks{break-inside:avoid;}
+  }
+
+  /* v3.2 — maintenance, how-calc, review helpers */
+  .mt-ctl{display:flex; gap:8px;} .mt-ctl select{flex:1; margin:0;}
+  .mt-title{font-size:16px; font-weight:800; color:var(--navy);} .mt-meta{font-size:11.5px; color:#6b6552; margin:3px 0 8px;}
+  .mt-chips{display:flex; gap:8px; flex-wrap:wrap;} .mt-chips span{background:#F8F6EF; border-radius:9px; padding:7px 10px; font-size:12px;}
+  .mt-mh{font-weight:800; font-size:13px; color:var(--navy); margin-bottom:4px; display:flex; justify-content:space-between;} .mt-mh span{background:var(--gold); color:#fff; border-radius:10px; padding:0 8px; font-size:11px; line-height:18px;}
+  .mt-row{display:flex; gap:10px; padding:8px 0; border-top:1px solid var(--line); font-size:12.5px; line-height:1.45; break-inside:avoid; page-break-inside:avoid;}
+  .mt-row:first-of-type{border-top:none;}
+  .mt-task{font-weight:600;} .mt-what .mt-rem{font-weight:400;} .mt-rem{font-size:12px; color:#4a4636; margin-top:2px;} .mt-rem.none{color:#9a927a; font-style:italic;}
+  .rv-mini{padding:3px 8px; border-radius:6px; border:1px solid var(--line); background:#fff; font-size:11px; cursor:pointer;}
+  .rv-cloud{border-radius:10px; padding:10px 12px; margin-bottom:10px; background:#F8F6EF;} .rv-cloud.on{background:#EAF5EC;} .rv-cloud.off{background:#FFF7E0;}
+  .hc-grid > div{padding:8px 0; border-top:1px solid var(--line); font-size:12.5px; line-height:1.5;} .hc-grid > div:first-child{border-top:none;}
+  .hc-grid b{display:block; color:var(--navy);} .hc-grid span{color:#4a4636;}
+  .hc-list{margin:0; padding-left:18px; font-size:12.5px; line-height:1.55; color:#3a3626;} .hc-list li{margin-bottom:5px;}
+  .rv-banner button{margin-left:8px; padding:5px 10px; border-radius:7px; border:1px solid #C9B36A; background:#fff; font-size:12px; cursor:pointer;}
+  .rv-banner{justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;}
+  .page-label + .page-label{display:none !important;}
+
 </style>
 </head>
 <body>
@@ -303,11 +424,13 @@
     <div class="tab" data-view="weekly">Weekly</div>
     <div class="tab" data-view="monthly">Monthly</div>
     <div class="tab" data-view="ytd">YTD Avg</div>
+    <div class="tab" data-view="maint">Maint.</div>
     <div class="tab" data-view="review">Review</div>
     <div class="tab" data-view="howcalc">How Calc.</div>
   </div>
 </header>
 
+<div class="rv-banner" id="reviewBanner" style="display:none"></div>
 <div class="meta" id="metaBar">
   <div class="picker-row">
     <button class="nav-btn" id="prevBtn">&lsaquo;</button>
@@ -454,7 +577,9 @@
   <div class="view" id="view-weekly"></div>
   <div class="view" id="view-monthly"></div>
   <div class="view" id="view-ytd"></div>
+  <div class="view" id="view-maint"></div>
   <div class="view" id="view-review">
+    <div id="reviewStatus"></div>
     <div class="card">
       <div class="hc-title">TOW Staff Ministry &amp; Performance Observation (40%)</div>
       <div class="reason">Self (40%) + Church Leadership (60%) ratings, weighted by category, feed the Total Performance Score below &mdash; only the Final Year-End ratings count toward the score (Mid-Year is tracked for reference, same as your original form). Combined with the KPI running score at 60/40 for the Final Recognition Score. Saved to this browser only (not shared across devices).</div>
@@ -512,16 +637,13 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="adhocModal">
+<div class="modal-overlay" id="frModal">
   <div class="modal">
     <div class="modal-head">
-      <h2 id="adhocModalTitle">Adhoc Activity</h2>
-      <div class="modal-head-actions">
-        <button class="modal-print-btn" id="adhocPrintBtn">Print</button>
-        <button class="modal-close" id="adhocClose">&times;</button>
-      </div>
+      <h2 id="frTitle">Daily report</h2>
+      <div class="modal-head-actions"><button class="modal-print-btn" id="frPrintBtn">Print</button><button class="modal-close" id="frClose">&times;</button></div>
     </div>
-    <div class="modal-body" id="adhocModalBody"></div>
+    <div class="modal-body" id="frBody"></div>
   </div>
 </div>
 
@@ -632,7 +754,7 @@ function buildRemark(rows, periodLabel){
 }
 
 async function loadLiveData(){
-  const [rawDaily, weeklyCalc, monthlyCalc, weeklyTaskSummary, monthlyTaskSummary, taskReference, accumWeekly, accumMonthly, leaveLog, workdayCalendar, kpiWeightsRows, flexRows] = await Promise.all([
+  const [rawDaily, weeklyCalc, monthlyCalc, weeklyTaskSummary, monthlyTaskSummary, taskReference, accumWeekly, accumMonthly, leaveLog, workdayCalendar, kpiWeightsRows, flexRows, maintRows] = await Promise.all([
     fetchSheetRows('Raw Daily Log'),
     fetchSheetRows('Weekly Calc'),
     fetchSheetRows('Monthly Calc'),
@@ -645,6 +767,7 @@ async function loadLiveData(){
     fetchSheetRows('Workday Calendar'),
     fetchSheetRows('KPI Weights').catch(() => []),
     fetchSheetRows('Flexible Arrangement Staff').catch(() => []),
+    fetchSheetRows('Maintenance Log').catch(() => []),
   ]);
 
   // ---- Real workdays only (Tue-Fri, minus public holidays) — used to keep
@@ -679,21 +802,21 @@ async function loadLiveData(){
       scored: r['In Score?'] === 'Yes',
       start: toISODate(r['Start Date (blank = from the beginning)']), end: toISODate(r['End Date (blank = still current)']),
       scoreFrom: toISODate(r['Scores From (blank = same as Start Date; reported but not scored before this date)']) ||
-        ((/^ps\./i.test(String(staff||'').trim()) && /ministerial\s+reading|ministry\s+training/i.test(String(r['Full Task Name']||''))) ? '2027-01-01' : '')
+        ((/^ps\./i.test(String(staff||'').trim()) && /ministerial\s+reading|ministry\s+training|levites\s+training/i.test(String(r['Full Task Name']||''))) ? '2027-01-01' : '')
     });
   });
 
   // ---- scoring weights + flexible-schedule staff ----
   const weights = {
-    Administration: {port:.45, plan:.10, sub:.15, mon:.10, adhoc:.15, qtr:.05},
-    Pastoral:       {port:.45, plan:.10, sub:.15, mon:.05, adhoc:.20, qtr:.05}
+    Administration: {port:.50, plan:.15, sub:.15, adhoc:.20},
+    Pastoral:       {port:.50, plan:.15, sub:.15, adhoc:.20}
   };
   kpiWeightsRows.forEach(r => {
     const p = r['Profile']; if(!p) return;
+    if(r['Monthly Progress'] !== undefined || r['Quarterly'] !== undefined) return;   // old 6-column sheet not migrated yet: keep the new defaults
     const k = p === 'Administration' ? 'Administration' : 'Pastoral';
     const g = (col, d) => { const v = toNum(r[col]); return v === null ? d : v; };
-    weights[k] = {port: g('Portfolio', weights[k].port), plan: g('Planning', weights[k].plan), sub: g('Submission', weights[k].sub),
-                  mon: g('Monthly Progress', weights[k].mon), adhoc: g('Adhoc', weights[k].adhoc), qtr: g('Quarterly', weights[k].qtr)};
+    weights[k] = {port: g('Portfolio', weights[k].port), plan: g('Planning', weights[k].plan), sub: g('Submission', weights[k].sub), adhoc: g('Adhoc', weights[k].adhoc)};
   });
   const flexSet = new Set(flexRows.map(r => String(r['Staff Name'] || r['Staff'] || '').trim()).filter(Boolean));
   const wdList = Array.from(workdayKeySet).sort();
@@ -749,7 +872,8 @@ async function loadLiveData(){
       expW: toNum(r['Expected Wkly Wt']) || 0, doneW: toNum(r['Completed Wkly Wt']) || 0, port: toNum(r['Portfolio %']),
       expM: toNum(r['Expected Mthly Wt']) || 0, doneM: toNum(r['Completed Mthly Wt (cum.)']) || 0, mprog: toNum(r['Monthly Progress %']) || 0,
       adhoc: toNum(r['Adhoc Count']) || 0, adhocPct: toNum(r['Adhoc %']), planDays: toNum(r['Plan Days']) || 0, matchDays: toNum(r['Match Days']) || 0, plan: toNum(r['Planning %']),
-      latePen: toNum(r['Late Penalty']) || 0, expQ: toNum(r['Expected Qtrly Wt']) || 0, doneQ: toNum(r['Completed Qtrly Wt (cum.)']) || 0, qprog: toNum(r['Quarterly Progress %']) || 0
+      latePen: toNum(r['Late Penalty']) || 0, expQ: toNum(r['Expected Qtrly Wt']) || 0, doneQ: toNum(r['Completed Qtrly Wt (cum.)']) || 0, qprog: toNum(r['Quarterly Progress %']) || 0,
+      portAll: toNum(r['Portfolio (all tasks) %']), fracM: toNum(r['Monthly share due']), fracQ: toNum(r['Quarterly share due'])
     };
     (weekly[wk] = weekly[wk] || []).push({
       staff: r['Staff'], dept: r['Dept'], score, rating: r['Rating'], reason: r['Reason'],
@@ -776,7 +900,8 @@ async function loadLiveData(){
     const calc = {
       profile: r['Profile'], port: toNum(r['Avg Portfolio %']), mprog: toNum(r['Monthly Progress % (final)']) || 0, plan: toNum(r['Avg Planning %']),
       sub: toNum(r['Avg Submission %']), adhoc: toNum(r['Total Adhoc']) || 0, adhocPct: toNum(r['Adhoc %']), latePen: toNum(r['Late Penalty']) || 0,
-      expM: toNum(r['Expected Mthly Wt']) || 0, expQ: toNum(r['Expected Qtrly Wt']) || 0, qprog: toNum(r['Quarterly Progress %']) || 0
+      expM: toNum(r['Expected Mthly Wt']) || 0, expQ: toNum(r['Expected Qtrly Wt']) || 0, qprog: toNum(r['Quarterly Progress %']) || 0,
+      portAll: toNum(r['Portfolio (all tasks) %']), fracM: toNum(r['Monthly share due']), fracQ: toNum(r['Quarterly share due']), avgWk: toNum(r['Avg Weekly Task Wt']) || 0
     };
     (monthly[mo] = monthly[mo] || []).push({
       staff: r['Staff'], dept: r['Dept'], score, rating: r['Rating'], reason: r['Reason / Variance vs Prev Month'],
@@ -841,7 +966,8 @@ async function loadLiveData(){
   });
   Object.keys(adhocLog).forEach(s => adhocLog[s].sort((a,b)=>a.date.localeCompare(b.date)));
 
-  return {daily, dailyDates, weekly, weekStarts, monthly, months, accum, portfolio, adhocLog, weeklyRaw, monthlyRaw, weights, flexSet, taskFull, leaveByStaffDate};
+  const maintenance = maintRows.map(r => ({date: toISODate(r['Date']), report: r['Report'], staff: r['Staff'], task: r['Task'] || '', remark: r['What was done (remarks)'] || '', dayRemark: r['Day remarks'] || ''})).filter(r => r.date && r.report);
+  return {workdays: wdList, maintenance, daily, dailyDates, weekly, weekStarts, monthly, months, accum, portfolio, adhocLog, weeklyRaw, monthlyRaw, weights, flexSet, taskFull, leaveByStaffDate};
 }
 
 let DATA = null;
@@ -908,7 +1034,7 @@ function renderDaily(key){
   const el = document.getElementById('view-daily');
   const rows = ROWS.daily[key] || [];
   if(!rows.length){ el.innerHTML = '<div class="empty">No submissions on file for this date.</div>'; return; }
-  el.innerHTML = rows.map(r => dailyCardHtml(r, DATA.taskFull)).join('');
+  el.innerHTML = rows.map(r => dailyCardHtml(r, key)).join('');
 }
 
 function renderPeriod(view, key){
@@ -984,13 +1110,13 @@ function renderYTD(){
           <div class="lbl">Avg Weekly</div>
           <div class="val">${pct(a.avgWeekly)}</div>
           <div class="sub">${a.weeksCounted} weeks &middot; <span class="badge ${ratingClass(ratingFromScore(a.avgWeekly))}">${ratingFromScore(a.avgWeekly).replace(/^\d - /,'')}</span></div>
-          <div class="remark">${a.weeklyRemark || ''}</div>
+          <div class="ys">${summarizePeriods(staff, 'weekly', ytdFromKey, ytdToKey)}</div>
         </div>
         <div class="splitcol">
           <div class="lbl">Avg Monthly</div>
           <div class="val">${pct(a.avgMonthly)}</div>
           <div class="sub">${a.monthsCounted} months &middot; <span class="badge ${ratingClass(ratingFromScore(a.avgMonthly))}">${ratingFromScore(a.avgMonthly).replace(/^\d - /,'')}</span></div>
-          <div class="remark">${a.monthlyRemark || ''}</div>
+          <div class="ys">${summarizePeriods(staff, 'monthly', ytdFromKey, ytdToKey)}</div>
         </div>
       </div>
       <button class="adhoc-link" onclick="openYtdDetail('${staff.replace(/'/g,"\\'")}')">View full report &amp; print &rsaquo;</button>
@@ -1067,11 +1193,16 @@ function switchTab(view){
     metaBar.style.display = 'none';
     if(exportBar) exportBar.style.display = 'flex';
     renderYTD();
+  } else if(view === 'maint'){
+    metaBar.style.display = 'none';
+    if(exportBar) exportBar.style.display = 'flex';
+    renderMaint();
   } else if(view === 'review'){
     metaBar.style.display = 'none';
     if(exportBar) exportBar.style.display = 'none';
     if(reviewStaffPicker.selectedIndex < 0) reviewStaffPicker.selectedIndex = 0;
     renderReviewCategories(reviewStaffPicker.value);
+    loadReviewCloud().then(() => { if(currentTab === 'review') renderReviewCategories(reviewStaffPicker.value); renderReviewBanner(); });
   } else if(view === 'howcalc'){
     metaBar.style.display = 'none';
     if(exportBar) exportBar.style.display = 'none';
@@ -1178,6 +1309,7 @@ function downloadBlob(content, filename, mime){
 function currentPickerLabel(){
   if(currentTab === 'ytd') return 'ytd-average';
   if(currentTab === 'howcalc') return 'methodology';
+  if(currentTab === 'maint') return maintReport.toLowerCase().replace(/\s+/g,'-');
   const picker = document.getElementById('picker');
   return picker.value || 'export';
 }
@@ -1193,6 +1325,9 @@ function buildCsvForCurrentView(){
     dataRows = ROWS[currentTab][key] || [];
     headers = ['Staff','Department','Score','Rating','Reason','Completed','In Progress','Deferred'];
     rows = dataRows.map(r => [r.staff, r.dept, pct(r.score), (r.rating||'').replace(/^\d - /,''), r.reason||'', r.completed||'', r.inprogress||'', r.deferred||'']);
+  } else if(currentTab === 'maint'){
+    headers = ['Date','Report','Staff','Task','What was done','Day remarks'];
+    rows = maintEntries().map(r => [r.date, r.report, r.staff, r.task, r.remark, r.dayRemark]);
   } else if(currentTab === 'ytd'){
     headers = ['Staff','Department','Weeks Counted','Avg Weekly Score','Weekly Rating','Months Counted','Avg Monthly Score','Monthly Rating','Status'];
     rows = Object.keys(DATA.accum).map(staff => {
@@ -1212,11 +1347,12 @@ document.getElementById('exportCsvBtn').addEventListener('click', () => {
 function periodLabelForExport(){
   if(currentTab === 'ytd') return 'Year-to-date average (' + new Date().getFullYear() + ')';
   if(currentTab === 'howcalc') return 'Methodology reference';
+  if(currentTab === 'maint') return (maintYear === 'all' ? 'All years' : maintYear) + ' \u2014 printed ' + new Date().toLocaleDateString('en-GB');
   const key = document.getElementById('picker').value;
   return FORMATTERS[currentTab](key);
 }
 function tabTitle(){
-  return {daily:'Daily Report', weekly:'Weekly Report', monthly:'Monthly Report', ytd:'YTD Average', howcalc:"How It's Calculated"}[currentTab];
+  return {daily:'Daily Report', weekly:'Weekly Report', monthly:'Monthly Report', ytd:'YTD Average', maint:'Maintenance History', howcalc:"How It's Calculated"}[currentTab];
 }
 const PX_PER_MM = 96 / 25.4;
 function clearPageLabels(container){
@@ -1224,30 +1360,28 @@ function clearPageLabels(container){
 }
 function insertPageLabels(container, pageHeightPx){
   clearPageLabels(container);
-  const children = Array.from(container.children);
-  if(!children.length) return;
-  let used = 0;
-  let page = 1;
-  const labelEls = [];
-  const firstLabel = document.createElement('div');
-  firstLabel.className = 'page-label first';
-  container.insertBefore(firstLabel, children[0]);
-  labelEls.push(firstLabel);
-  children.forEach(el => {
-    const h = el.offsetHeight + 12;
-    if(used + h > pageHeightPx && used > 0){
-      page++;
-      const label = document.createElement('div');
-      label.className = 'page-label';
-      container.insertBefore(label, el);
-      labelEls.push(label);
-      used = h;
-    } else {
-      used += h;
-    }
+  // Measure the real content blocks. A wrapper (e.g. the long task list) or anything taller than a page is measured
+  // through its children, so we never force a page break in front of one huge block (which left the header alone on page 1).
+  const blocks = [];
+  const collect = parent => Array.from(parent.children).forEach(el => {
+    if(el.classList.contains('page-label') || el.offsetHeight === 0) return;
+    if(el.children.length > 1 && (el.id === 'portfolioList' || el.offsetHeight > pageHeightPx)) collect(el);
+    else blocks.push(el);
   });
-  const total = page;
-  labelEls.forEach((el, i) => { el.textContent = `Page ${i+1} of ${total}`; });
+  collect(container);
+  if(!blocks.length) return;
+  let used = 0, page = 1;
+  const labelEls = [];
+  const mk = (before, first) => { const l = document.createElement('div'); l.className = 'page-label' + (first ? ' first' : ''); before.parentNode.insertBefore(l, before); labelEls.push(l); };
+  mk(container.firstElementChild || blocks[0], true);
+  blocks.forEach(el => {
+    const h = el.offsetHeight + 12;
+    // keep a group heading together with its first row
+    const need = (el.classList.contains('portfolio-group-label') && el.nextElementSibling) ? h + el.nextElementSibling.offsetHeight : h;
+    if(used > 0 && used + need > pageHeightPx){ page++; mk(el, false); used = h; }
+    else used += h;
+  });
+  labelEls.forEach((el, i) => { el.textContent = `Page ${i+1} of ${page}`; });
 }
 function exportPdf(){
   const orientation = document.getElementById('pdfOrientation').value;
@@ -1256,7 +1390,7 @@ function exportPdf(){
   document.getElementById('pageSizeStyle').textContent = `@page { size: A4 ${orientation}; margin: 12mm; }`;
 
   // Populate the print-only header with the current tab + period
-  document.getElementById('printTitle').textContent = 'Staff Performance Dashboard — ' + tabTitle();
+  document.getElementById('printTitle').textContent = currentTab === 'maint' ? MAINT_REPORTS[maintReport].title : 'Staff Performance Dashboard — ' + tabTitle();
   document.getElementById('printPeriod').textContent = periodLabelForExport();
 
   const pageHeightMM = orientation === 'landscape' ? 210 : 297;
@@ -1275,16 +1409,6 @@ window.addEventListener('afterprint', () => {
 
 // ---- YTD staff detail modal (breakdown + adhoc log, printable) ----
 const ytdDetailModal = document.getElementById('ytdDetailModal');
-function adhocLogHtml(staff){
-  const entries = DATA.adhocLog[staff] || [];
-  if(!entries.length) return '<div class="empty">No adhoc items on file.</div>';
-  return entries.slice().reverse().map(e => `
-    <div class="adhoc-row">
-      <div class="adhoc-date">${fmtDate(e.date)}</div>
-      ${e.items.map(it => `<div class="adhoc-item">${it}</div>`).join('')}
-    </div>
-  `).join('');
-}
 function breakdownTableHtml(b){
   if(!b) return '<div class="empty">No data on file.</div>';
   return `
@@ -1292,7 +1416,6 @@ function breakdownTableHtml(b){
       <tr><td>Portfolio (task completion)</td><td>${pct(b.avgPortfolio)}</td></tr>
       <tr><td>Submission compliance</td><td>${pct(b.avgSubmission)}</td></tr>
       <tr><td>Planning accuracy</td><td>${pct(b.avgPlanning)}</td></tr>
-      <tr><td>Monthly progress</td><td>${pct(b.avgMonthProgress)}</td></tr>
       <tr><td>Adhoc contribution</td><td>${pct(b.avgAdhocPct)}</td></tr>
       <tr><td>Total adhoc items logged</td><td>${b.totalAdhoc}</td></tr>
       <tr><td>Total late submissions</td><td>${b.totalLate}</td></tr>
@@ -1311,7 +1434,7 @@ function openYtdDetail(staff){
       <span class="val">${pct(a.avgWeekly)}</span>
       <span class="badge ${ratingClass(a.weeklyRating)}">${(a.weeklyRating||'').replace(/^\d - /,'')}</span>
     </div>
-    <div class="reason">${a.weeklyRemark || ''}</div>
+    <div class="ys">${summarizePeriods(staff, 'weekly', DATA.months[0], DATA.months[DATA.months.length-1])}</div>
     ${breakdownTableHtml(bd.weekly)}
 
     <div class="ytd-section-title">Monthly Average (May to date)</div>
@@ -1319,42 +1442,18 @@ function openYtdDetail(staff){
       <span class="val">${pct(a.avgMonthly)}</span>
       <span class="badge ${ratingClass(a.monthlyRating)}">${(a.monthlyRating||'').replace(/^\d - /,'')}</span>
     </div>
-    <div class="reason">${a.monthlyRemark || ''}</div>
+    <div class="ys">${summarizePeriods(staff, 'monthly', DATA.months[0], DATA.months[DATA.months.length-1])}</div>
     ${breakdownTableHtml(bd.monthly)}
 
     <div class="ytd-section-title">Week by week (tap a week to see how it was scored)</div>
     ${ytdWeeksHtml(staff)}
 
-    <div class="ytd-section-title">Adhoc Activity Log</div>
-    ${adhocLogHtml(staff)}
   `;
   ytdDetailModal.classList.add('open');
 }
 document.getElementById('ytdDetailClose').addEventListener('click', () => ytdDetailModal.classList.remove('open'));
 ytdDetailModal.addEventListener('click', (e) => { if(e.target === ytdDetailModal) ytdDetailModal.classList.remove('open'); });
 document.getElementById('ytdDetailPrintBtn').addEventListener('click', () => printModal('portrait'));
-
-// ---- Adhoc activity log modal ----
-const adhocModal = document.getElementById('adhocModal');
-function openAdhocLog(staff){
-  const entries = DATA.adhocLog[staff] || [];
-  document.getElementById('adhocModalTitle').textContent = 'Adhoc Activity — ' + staff;
-  const body = document.getElementById('adhocModalBody');
-  if(!entries.length){
-    body.innerHTML = '<div class="empty">No adhoc items on file.</div>';
-  } else {
-    body.innerHTML = entries.slice().reverse().map(e => `
-      <div class="adhoc-row">
-        <div class="adhoc-date">${fmtDate(e.date)}</div>
-        ${e.items.map(it => `<div class="adhoc-item">${it}</div>`).join('')}
-      </div>
-    `).join('');
-  }
-  adhocModal.classList.add('open');
-}
-document.getElementById('adhocClose').addEventListener('click', () => adhocModal.classList.remove('open'));
-adhocModal.addEventListener('click', (e) => { if(e.target === adhocModal) adhocModal.classList.remove('open'); });
-document.getElementById('adhocPrintBtn').addEventListener('click', () => printModal('portrait'));
 
 // ---- Print whichever modal is currently open ----
 function printModal(defaultOrientation){
@@ -1433,7 +1532,7 @@ function reviewFieldBlock(key, label, val){
 }
 
 function renderReviewCategories(staff){
-  const stored = loadReviewData(staff);
+  const stored = applyCloudToStored(staff, loadReviewData(staff));
   renderReviewHeader(staff);
   const container = document.getElementById('reviewCategories');
   container.innerHTML = REVIEW_STRUCTURE.map((cat) => {
@@ -1470,6 +1569,8 @@ function renderReviewCategories(staff){
   document.querySelectorAll('.rev-header-input').forEach(el => {
     el.addEventListener('input', () => computeReviewScore(staff));
   });
+  if(REVIEW_CLOUD){ container.querySelectorAll('select.mid-self, select.final-self, .mid-selfRemark, .final-selfRemark').forEach(el => { el.disabled = true; }); }
+  const rs = document.getElementById('reviewStatus'); if(rs) rs.innerHTML = reviewStatusHtml(staff);
   computeReviewScore(staff);
 }
 
@@ -1545,14 +1646,18 @@ function computeReviewScore(staff){
 document.getElementById('reviewStaffPicker').addEventListener('change', (e) => renderReviewCategories(e.target.value));
 document.getElementById('reviewSaveBtn').addEventListener('click', () => {
   const staff = reviewStaffPicker.value;
-  saveReviewData(staff, collectReviewData());
+  const data = collectReviewData();
+  saveReviewData(staff, data);
   const btn = document.getElementById('reviewSaveBtn');
   const orig = btn.textContent;
-  btn.textContent = 'Saved to this browser \u2713';
-  setTimeout(() => { btn.textContent = orig; }, 1500);
+  const done = msg => { btn.textContent = msg; setTimeout(() => { btn.textContent = orig; }, 2200); };
+  if(reviewCfg().api && reviewCfg().lk){
+    btn.textContent = 'Saving…';
+    reviewCloudCall('saveLead', {staff, data}).then(j => { if(j.ok){ done('Saved to the shared review \u2713'); loadReviewCloud(); } else done('Not saved: ' + (j.error || 'error')); }).catch(() => done('Saved on this device only (no connection)'));
+  } else done('Saved to this browser \u2713');
 });
 function computeReviewSummaryFor(staff){
-  const stored = loadReviewData(staff);
+  const stored = applyCloudToStored(staff, loadReviewData(staff));
   const header = stored.__header || {};
   let totalPerformanceScore = 0;
   const catLines = REVIEW_STRUCTURE.map(cat => {
@@ -1682,115 +1787,261 @@ window.addEventListener('afterprint', () => {
 });
 
 // ===================== v3.1 additions =====================
+// ===================== v3.2 =====================
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function n1(v){ return (Math.round((v||0)*10)/10).toString(); }
+function toKey(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function addDaysKey(k, n){ const d = new Date(k+'T00:00:00'); d.setDate(d.getDate()+n); return toKey(d); }
+function fmtDay(k){ return new Date(k+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short', day:'numeric', month:'short'}); }
+function fmtDayLong(k){ return new Date(k+'T00:00:00').toLocaleDateString('en-GB',{weekday:'long', day:'numeric', month:'long', year:'numeric'}); }
+const ACCOUNTED = {'Completed':1, 'In Progress':1, 'Deferred (Approved)':1};
+const NOISE = /^(no|none|nil|n\/a|na|-|--|\.|nothing)$/i;
+const CATS = [['w','Weekly'],['m','Monthly'],['q','Quarterly'],['a','Adhoc']];
+
+function dayRow(staff, date){ const rows = DATA.daily[date]; return rows ? rows.find(r => r.staff === staff) : null; }
+function nextWorkdayKey(k){ return DATA.workdays.find(x => x > k) || null; }
+/** full, un-abbreviated task name for a short name (plan lists only carry short names) */
+function fullOf(staff, short){
+  const list = DATA.portfolio[staff] || [];
+  const low = String(short).trim().toLowerCase();
+  const t = list.find(x => String(x.short).trim().toLowerCase() === low && !(x.end && x.end < TODAY_KEY)) || list.find(x => String(x.short).trim().toLowerCase() === low);
+  return t ? (t.full || t.short).replace(/^(weekly|monthly|quarterly|ad-?hoc|every 4 months)\s*[-–—]\s*/i, '') : short;
+}
+function stChip(s){
+  const cls = s === 'Completed' ? 'Completed' : s === 'In Progress' ? 'InProgress' : s === 'Deferred (Approved)' ? 'Deferred' : 'Other';
+  const label = s === 'Deferred (Approved)' ? 'Deferred' : s;
+  return `<span class="st ${cls}">${esc(label)}</span>`;
+}
 function stMark(s){ return s==='Completed' ? '' : s==='In Progress' ? ' <i>(in progress)</i>' : s==='Deferred (Approved)' ? ' <i>(deferred)</i>' : ' <i>('+esc(s)+')</i>'; }
-function catLine(label, items){
-  if(!items || !items.length) return '';
-  return `<div class="catline"><span class="catl">${label}</span>${items.map(it => esc(it.n) + stMark(it.s)).join(', ')}</div>`;
-}
-function planLine(label, arr){
-  if(!arr || !arr.length) return '';
-  return `<div class="catline"><span class="catl">${label}</span>${arr.map(esc).join(', ')}</div>`;
-}
+function dlLine(label, html){ return `<div class="dl-line"><span class="dl-k">${label}</span><span class="dl-v">${html}</span></div>`; }
+function itemsLine(label, items){ return (items && items.length) ? dlLine(label, items.map(it => esc(it.n) + stMark(it.s)).join(', ')) : ''; }
+function namesLine(label, arr){ return (arr && arr.length) ? dlLine(label, arr.map(esc).join(', ')) : ''; }
 function leaveText(li){ return li ? `${esc(li.type)}${li.duration ? ' &middot; ' + esc(li.duration) : ''}` : ''; }
+const meaningful = t => !!t && !NOISE.test(String(t).trim());
 
-/** One staff member's Daily card, in the layout asked for: status, Leave, Today (one line per category),
- *  Remarks, Planned tomorrow (one line per category / leave / rest). Click the name for the full, un-abbreviated list. */
-function dailyCardHtml(r, taskFull){
+/** One staff member's Daily card: identical layout for everyone — name + status, then TODAY and PLANNED TOMORROW side by side. */
+function dailyCardHtml(r, date){
   const d = r.detail;
-  const badgeText = r.status === 'On Leave' && r.leaveInfo ? 'On Leave' : r.status;
-  const badge = `<span class="badge ${statusBadgeClass(r.status)}">${esc(badgeText)}${r.time ? ' &middot; ' + esc(r.time) : ''}</span>`;
-  let body = '';
-  if(r.leaveInfo){
-    const half = /half/i.test(r.leaveInfo.duration || '');
-    body += `<div class="sec"><b>Leave</b><span class="taskline">On approved leave &mdash; ${leaveText(r.leaveInfo)}${half && r.status !== 'On Leave' ? '<br><i>Half-day leave: submitting before 5:30pm is expected and is not penalised.</i>' : ''}</span></div>`;
-  }
-  const hasToday = d && ((d.w&&d.w.length)||(d.m&&d.m.length)||(d.q&&d.q.length)||(d.a&&d.a.length)||d.o||d.rm);
-  if(d){
-    if(hasToday){
-      body += `<div class="sec"><b>Today</b>${catLine('Weekly', d.w)}${catLine('Monthly', d.m)}${catLine('Quarterly', d.q)}${catLine('Adhoc', d.a)}${d.o ? `<div class="catline"><span class="catl">Other adhoc</span>${esc(d.o)}</div>` : ''}</div>`;
-      if(d.rm) body += `<div class="sec"><b>Remarks on tasks today</b><span class="taskline">${esc(d.rm)}</span></div>`;
-    } else if(r.leaveInfo && r.status === 'On Leave'){
-      body += `<div class="sec"><b>Today</b><span class="taskline">${esc(r.leaveInfo.type)}</span></div>`;
-    } else if(!r.status || r.status === 'NOT SUBMITTED' || r.status === 'Rest & Recovery'){
-      body += '';
-    } else {
-      body += `<div class="sec"><b>Today</b><span class="taskline dash">&mdash;</span></div>`;
-    }
-  } else if(r.status !== 'NOT SUBMITTED' && r.status !== 'Rest & Recovery' && r.today && r.today !== '—'){
-    body += `<div class="sec"><b>Today</b><span class="taskline">${esc(r.today)}</span></div>`;
-  }
-  // planned tomorrow
-  let plan = '';
-  const p = d && d.p;
-  if(r.nextLeave) plan = `<div class="catline"><span class="catl"></span>On planned leave &mdash; ${leaveText(r.nextLeave)}</div>`;
-  else if(p && p.ps === 'Rest & Recovery') plan = `<div class="catline"><span class="catl"></span>Planned Rest &amp; Recovery day</div>`;
-  else if(p && p.ps === 'Leave') plan = `<div class="catline"><span class="catl"></span>On planned leave</div>`;
-  else if(p) plan = planLine('Weekly', p.w) + planLine('Monthly', p.m) + planLine('Quarterly', p.q) + planLine('Adhoc', p.a) + (p.o ? `<div class="catline"><span class="catl">Other adhoc</span>${esc(p.o)}</div>` : '');
-  else if(!d && r.plan && r.plan !== '—') plan = `<div class="catline">${esc(r.plan)}</div>`;
-  const submitted = r.status !== 'NOT SUBMITTED' && r.status !== 'Rest & Recovery';
-  if(submitted || plan) body += `<div class="sec"><b>Planned tomorrow</b>${plan || '<span class="taskline dash">&mdash;</span>'}</div>`;
-  if(r.status === 'Rest & Recovery') body = `<div class="sec"><b>Status</b><span class="taskline">${r.restPlanned ? 'Planned Rest &amp; Recovery day (flexible schedule) &mdash; no report required.' : 'Flexible schedule &mdash; no report today. Scored on tasks completed by Friday, not on daily reports.'}</span></div>` + body;
+  const badge = `<span class="badge ${statusBadgeClass(r.status)}">${esc(r.status)}${r.time ? ' &middot; ' + esc(r.time) : ''}</span>`;
+  const half = r.leaveInfo && /half/i.test(r.leaveInfo.duration || '');
+  const pill = r.leaveInfo ? `<div class="dl-pill">${leaveText(r.leaveInfo)}</div>` : '';
 
-  // full, un-abbreviated view (opens when the name is clicked)
-  let full = '';
-  if(d){
-    const fl = (label, items) => (items && items.length) ? `<div class="fullcat"><b>${label}</b>${items.map(it => `<div class="fullitem">${esc((taskFull && taskFull[it.id]) || it.n)} &mdash; <i>${esc(it.s)}</i>${it.r ? `<div class="fullremark">&ldquo;${esc(it.r)}&rdquo;</div>` : ''}</div>`).join('')}</div>` : '';
-    full = fl('Weekly', d.w) + fl('Monthly', d.m) + fl('Quarterly', d.q) + fl('Adhoc', d.a)
-      + (d.o ? `<div class="fullcat"><b>Other adhoc</b><div class="fullitem">${esc(d.o)}</div></div>` : '')
-      + (d.rm ? `<div class="fullcat"><b>Remarks</b><div class="fullitem">${esc(d.rm)}</div></div>` : '')
-      + (p && (p.pr) ? `<div class="fullcat"><b>Tomorrow &mdash; answer given</b><div class="fullitem">${esc(p.pr)}</div></div>` : '');
+  // ---- TODAY ----
+  let today = '';
+  const hasTasks = d && ((d.w&&d.w.length)||(d.m&&d.m.length)||(d.q&&d.q.length)||(d.a&&d.a.length)||meaningful(d.o));
+  if(d && hasTasks){
+    today = itemsLine('Weekly', d.w) + itemsLine('Monthly', d.m) + itemsLine('Quarterly', d.q) + itemsLine('Adhoc', d.a) + (meaningful(d.o) ? dlLine('Other', esc(d.o)) : '');
+  } else if(!d && r.status !== 'NOT SUBMITTED' && r.status !== 'Rest & Recovery' && r.status !== 'On Leave' && r.today && r.today !== '—'){
+    today = dlLine('Done', esc(r.today));
   }
-  return `<div class="card">
-    <div class="row1"><div><div class="staff ${full ? 'clickname' : ''}" ${full ? 'data-toggle="1"' : ''}>${esc(r.staff)}${full ? ' <span class="chev">&#9662;</span>' : ''}</div><div class="dept">${esc(r.dept)}</div></div>${badge}</div>
-    ${body}
-    ${full ? `<div class="fullbox" style="display:none">${full}</div>` : ''}
+  if(!today){
+    today = r.status === 'NOT SUBMITTED' ? '<div class="dl-none">No report submitted.</div>'
+      : r.status === 'On Leave' ? '<div class="dl-none">On leave &mdash; no tasks expected.</div>'
+      : r.status === 'Rest & Recovery' ? `<div class="dl-none">${r.restPlanned ? 'Planned rest &amp; recovery day.' : 'Flexible schedule &mdash; no daily report required.'}</div>`
+      : '<div class="dl-none">No tasks reported.</div>';
+  }
+  const rm = d && meaningful(d.rm) ? `<div class="dl-remarks"><b>Remarks</b>${esc(d.rm)}</div>` : '';
+
+  // ---- PLANNED TOMORROW ----
+  const p = d && d.p;
+  let plan = '';
+  if(r.nextLeave) plan = `<div class="dl-note">On planned leave &mdash; ${leaveText(r.nextLeave)}</div>`;
+  else if(p && p.ps === 'Rest & Recovery') plan = '<div class="dl-note">Planned rest &amp; recovery day.</div>';
+  else if(p && p.ps === 'Leave') plan = '<div class="dl-note">On planned leave.</div>';
+  else if(p) plan = namesLine('Weekly', p.w) + namesLine('Monthly', p.m) + namesLine('Quarterly', p.q) + namesLine('Adhoc', p.a) + (meaningful(p.o) ? dlLine('Other', esc(p.o)) : '');
+  else if(!d && r.plan && r.plan !== '—') plan = dlLine('Plan', esc(r.plan));
+  if(!plan) plan = '<div class="dl-none">' + (r.status === 'NOT SUBMITTED' ? 'No plan submitted.' : 'Nothing planned.') + '</div>';
+
+  return `<div class="card dl">
+    <div class="dl-head">
+      <div><button class="dl-name" data-report="${esc(date)}|${esc(r.staff)}" title="Open the full report">${esc(r.staff)} <span class="chev">&rsaquo;</span></button><div class="dept">${esc(r.dept)}</div></div>
+      ${badge}
+    </div>
+    ${pill}
+    <div class="dl-cols">
+      <section class="dl-col dl-today"><h4>Today</h4>${today}</section>
+      <section class="dl-col dl-next"><h4>Planned tomorrow</h4>${plan}</section>
+    </div>
+    ${rm}
   </div>`;
 }
 
-// ---------- score breakdown (mirrors the sheet's formulas exactly) ----------
+/** The full, un-abbreviated report for one person on one day (opens when their name is tapped). */
+function fullReportHtml(r, date){
+  const d = r.detail;
+  const nd = nextWorkdayKey(date);
+  let h = `<div class="fr-meta"><b>${esc(r.staff)}</b> &middot; ${esc(r.dept)}<br>${esc(fmtDayLong(date))}<br>Status: <span class="badge ${statusBadgeClass(r.status)}">${esc(r.status)}${r.time ? ' &middot; ' + esc(r.time) : ''}</span>`;
+  if(r.leaveInfo) h += `<br>Leave: ${leaveText(r.leaveInfo)}`;
+  h += `</div>`;
+  if(!d){
+    return h + `<div class="fr-sec today"><h3>Today</h3><div class="dl-none">${r.status === 'NOT SUBMITTED' ? 'No report was submitted.' : (r.today && r.today !== '—' ? esc(r.today) : 'No detail on file.')}</div></div>
+      <div class="fr-sec next"><h3>Planned for ${nd ? esc(fmtDay(nd)) : 'the next working day'}</h3><div class="dl-none">${r.plan && r.plan !== '—' ? esc(r.plan) : 'No detail on file.'}</div></div>`;
+  }
+  const doneCat = (label, items) => (items && items.length) ? `<div class="fr-cat"><b>${label}</b>${items.map(it => `<div class="fr-item">${esc((DATA.taskFull && DATA.taskFull[it.id] || it.n).replace(/^(weekly|monthly|quarterly|ad-?hoc|every 4 months)\s*[-–—]\s*/i,''))} ${stChip(it.s)}${meaningful(it.r) ? `<div class="fr-remark">&ldquo;${esc(it.r)}&rdquo;</div>` : ''}</div>`).join('')}</div>` : '';
+  let today = doneCat('Weekly tasks', d.w) + doneCat('Monthly tasks', d.m) + doneCat('Quarterly / every-4-months tasks', d.q) + doneCat('Adhoc tasks', d.a);
+  if(meaningful(d.o)) today += `<div class="fr-cat"><b>Other adhoc work</b><div class="fr-item">${esc(d.o)}</div></div>`;
+  if(meaningful(d.rm)) today += `<div class="fr-cat"><b>Remarks on tasks today</b><div class="fr-item">${esc(d.rm)}</div></div>`;
+  if(!today) today = '<div class="dl-none">No tasks reported.</div>';
+  h += `<div class="fr-sec today"><h3>Today</h3>${today}</div>`;
+
+  const p = d.p || {};
+  const planCat = (label, arr) => (arr && arr.length) ? `<div class="fr-cat"><b>${label}</b>${arr.map(n => `<div class="fr-item">${esc(fullOf(r.staff, n))}</div>`).join('')}</div>` : '';
+  let plan = '';
+  if(r.nextLeave) plan = `<div class="fr-item">On planned leave &mdash; ${leaveText(r.nextLeave)}</div>`;
+  else if(p.ps === 'Rest & Recovery') plan = '<div class="fr-item">Planned rest &amp; recovery day.</div>';
+  else if(p.ps === 'Leave') plan = '<div class="fr-item">On planned leave.</div>';
+  else {
+    plan = planCat('Weekly tasks', p.w) + planCat('Monthly tasks', p.m) + planCat('Quarterly / every-4-months tasks', p.q) + planCat('Adhoc tasks', p.a);
+    if(meaningful(p.o)) plan += `<div class="fr-cat"><b>Other planned work</b><div class="fr-item">${esc(p.o)}</div></div>`;
+  }
+  if(!plan) plan = '<div class="dl-none">Nothing planned.</div>';
+  h += `<div class="fr-sec next"><h3>Planned for ${nd ? esc(fmtDayLong(nd)) : 'the next working day'}</h3>${plan}</div>`;
+  return h;
+}
+function openReport(date, staff){
+  const r = dayRow(staff, date); if(!r) return;
+  document.getElementById('frTitle').textContent = staff + ' — ' + fmtDay(date);
+  document.getElementById('frBody').innerHTML = fullReportHtml(r, date);
+  document.getElementById('frModal').classList.add('open');
+}
+
+// ---------- evidence from the daily reports (so the breakdown can NAME what cost points) ----------
+function monthEndKey(k){ const d = new Date(k+'T00:00:00'); return toKey(new Date(d.getFullYear(), d.getMonth()+1, 0)); }
+function planMisses(staff, fromKey, toKey){
+  const out = [];
+  const tasks = DATA.portfolio[staff] || [];
+  const byShort = {};
+  tasks.forEach(t => { const k = String(t.short).trim().toLowerCase(); (byShort[k] = byShort[k] || []).push(t); });
+  DATA.workdays.filter(d => d >= fromKey && d <= toKey).forEach(d => {
+    const rec = dayRow(staff, d); if(!rec || !rec.detail || !rec.detail.p) return;
+    const p = rec.detail.p;
+    if(p.ps === 'Leave' || p.ps === 'Rest & Recovery') return;
+    const nd = nextWorkdayKey(d); if(!nd || nd > TODAY_KEY) return;
+    if(DATA.leaveByStaffDate[staff + '|' + nd]) return;
+    const seen = new Set(), planned = [];
+    [].concat(p.w||[], p.m||[], p.q||[], p.a||[]).forEach(n => {
+      const k = String(n).trim().toLowerCase(); const tl = byShort[k];
+      if(!tl || seen.has(k)) return; seen.add(k);
+      if(!tl.some(x => !(x.scoreFrom && d < x.scoreFrom))) return;     // trial-period tasks don't count in planning
+      planned.push(n);
+    });
+    if(!planned.length) return;
+    const nrec = dayRow(staff, nd);
+    const acc = new Set();
+    if(nrec && nrec.detail) CATS.forEach(([k]) => (nrec.detail[k]||[]).forEach(it => { if(ACCOUNTED[it.s]) acc.add(String(it.n).trim().toLowerCase()); }));
+    planned.forEach(n => { if(!acc.has(String(n).trim().toLowerCase())) out.push({task:n, planned:d, next:nd, noReport: !nrec || !nrec.detail}); });
+  });
+  return out;
+}
+function submissionIssues(staff, fromKey, toKey){
+  const missed = [], late = [];
+  DATA.workdays.filter(d => d >= fromKey && d <= toKey && d < TODAY_KEY).forEach(d => {
+    const rec = dayRow(staff, d); if(!rec) return;
+    if(rec.status === 'NOT SUBMITTED' && !rec.leaveInfo) missed.push(d);
+    if(rec.status === 'Late') late.push({d, time: rec.time});
+  });
+  return {missed, late};
+}
+function splitTagged(str){
+  const o = {w:[], m:[], q:[]};
+  if(!str || str === '—') return o;
+  String(str).split(', ').forEach(x => { x = x.trim(); if(!x) return; if(/ \[M\]$/.test(x)) o.m.push(x.replace(/ \[M\]$/,'')); else if(/ \[Q\]$/.test(x)) o.q.push(x.replace(/ \[Q\]$/,'')); else o.w.push(x); });
+  return o;
+}
+const listJoin = (a, max) => { max = max || 6; return a.slice(0, max).map(esc).join(', ') + (a.length > max ? ` and ${a.length - max} more` : ''); };
+
+// ---------- score breakdown (mirrors the sheet's formulas) ----------
+function portFallback(kind, c){
+  if(kind === 'weekly'){
+    const fm = c.fracM == null ? 1 : c.fracM, fq = c.fracQ == null ? 1 : c.fracQ;
+    const due = c.expW + c.expM*fm + c.expQ*fq;
+    return due <= 0 ? 1 : Math.min(1, (c.doneW + Math.min(c.doneM, c.expM*fm) + Math.min(c.doneQ, c.expQ*fq)) / due);
+  }
+  const fm = c.fracM == null ? 1 : c.fracM, fq = c.fracQ == null ? 1 : c.fracQ, U = c.avgWk || 0;
+  const den = U + c.expM*fm + c.expQ*fq;
+  return den <= 0 ? (c.port || 0) : Math.min(1, ((c.port||0)*U + Math.min(c.mprog, fm)*c.expM + Math.min(c.qprog, fq)*c.expQ) / den);
+}
 function breakdownCalc(kind, c, profile, flex, W){
   const w = W[profile === 'Pastoral' ? 'Pastoral' : 'Administration'];
   const comps = [];
-  const add = (key, name, value, weight, applies, detail, why) => comps.push({key, name, value, weight, applies, detail, why});
+  const add = (key, name, value, weight, applies, what, why) => comps.push({key, name, value, weight, applies, what, why});
+  const port = (c.portAll !== null && c.portAll !== undefined) ? c.portAll : portFallback(kind, c);
+  let portWhat;
   if(kind === 'weekly'){
-    add('port', 'Portfolio (weekly tasks)', c.port, w.port, c.port !== null, `${n1(c.doneW)} of ${n1(c.expW)} task points completed or in progress`, '');
-    add('plan', 'Planning', c.plan, w.plan, !flex && c.plan !== null, c.planDays ? `${n1(c.matchDays)} of ${c.planDays} planned days accounted for the next working day` : '', flex ? 'Not applied: flexible-schedule staff are scored on task completion' : (c.plan === null ? 'Not applied: no plan was logged this week' : ''));
-    add('sub', 'Submission', c.sub, w.sub, !flex, `${c.submitted} of ${c.expDays} expected days submitted`, flex ? 'Not applied: flexible-schedule staff are not required to submit daily' : '');
-    add('mon', 'Monthly progress', c.mprog, w.mon, c.expM > 0, `${n1(c.doneM)} of ${n1(c.expM)} monthly task points touched so far this month`, c.expM > 0 ? '' : 'Not applied: no monthly tasks');
-    add('adhoc', 'Adhoc', c.adhocPct, w.adhoc, c.adhoc > 0, `${c.adhoc} adhoc item(s) (5 or more = 100%)`, c.adhoc > 0 ? '' : 'Not applied: no adhoc work logged, so its weight goes to the other components');
-    add('qtr', 'Quarterly progress', c.qprog, w.qtr, c.expQ > 0, `${n1(c.doneQ)} of ${n1(c.expQ)} quarterly task points touched so far this quarter`, c.expQ > 0 ? '' : 'Not applied: no quarterly tasks this quarter');
-  } else {
-    const monOn = c.expM > 0;
-    add('port', monOn ? 'Portfolio + monthly tasks (blended)' : 'Portfolio (weekly tasks)', monOn ? (c.port + c.mprog) / 2 : c.port, w.port + (monOn ? w.mon : 0), true,
-        monOn ? `weekly tasks ${pct(c.port)} and monthly tasks ${pct(c.mprog)}, averaged` : `average of the month's weekly portfolio scores`, '');
-    add('plan', 'Planning', c.plan, w.plan, !flex && c.plan !== null, '', flex ? 'Not applied: flexible-schedule staff are scored on task completion' : (c.plan === null ? 'Not applied: no plans logged this month' : ''));
-    add('sub', 'Submission', c.sub, w.sub, !flex, '', flex ? 'Not applied: flexible-schedule staff are not required to submit daily' : '');
-    add('adhoc', 'Adhoc', c.adhocPct, w.adhoc, c.adhoc > 0, `${c.adhoc} adhoc item(s) this month (20 or more = 100%)`, c.adhoc > 0 ? '' : 'Not applied: no adhoc work logged');
-    add('qtr', 'Quarterly progress', c.qprog, w.qtr, c.expQ > 0, '', c.expQ > 0 ? '' : 'Not applied: no quarterly tasks this quarter');
-  }
+    const fm = c.fracM == null ? 1 : c.fracM, fq = c.fracQ == null ? 1 : c.fracQ;
+    const due = c.expW + c.expM*fm + c.expQ*fq;
+    const done = c.doneW + Math.min(c.doneM, c.expM*fm) + Math.min(c.doneQ, c.expQ*fq);
+    portWhat = `${n1(done)} of ${n1(due)} task points done (completed or in progress)`;
+  } else portWhat = `all weekly, monthly and quarterly task points that were due, blended`;
+  const mix = `Weekly tasks ${pct(c.port)}${c.expM > 0 ? ' &middot; Monthly tasks ' + pct(Math.min(c.mprog, c.fracM == null ? 1 : c.fracM) / ((c.fracM == null || c.fracM === 0) ? 1 : c.fracM)) : ''}${c.expQ > 0 ? ' &middot; Quarterly tasks ' + pct(c.qprog) : ''}`;
+  add('port', 'Portfolio (your task list)', port, w.port, port !== null, portWhat + '<br>' + mix, '');
+  add('plan', 'Planning', c.plan, w.plan, !flex && c.plan !== null,
+      kind === 'weekly' ? (c.planDays ? `${c.planDays} day(s) had a plan for the next working day; ${pct(c.plan)} of the planned tasks were reported (or deferred with a reason) the next working day` : '') : `Average over the month: ${pct(c.plan)} of planned tasks followed through`,
+      flex ? 'Does not apply: flexible-schedule staff are scored on task completion' : (c.plan === null ? 'Does not apply: no plan was logged' : ''));
+  add('sub', 'Submission', c.sub, w.sub, !flex, kind === 'weekly' ? `Reports submitted on ${c.submitted} of ${c.expDays} expected days` : `Average over the month: ${pct(c.sub)} of expected days submitted`,
+      flex ? 'Does not apply: flexible-schedule staff are not required to report daily' : '');
+  const target = kind === 'weekly' ? 5 : 20;
+  add('adhoc', 'Adhoc work', c.adhocPct, w.adhoc, c.adhoc > 0, `${c.adhoc} adhoc item(s) logged &mdash; ${target} or more in the ${kind === 'weekly' ? 'week' : 'month'} earns full marks`, c.adhoc > 0 ? '' : 'Does not apply: no adhoc work logged');
   const den = comps.filter(x => x.applies).reduce((a, x) => a + x.weight, 0);
   comps.forEach(x => { x.share = x.applies && den ? x.weight / den : 0; x.earned = x.applies ? (x.value || 0) * x.share : 0; x.lost = x.applies ? (1 - (x.value || 0)) * x.share : 0; });
   const late = flex ? 0 : (c.latePen || 0);
   const raw = comps.reduce((a, x) => a + x.earned, 0) - late;
-  return { comps, late, final: Math.max(0, Math.min(1, raw)) };
+  return { comps, late, final: Math.max(0, Math.min(1, raw)), target };
 }
 
-function adviceFor(kind, b, c, row){
-  const out = [];
-  const worst = b.comps.filter(x => x.applies && x.lost > 0.005).sort((x, y) => y.lost - x.lost).slice(0, 3);
-  worst.forEach(x => {
+function whyLost(kind, key, staff, row, b, c){
+  const items = [];
+  const from = key, to = kind === 'weekly' ? addDaysKey(key, 6) : monthEndKey(key);
+  const flex = DATA.flexSet.has(staff);
+  b.comps.filter(x => x.applies && x.lost * 100 > 0.05).sort((x, y) => y.lost - x.lost).forEach(x => {
     const pts = (x.lost * 100).toFixed(1);
-    if(x.key === 'port') out.push(`Portfolio cost ${pts} pts. ${row.deferred && row.deferred !== '—' ? 'Not touched: ' + esc(row.deferred) + '. ' : ''}${row.deferredApproved && row.deferredApproved !== '—' ? 'Deferred (Approved) does not count as done &mdash; ' + esc(row.deferredApproved) + ' must be completed or progressed within the period. ' : ''}`);
-    else if(x.key === 'plan') out.push(`Planning cost ${pts} pts. A planned task counts when it is worked on, or marked Deferred (Approved) with a reason in the remarks. Planned tasks that are simply ignored cost points.`);
-    else if(x.key === 'sub') out.push(`Submission cost ${pts} pts (${c.submitted} of ${c.expDays} expected days).`);
-    else if(x.key === 'mon') out.push(`Monthly progress cost ${pts} pts &mdash; ${n1(c.expM - c.doneM)} task point(s) of monthly work not yet touched this month.`);
-    else if(x.key === 'adhoc') out.push(`Adhoc cost ${pts} pts &mdash; logging 5 adhoc items in a week (20 in a month) gives full marks.`);
-    else if(x.key === 'qtr') out.push(`Quarterly progress cost ${pts} pts &mdash; ${n1(c.expQ - c.doneQ)} quarterly task point(s) still untouched this quarter.`);
+    let text = '', fix = '';
+    if(x.key === 'port'){
+      const t = splitTagged(row.deferred), da = splitTagged(row.deferredApproved);
+      const parts = [];
+      if(kind === 'weekly'){
+        if(t.w.length) parts.push(`<b>Weekly tasks not done this week:</b> ${listJoin(t.w)}.`);
+        if(t.m.length) parts.push(`<b>Monthly tasks still untouched this month:</b> ${listJoin(t.m)}.`);
+        if(t.q.length) parts.push(`<b>Quarterly tasks still untouched this quarter:</b> ${listJoin(t.q)}.`);
+      } else {
+        const open = t.w.concat(t.m);
+        if(open.length) parts.push(`<b>Monthly tasks not done this month:</b> ${listJoin(open)}.`);
+        const wk = (DATA.weeklyRaw[staff] || []).filter(r => r.wk >= from && r.wk <= to && r.score !== null && r.port !== null && r.port < 0.995);
+        if(wk.length) parts.push(`<b>Weeks where weekly tasks were missed:</b> ${wk.map(r => fmtDay(addDaysKey(r.wk,1)) + ' (' + pct(r.port) + ')').join(', ')}.`);
+        const open2 = t.q; if(open2.length) parts.push(`<b>Quarterly tasks still untouched:</b> ${listJoin(open2)}.`);
+      }
+      const dall = da.w.concat(da.m, da.q);
+      if(dall.length) parts.push(`<b>Marked Deferred (Approved) but still open:</b> ${listJoin(dall)} &mdash; protects your Planning score but still counts as not done.`);
+      if(!parts.length) parts.push(`${pct(x.value)} of the task points due were done.`);
+      text = parts.join('<br>');
+      fix = 'Mark each task Completed or In Progress in your daily report on a day you work on it.';
+    } else if(x.key === 'plan'){
+      const miss = planMisses(staff, from, to);
+      if(miss.length){
+        const by = {}; miss.forEach(m => { (by[m.task] = by[m.task] || []).push(m); });
+        const lines = Object.keys(by).slice(0, 6).map(k => `<b>${esc(k)}</b> &mdash; planned ${by[k].map(m => fmtDay(m.planned)).join(' · ')}; ${by[k].every(m => m.noReport) ? 'no report the next working day' : 'not reported the next working day'}`);
+        text = `Planned for the next working day but not reported (as Completed, In Progress or Deferred with a reason):<br>${lines.join('<br>')}${Object.keys(by).length > 6 ? `<br>&hellip; and ${Object.keys(by).length - 6} more` : ''}`;
+      } else text = `${pct(x.value)} of the tasks planned for the next working day were followed through.`;
+      fix = 'The next working day, report each planned task as Completed / In Progress &mdash; or Deferred (Approved) with the reason in remarks. Leave it out of the plan if you will not do it.';
+    } else if(x.key === 'sub'){
+      const si = submissionIssues(staff, from, to);
+      const parts = [];
+      if(si.missed.length) parts.push(`<b>No report on:</b> ${si.missed.map(fmtDay).join(', ')}.`);
+      if(si.late.length) parts.push(`<b>Reports sent late on:</b> ${si.late.map(l => fmtDay(l.d)).join(', ')}.`);
+      text = parts.join('<br>') || `Reports submitted on ${pct(x.value)} of expected days.`;
+      fix = 'Submit your daily report every working day by 7:30pm (leave days are excluded).';
+    } else if(x.key === 'adhoc'){
+      const per = (x.share * 100 / b.target).toFixed(1);
+      text = `${c.adhoc} adhoc item(s) logged; ${b.target} earns full marks. Each item adds ${per} pts.${row.adhocItems && row.adhocItems !== '—' ? '<br><b>Logged:</b> ' + esc(row.adhocItems) : ''}`;
+      fix = 'Record work outside your listed tasks as adhoc each day (adhoc tasks or &ldquo;Other adhoc&rdquo;).';
+    }
+    items.push({name: x.name, pts, text, fix});
   });
-  if(b.late > 0) out.push(`Late submissions cost ${(b.late * 100).toFixed(1)} pts (0.5% each) &mdash; submit by 7:30pm.`);
-  return out;
+  if(b.late > 0){
+    const si = submissionIssues(staff, from, to);
+    items.push({name: 'Late-report penalty', pts: (b.late * 100).toFixed(1), text: `0.5 pt per report sent after 7:30pm${si.late.length ? ': ' + si.late.map(l => fmtDay(l.d)).join(', ') : ''}.`, fix: 'Submit by 7:30pm.'});
+  }
+  return items;
 }
 
 function findRow(kind, key, staff){ return (ROWS[kind][key] || []).find(r => r.staff === staff); }
@@ -1799,100 +2050,271 @@ function prevRowFor(kind, key, staff){
   for(const k of keys){ const r = findRow(kind, k, staff); if(r && r.score !== null && r.calc) return {key: k, row: r}; }
   return null;
 }
+const barCls = v => v >= 0.8 ? '' : v >= 0.7 ? 'mid' : 'low';
 function breakdownHtml(kind, key, staff){
   const row = findRow(kind, key, staff);
   if(!row || !row.calc) return '<div class="empty">A detailed breakdown is not available for this period.</div>';
   const flex = DATA.flexSet.has(staff);
-  const b = breakdownCalc(kind, row.calc, row.calc.profile, flex, DATA.weights);
-  const label = kind === 'weekly' ? fmtWeek(key) : fmtMonth(key);
+  const W = DATA.weights;
+  const b = breakdownCalc(kind, row.calc, row.calc.profile, flex, W);
+  const label = kind === 'weekly' ? 'Week of ' + fmtWeek(key) : fmtMonth(key);
   const prev = prevRowFor(kind, key, staff);
-  let delta = '';
-  let moved = '';
+  let delta = '', moved = '';
   if(prev){
-    const pb = breakdownCalc(kind, prev.row.calc, prev.row.calc.profile, flex, DATA.weights);
+    const pb = breakdownCalc(kind, prev.row.calc, prev.row.calc.profile, flex, W);
     const d = (row.score !== null ? row.score : b.final) - (prev.row.score !== null ? prev.row.score : pb.final);
-    delta = `<div class="reason">${d >= 0 ? '&#9650;' : '&#9660;'} ${(Math.abs(d) * 100).toFixed(1)} pts vs ${kind === 'weekly' ? 'the previous scored week' : 'last month'} (${pct(prev.row.score)})</div>`;
+    delta = ` &middot; ${d >= 0 ? '&#9650;' : '&#9660;'} ${(Math.abs(d) * 100).toFixed(1)} pts vs ${kind === 'weekly' ? 'last scored week' : 'last month'} (${pct(prev.row.score)})`;
     const diffs = b.comps.map(x => { const o = pb.comps.find(y => y.key === x.key); return {name: x.name, d: (x.earned - (o ? o.earned : 0)) * 100}; }).filter(x => Math.abs(x.d) >= 0.5).sort((x, y) => Math.abs(y.d) - Math.abs(x.d)).slice(0, 3);
-    if(diffs.length) moved = `<div class="sec"><b>What changed since ${kind === 'weekly' ? 'last week' : 'last month'}</b><span class="taskline">${diffs.map(x => `${esc(x.name)} ${x.d > 0 ? '+' : ''}${x.d.toFixed(1)} pts`).join(' &middot; ')}</span></div>`;
+    if(diffs.length) moved = `<div class="bx-h">What changed since ${kind === 'weekly' ? 'last week' : 'last month'}</div><div class="bx-what">${diffs.map(x => `${esc(x.name)} <b>${x.d > 0 ? '+' : ''}${x.d.toFixed(1)} pts</b>`).join(' &middot; ')}</div>`;
   }
-  const rows = b.comps.map(x => x.applies
-    ? `<tr><td>${esc(x.name)}${x.detail ? `<div class="bdsub">${esc(x.detail)}</div>` : ''}</td><td>${pct(x.value)}</td><td>${(x.share * 100).toFixed(0)}%</td><td class="up">+${(x.earned * 100).toFixed(1)}</td><td class="dn">${x.lost > 0.0005 ? '&minus;' + (x.lost * 100).toFixed(1) : '0'}</td></tr>`
-    : `<tr class="na"><td colspan="5">${esc(x.name)} &mdash; <i>${esc(x.why || 'not applicable')}</i></td></tr>`).join('');
-  const adv = adviceFor(kind, b, row.calc, row);
+  const sheetNote = (row.score !== null && Math.abs(row.score - b.final) > 0.006)
+    ? `<div class="bx-late">Note: the sheet has not been refreshed with the new four-part scoring yet, so this page may differ from the number shown. Run <b>manualRefresh</b> in the Apps Script.</div>` : '';
+  const parts = b.comps.map(x => x.applies
+    ? `<div class="bx-part"><div class="bx-row"><span class="bx-name">${esc(x.name)}</span><span class="bx-pts">${(x.earned * 100).toFixed(1)} <small>of ${(x.share * 100).toFixed(1)} pts</small></span></div>
+        <div class="bx-bar ${barCls(x.value || 0)}"><i style="width:${Math.max(2, Math.round((x.value || 0) * 100))}%"></i></div>
+        <div class="bx-what"><b>${pct(x.value)}</b> &mdash; ${x.what}</div></div>`
+    : `<div class="bx-na">${esc(x.name)} &mdash; ${esc(x.why || 'does not apply')}</div>`).join('');
+  const lost = whyLost(kind, key, staff, row, b, row.calc);
+  const lostHtml = lost.length ? lost.map(l => `<div class="bx-lost"><div class="t">${esc(l.name)} <span>&minus;${l.pts} pts</span></div>${l.text}${l.fix ? `<div class="fix">&#10148; ${l.fix}</div>` : ''}</div>`).join('')
+    : '<div class="bx-ok">Nothing was lost &mdash; every part that applies is at 100%.</div>';
   const lists = (lab, v) => v && v !== '—' ? `<div class="sec"><b>${lab}</b><span class="taskline">${esc(v)}</span></div>` : '';
-  return `<div class="ytd-score-row"><span class="val">${pct(row.score)}</span><span class="badge ${ratingClass(row.rating)}">${esc((row.rating || '').replace(/^\d - /, ''))}</span></div>
-    <div class="reason">${esc(staff)} &middot; ${esc(label)}</div>${delta}
-    <table class="breakdown-table bd"><tr><th>Component</th><th>Result</th><th>Weight</th><th>Earned</th><th>Lost</th></tr>${rows}
-      ${b.late > 0 ? `<tr><td colspan="3">Late-submission penalty</td><td></td><td class="dn">&minus;${(b.late * 100).toFixed(1)}</td></tr>` : ''}
-      <tr class="tot"><td colspan="3">Final score</td><td colspan="2">${(b.final * 100).toFixed(1)}%</td></tr></table>
-    <div class="reason" style="margin-top:4px">Weights are re-balanced to 100% across the components that apply, so nothing is lost for work that doesn't exist for that person or period.</div>
+  const wtxt = Object.assign({}, ...b.comps.filter(x => x.applies).map(x => ({[x.key]: Math.round(x.share * 100)})));
+  return `<div class="bx-top"><span class="val">${pct(row.score)}</span><span class="badge ${ratingClass(row.rating)}">${esc((row.rating || '').replace(/^\d - /, ''))}</span></div>
+    <div class="bx-sub">${esc(staff)} &middot; ${esc(label)}${delta}</div>${sheetNote}
+    <div class="bx-legend"><b>How to read this:</b> every score is out of 100 points. The points are shared between the parts that apply to ${flex ? 'this person (flexible schedule)' : 'this person'}: <b>Portfolio ${wtxt.port || 0}</b>${wtxt.plan !== undefined ? ` &middot; <b>Planning ${wtxt.plan}</b>` : ''}${wtxt.sub !== undefined ? ` &middot; <b>Submission ${wtxt.sub}</b>` : ''}${wtxt.adhoc !== undefined ? ` &middot; <b>Adhoc ${wtxt.adhoc}</b>` : ''}. Each part earns its share in proportion to the result (e.g. 80% of 15 pts = 12 pts). ${b.late > 0 ? 'Late reports then cost 0.5 pt each. ' : ''}Parts that do not apply are left out and the rest scaled up to 100.</div>
+    <div class="bx-h">How the score was built</div>${parts}
+    <div class="bx-h">Where points were lost &mdash; and how to win them back</div>${lostHtml}
     ${moved}
-    ${adv.length ? `<div class="sec"><b>What would raise this score</b>${adv.map(a => `<div class="catline">${a}</div>`).join('')}</div>` : '<div class="sec"><b>What would raise this score</b><span class="taskline">Nothing is being lost &mdash; every applicable component is at 100%.</span></div>'}
-    ${lists('Completed', row.completed)}${lists('In progress', row.inprogress)}${lists('Deferred (Approved) — counts as not done', row.deferredApproved)}${lists('Not touched', row.deferred)}${lists('Adhoc', row.adhocItems)}`;
+    <details class="bx-det"><summary>Task detail for this ${kind === 'weekly' ? 'week' : 'month'}</summary>
+      ${lists('Completed', row.completed)}${lists('In progress', row.inprogress)}${lists('Deferred (Approved) — counts as not done', row.deferredApproved)}${lists('Not touched', row.deferred)}${lists('Adhoc', row.adhocItems)}
+    </details>`;
 }
 function openBreakdown(kind, key, staff){
-  document.getElementById('bdTitle').textContent = (kind === 'weekly' ? 'Weekly' : 'Monthly') + ' score breakdown';
+  document.getElementById('bdTitle').textContent = (kind === 'weekly' ? 'Weekly' : 'Monthly') + ' score — ' + staff;
   document.getElementById('bdBody').innerHTML = breakdownHtml(kind, key, staff);
   document.getElementById('bdModal').classList.add('open');
 }
+
+// ---------- YTD: short plain-language summary of why the weekly / monthly average is what it is ----------
+function periodRows(staff, kind, fromKey, toKey){
+  const f = fromKey.slice(0,7), t = toKey.slice(0,7);
+  const keys = (kind === 'weekly' ? DATA.weekStarts.filter(weekDone) : DATA.months.filter(monthDone)).filter(k => k.slice(0,7) >= f && k.slice(0,7) <= t);
+  const out = [];
+  keys.forEach(k => { const r = findRow(kind, k, staff); if(r && r.score !== null && r.calc) out.push({key:k, row:r}); });
+  return out;
+}
+function summarizePeriods(staff, kind, fromKey, toKey){
+  const rows = periodRows(staff, kind, fromKey, toKey);
+  if(!rows.length) return 'No completed ' + (kind === 'weekly' ? 'weeks' : 'months') + ' scored in this range.';
+  const flex = DATA.flexSet.has(staff), unit = kind === 'weekly' ? 'week' : 'month';
+  const lostSum = {}, nameOf = {};
+  let late = 0, adhocTot = 0;
+  const missed = {};
+  rows.forEach(({row}) => {
+    const b = breakdownCalc(kind, row.calc, row.calc.profile, flex, DATA.weights);
+    b.comps.forEach(x => { nameOf[x.key] = x.name; if(x.applies) lostSum[x.key] = (lostSum[x.key] || 0) + x.lost * 100; });
+    late += (b.late > 0 ? Math.round(b.late / 0.005) : 0);
+    adhocTot += row.calc.adhoc || 0;
+    const t = splitTagged(row.deferred); t.w.concat(kind === 'monthly' ? t.m : []).forEach(n => { missed[n] = (missed[n] || 0) + 1; });
+  });
+  const avg = rows.reduce((a, x) => a + x.row.score, 0) / rows.length;
+  const n = rows.length;
+  const loss = Object.keys(lostSum).map(k => ({k, v: lostSum[k] / n})).filter(x => x.v >= 0.5).sort((a, b) => b.v - a.v).slice(0, 3);
+  const best = rows.reduce((a, x) => x.row.score > a.row.score ? x : a), worst = rows.reduce((a, x) => x.row.score < a.row.score ? x : a);
+  const lbl = k => kind === 'weekly' ? 'week of ' + fmtDay(addDaysKey(k, 1)) : fmtMonth(k);
+  const lossTxt = {
+    port: () => 'task completion (some listed tasks were not done)',
+    plan: () => 'planned tasks not reported the next day',
+    sub: () => 'missed or late daily reports',
+    adhoc: () => `few adhoc items logged (${(adhocTot / n).toFixed(1)} per ${unit} on average)`
+  };
+  let s = `Average ${pct(avg)} over ${n} ${unit}${n > 1 ? 's' : ''}.`;
+  if(loss.length) s += ` Points were mainly lost on ${loss.map(x => `<b>${esc(({port:'Portfolio',plan:'Planning',sub:'Submission',adhoc:'Adhoc'})[x.k])}</b> (&minus;${x.v.toFixed(1)} pts per ${unit} &ndash; ${lossTxt[x.k]()})`).join('; ')}.`;
+  else s += ' Nearly all points were earned.';
+  const top = Object.keys(missed).sort((a, b) => missed[b] - missed[a]).slice(0, 3).filter(k => missed[k] >= 2);
+  if(top.length) s += ` Tasks most often left undone: ${top.map(k => `${esc(k)} (${missed[k]}&times;)`).join(', ')}.`;
+  if(late) s += ` ${late} late report(s).`;
+  if(n > 1) s += ` Best: ${lbl(best.key)} (${pct(best.row.score)}); lowest: ${lbl(worst.key)} (${pct(worst.row.score)}).`;
+  return s;
+}
+
+// ---------- How Calc — short version ----------
+function renderHowCalc(){
+  const W = DATA.weights;
+  const wr = p => { const x = W[p]; return `<tr><td>${p}</td><td>${Math.round(x.port*100)}</td><td>${Math.round(x.plan*100)}</td><td>${Math.round(x.sub*100)}</td><td>${Math.round(x.adhoc*100)}</td></tr>`; };
+  const flexNames = Array.from(DATA.flexSet).join(', ') || '&mdash;';
+  document.getElementById('howcalcBody').innerHTML = `
+    <div class="card"><div class="hc-title">The score in one line</div>
+      <div class="reason">Every week and every month is scored out of 100 points, shared between four parts. Each part earns its share in proportion to its result (80% of a 15-point part = 12 points).</div>
+      <table class="hc-table"><tr><th>Points</th><th>Portfolio</th><th>Planning</th><th>Submission</th><th>Adhoc</th></tr>${wr('Administration')}${wr('Pastoral')}</table>
+      <div class="reason">A part that does not apply (no adhoc logged, no plan, flexible schedule) is left out and the others scale up to 100. Each report sent after 7:30pm costs 0.5 pt.</div></div>
+
+    <div class="card"><div class="hc-title">The four parts</div>
+      <div class="hc-grid">
+        <div><b>Portfolio</b><span>Your listed tasks. Points of tasks Completed or In Progress &divide; points that were due. Weekly, monthly and quarterly tasks are blended; a monthly or quarterly task is only &ldquo;due&rdquo; in proportion to how much of the month or quarter has passed.</span></div>
+        <div><b>Planning</b><span>Of the tasks you planned for tomorrow, the share you reported the next working day (Completed / In Progress, or Deferred (Approved) with the reason).</span></div>
+        <div><b>Submission</b><span>Days reported &divide; working days expected (Tue&ndash;Fri, leave removed).</span></div>
+        <div><b>Adhoc</b><span>Adhoc items logged &divide; 5 per week (20 per month), capped at 100%.</span></div>
+      </div></div>
+
+    <div class="card"><div class="hc-title">Good to know</div>
+      <ul class="hc-list">
+        <li><b>Deferred (Approved)</b> protects your Planning score, but the task still counts as <b>not done</b> in Portfolio.</li>
+        <li><b>Leave</b> is never penalised; a full leave week is skipped, not scored as zero.</li>
+        <li><b>Flexible schedule</b> (${flexNames}): no daily report needed; scored on Portfolio and Adhoc only.</li>
+        <li><b>New-type pastoral tasks</b> (Ministerial Reading, Ministry Training, Levites Training, Every&nbsp;4&nbsp;Months tasks) are reported but do not affect the score until 1 Jan 2027.</li>
+        <li><b>Portfolio change:</b> scores to 18 Sep 2026 use the old task list; from 21 Sep 2026 the new one. Quarterly tasks count from 1 Oct 2026.</li>
+        <li><b>Monthly score</b> = the weeks' Portfolio, Planning, Submission and Adhoc results for the month, with monthly and quarterly tasks blended into Portfolio.</li>
+        <li>Tap any score on the Weekly or Monthly tab to see exactly where its points came from.</li>
+      </ul></div>
+
+    <div class="card"><div class="hc-title">Rating</div>
+      <table class="hc-table"><tr><td>80% and above</td><td><span class="badge good">Good</span></td></tr>
+        <tr><td>70&ndash;79%</td><td><span class="badge mid">Needs Improvement</span></td></tr>
+        <tr><td>Below 70%</td><td><span class="badge low">Immediate Attention</span></td></tr></table>
+      <div class="reason">YTD = the average of all completed, scored weeks (and months).</div></div>
+
+    <div class="card"><div class="hc-title">Annual review</div>
+      <div class="reason">Final score = Daily Reporting KPI &times; 60% + Staff Observation (Mid-Year / Year-End review) &times; 40%, shown out of 5.</div>
+      <table class="hc-table"><tr><th>Score</th><th>Level</th><th>Increment</th><th>Bonus</th></tr>
+        <tr><td>4.50&ndash;5.00</td><td>Outstanding</td><td>6%</td><td>1.5 months</td></tr>
+        <tr><td>3.80&ndash;4.49</td><td>Exceeds</td><td>4&ndash;5%</td><td>1 month</td></tr>
+        <tr><td>3.00&ndash;3.79</td><td>Meets</td><td>2&ndash;3%</td><td>0.5 month</td></tr>
+        <tr><td>2.00&ndash;2.99</td><td>Below</td><td>0&ndash;1%</td><td>Discretionary</td></tr>
+        <tr><td>&lt; 2.00</td><td>Needs Improvement</td><td>None</td><td>None</td></tr></table></div>`;
+}
+
+// ---------- Maintenance history reports (Vehicle — Ps. Kevin, Music Instruments — Ps. Kenrick) ----------
+const MAINT_REPORTS = {
+  'Vehicle Maintenance': {title: 'Vehicle Maintenance History'},
+  'Music Instruments Maintenance': {title: 'Music Instruments Maintenance History'}
+};
+let maintReport = 'Vehicle Maintenance', maintYear = 'all';
+function maintEntries(){
+  return (DATA.maintenance || []).filter(r => r.report === maintReport && (maintYear === 'all' || r.date.slice(0,4) === maintYear)).sort((a, b) => b.date.localeCompare(a.date));
+}
+function renderMaint(){
+  const el = document.getElementById('view-maint');
+  const all = (DATA.maintenance || []).filter(r => r.report === maintReport);
+  const years = Array.from(new Set(all.map(r => r.date.slice(0,4)))).sort().reverse();
+  if(maintYear !== 'all' && !years.includes(maintYear)) maintYear = 'all';
+  const list = maintEntries();
+  const staffName = (all[0] && all[0].staff) || (maintReport === 'Vehicle Maintenance' ? 'Ps. Kevin Ong' : 'Ps. Kenrick Kong');
+  const last = list[0];
+  const byMonth = {};
+  list.forEach(r => { (byMonth[r.date.slice(0,7)] = byMonth[r.date.slice(0,7)] || []).push(r); });
+  const sel = `<div class="card mt-ctl">
+      <select id="maintSel" class="orientation-select">${Object.keys(MAINT_REPORTS).map(k => `<option ${k === maintReport ? 'selected' : ''}>${k}</option>`).join('')}</select>
+      <select id="maintYear" class="orientation-select"><option value="all">All years</option>${years.map(y => `<option ${y === maintYear ? 'selected' : ''}>${y}</option>`).join('')}</select>
+    </div>`;
+  const chips = `<div class="card mt-sum"><div class="mt-title">${esc(MAINT_REPORTS[maintReport].title)}</div>
+      <div class="mt-meta">Responsible: ${esc(staffName)} &middot; recorded automatically each time the task is ticked <b>Completed</b> in the daily report</div>
+      <div class="mt-chips"><span><b>${list.length}</b> record(s)</span><span>Last done: <b>${last ? fmtDay(last.date) + ' ' + last.date.slice(0,4) : '—'}</b></span></div></div>`;
+  const body = list.length ? Object.keys(byMonth).sort().reverse().map(m => `<div class="card mt-month"><div class="mt-mh">${fmtMonth(m + '-01')} <span>${byMonth[m].length}</span></div>
+      ${byMonth[m].map(r => `<div class="mt-row"><div class="mt-date">${fmtDay(r.date)}</div><div class="mt-what"><div class="mt-task">${esc(r.task)}</div>${meaningful(r.remark) ? `<div class="mt-rem">${esc(r.remark)}</div>` : '<div class="mt-rem none">No remarks</div>'}${meaningful(r.dayRemark) && r.dayRemark !== r.remark ? `<div class="mt-rem">Day note: ${esc(r.dayRemark)}</div>` : ''}</div></div>`).join('')}</div>`).join('')
+    : '<div class="empty">Nothing recorded yet. Entries appear after the next sheet refresh once this task is ticked Completed.</div>';
+  el.innerHTML = sel + chips + body;
+  document.getElementById('maintSel').addEventListener('change', e => { maintReport = e.target.value; renderMaint(); });
+  document.getElementById('maintYear').addEventListener('change', e => { maintYear = e.target.value; renderMaint(); });
+}
+
+// ---------- Review: due reminder + shared staff self-review (cloud) ----------
+const REVIEW_CYCLES = [{id:'mid', label:'Mid-Year Review', m:5, d:30}, {id:'final', label:'Final Year-End Review', m:11, d:31}];
+function reviewCfg(){
+  try{
+    const u = new URLSearchParams(location.search);
+    if(u.get('api')){ localStorage.setItem('tow_review_api', u.get('api')); if(u.get('lk')) localStorage.setItem('tow_review_lk', u.get('lk')); history.replaceState(null, '', location.pathname); }
+    return {api: localStorage.getItem('tow_review_api') || '', lk: localStorage.getItem('tow_review_lk') || ''};
+  }catch(e){ return {api:'', lk:''}; }
+}
+let REVIEW_CLOUD = null, REVIEW_CLOUD_ERR = '';
+async function reviewCloudCall(action, body){
+  const c = reviewCfg(); if(!c.api) throw new Error('not configured');
+  if(!body){ const r = await fetch(c.api + (c.api.includes('?') ? '&' : '?') + 'action=' + action + '&lk=' + encodeURIComponent(c.lk)); return r.json(); }
+  const r = await fetch(c.api, {method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(Object.assign({action, lk:c.lk}, body))});
+  return r.json();
+}
+async function loadReviewCloud(){
+  const c = reviewCfg(); if(!c.api || !c.lk){ REVIEW_CLOUD = null; return; }
+  try{ const j = await reviewCloudCall('list'); if(j.ok){ REVIEW_CLOUD = j.data || {}; REVIEW_CLOUD_ERR = ''; } else { REVIEW_CLOUD = null; REVIEW_CLOUD_ERR = j.error || 'Could not load'; } }
+  catch(e){ REVIEW_CLOUD = null; REVIEW_CLOUD_ERR = 'Could not reach the review service.'; }
+}
+function reviewDueInfo(){
+  const now = new Date(TODAY_KEY + 'T00:00:00'), y = now.getFullYear();
+  const list = [];
+  [y - 1, y].forEach(yy => REVIEW_CYCLES.forEach(c => { const d = new Date(yy, c.m, c.d); list.push({c, d, days: Math.round((d - now) / 86400000), year: yy}); }));
+  return list.filter(x => x.days <= 45 && x.days >= -30).sort((a, b) => a.days - b.days)[0] || null;
+}
+function reviewCycleDone(info){
+  if(!REVIEW_CLOUD) return false;
+  const staff = Object.keys(DATA.portfolio);
+  return staff.length && staff.every(s => REVIEW_CLOUD[s] && REVIEW_CLOUD[s].__submitted && REVIEW_CLOUD[s].__submitted[info.c.id]);
+}
+function renderReviewBanner(){
+  const el = document.getElementById('reviewBanner'); if(!el) return;
+  const info = reviewDueInfo();
+  let dismissed = false; try{ dismissed = localStorage.getItem('tow_rv_dismiss') === info?.c.id + info?.year; }catch(e){}
+  if(!info || dismissed){ el.style.display = 'none'; return; }
+  const when = info.days > 0 ? `due in <b>${info.days} day${info.days === 1 ? '' : 's'}</b> (${fmtShortDate(toKey(info.d))})` : info.days === 0 ? '<b>due today</b>' : `<b>${-info.days} day(s) overdue</b> (was due ${fmtShortDate(toKey(info.d))})`;
+  let status = '';
+  if(REVIEW_CLOUD){
+    const staff = Object.keys(DATA.portfolio);
+    const n = staff.filter(s => REVIEW_CLOUD[s] && REVIEW_CLOUD[s].__submitted && REVIEW_CLOUD[s].__submitted[info.c.id]).length;
+    status = ` &middot; ${n} of ${staff.length} staff have submitted their self-review`;
+    if(reviewCycleDone(info)){ el.style.display = 'none'; return; }
+  }
+  el.style.display = 'flex';
+  el.innerHTML = `<span>&#128276; <b>${esc(info.c.label)}</b> ${when}${status}</span><span><button data-rvgo="1">Open Review</button><button data-rvdismiss="${info.c.id}${info.year}">&times;</button></span>`;
+}
+function reviewStatusHtml(staff){
+  const c = reviewCfg();
+  if(!c.api) return `<div class="rv-cloud off"><b>Staff self-review link</b><br>Not connected yet. Open the leadership link from the <i>Review Links</i> tab of the private review sheet once on this device to switch on shared self-reviews.</div>`;
+  if(!c.lk) return `<div class="rv-cloud off">This device has the staff API but no leadership key. Open the leadership link once.</div>`;
+  if(!REVIEW_CLOUD) return `<div class="rv-cloud off">${esc(REVIEW_CLOUD_ERR || 'Loading staff reviews…')}</div>`;
+  const sub = (REVIEW_CLOUD[staff] || {}).__submitted || {};
+  const chip = (id, lab) => sub[id] ? `<span class="badge good">${lab}: submitted ${esc(sub[id])}</span> <button class="rv-mini" data-reopen="${id}">Re-open</button>` : `<span class="badge mid">${lab}: not submitted yet</span>`;
+  return `<div class="rv-cloud on"><b>Staff self-review (shared link)</b><br>${chip('mid', 'Mid-Year')} ${chip('final', 'Year-End')}<div class="mt-rem">Self ratings come from the staff's own link and cannot be edited here. Fill in the Lead ratings and press Save.</div></div>`;
+}
+function applyCloudToStored(staff, stored){
+  if(!REVIEW_CLOUD || !REVIEW_CLOUD[staff]) return stored;
+  const cl = REVIEW_CLOUD[staff], out = Object.assign({}, stored);
+  Object.keys(cl).forEach(k => {
+    if(!/^[A-D]_\d+$/.test(k)) return;
+    out[k] = Object.assign({}, out[k] || {});
+    Object.keys(cl[k]).forEach(f => { if(cl[k][f] !== '' && cl[k][f] != null) out[k][f] = cl[k][f]; });
+  });
+  if(cl.__header && !out.__header) out.__header = cl.__header;
+  return out;
+}
+
 function ytdWeeksHtml(staff){
   const list = (DATA.weeklyRaw[staff] || []).filter(r => r.score !== null && r.wk <= TODAY_KEY);
   if(!list.length) return '<div class="empty">No scored weeks yet.</div>';
   return `<table class="breakdown-table bd"><tr><th>Week</th><th>Score</th><th></th></tr>${list.map(r => `<tr class="clickrow" data-bd="weekly|${r.wk}|${esc(staff)}"><td>${esc(fmtWeek(r.wk))}</td><td>${pct(r.score)}</td><td>&rsaquo;</td></tr>`).join('')}</table>`;
 }
-
-// ---------- How Calc (filled from the live KPI Weights sheet) ----------
-function renderHowCalc(){
-  const W = DATA.weights;
-  const wr = (p) => { const x = W[p]; return `<tr><td>${p === 'Pastoral' ? 'Pastoral' : 'Administration'}</td><td>${Math.round(x.port*100)}%</td><td>${Math.round(x.plan*100)}%</td><td>${Math.round(x.sub*100)}%</td><td>${Math.round(x.mon*100)}%</td><td>${Math.round(x.adhoc*100)}%</td><td>${Math.round(x.qtr*100)}%</td></tr>`; };
-  const flexNames = Array.from(DATA.flexSet).join(', ') || '&mdash;';
-  document.getElementById('howcalcBody').innerHTML = `
-    <div class="card"><div class="hc-title">The Final KPI formula</div>
-      <div class="hc-formula">Final KPI % = &Sigma; (component result &times; its weight) &divide; &Sigma; (weights that apply) &minus; Late Penalty</div>
-      <div class="reason">Only the components that <b>apply</b> to that person and period are counted, and the weights are re-balanced to 100%. A component does not apply when the person has no tasks of that kind (e.g. no monthly or quarterly tasks), logged no adhoc work that week, or made no plan. Tap any score on the Weekly or Monthly tab to see exactly how it was built.</div></div>
-    <div class="card"><div class="hc-title">Weights</div>
-      <table class="hc-table"><tr><th></th><th>Portfolio</th><th>Planning</th><th>Submission</th><th>Monthly</th><th>Adhoc</th><th>Quarterly</th></tr>${wr('Administration')}${wr('Pastoral')}</table>
-      <div class="reason">At the Monthly level, Portfolio and Monthly progress are blended into one score and carry their combined weight.</div></div>
-    <div class="card"><div class="hc-title">What each component means</div>
-      <div class="sec"><b>Portfolio %</b><span class="taskline">Of the points assigned to the person's <b>Weekly</b> tasks, how many were Completed or In Progress at least once during the week. <b>Deferred (Approved) does not count as done</b> &mdash; the portfolio is a commitment, so a task still only deferred at the end of the week scores the same as one with no status.</span></div>
-      <div class="sec"><b>Monthly progress %</b><span class="taskline">Same idea for Monthly tasks, cumulative through the month (a monthly task touched in week 1 stays counted for the rest of the month).</span></div>
-      <div class="sec"><b>Quarterly progress %</b><span class="taskline">Same idea for Quarterly tasks, cumulative through the calendar quarter. Quarterly scoring starts in Q4 (1 Oct 2026). Pastoral &lsquo;new-type&rsquo; tasks (e.g. Ministerial Reading, Ministry Training) are in a trial period: you still report on them and they show in the Daily log, but they do not affect any score or Planning until <b>1 Jan 2027</b>.</span></div>
-      <div class="sec"><b>Planning %</b><span class="taskline">Of the tasks planned for tomorrow, the share <b>accounted for</b> on the next working day &mdash; worked on (Completed / In Progress) <b>or</b> marked Deferred (Approved) with the reason in remarks. A planned task that is simply ignored costs planning score. Friday's plan is checked on Tuesday (the next working day).</span></div>
-      <div class="sec"><b>Submission %</b><span class="taskline">Days submitted &divide; expected working days (Tue&ndash;Fri). Approved leave (including half-days) is removed from the expected days. A half-day leave report submitted before 5:30pm is expected and not penalised.</span></div>
-      <div class="sec"><b>Adhoc %</b><span class="taskline">Adhoc items logged &divide; 5 per week (&divide; 20 per month), capped at 100%. Only counted in weeks where adhoc work was logged.</span></div>
-      <div class="sec"><b>Late penalty</b><span class="taskline">0.5% for each report submitted after 7:30pm on the day, or on any later day.</span></div></div>
-    <div class="card"><div class="hc-title">Two scoring periods</div>
-      <div class="reason">Your portfolio was revised in the Google Form in September. Scores up to <b>18 Sep 2026</b> use the previous portfolio and frequencies exactly as they were; from <b>21 Sep 2026</b> scores use the new portfolio and frequencies. A task that changed frequency (e.g. Weekly &rarr; Monthly) appears once under each. New tasks only count from 21 Sep (Quarterly from 1 Oct), so nobody is marked down for work that did not yet exist. See <b>Task Glossary</b> for each person's current and previous tasks.</div></div>
-    <div class="card"><div class="hc-title">Flexible-schedule staff</div>
-      <div class="reason">${flexNames} ${DATA.flexSet.size > 1 ? 'work' : 'works'} on a flexible schedule: no daily report is required (shown as <b>Rest &amp; Recovery</b> rather than Not Submitted), and Submission %, Planning % and the late penalty do not apply. The score is based on Weekly, Monthly and Quarterly tasks being completed within their period (weekly tasks by Friday).</div></div>
-    <div class="card"><div class="hc-title">Leave</div>
-      <div class="reason">Approved leave of any type is never penalised. A week of full leave is excluded from scoring (shown as On Leave) and is not counted as zero in monthly or YTD averages. Partial-leave weeks are scored on the days actually available.</div></div>
-    <div class="card"><div class="hc-title">Rating bands</div>
-      <table class="hc-table"><tr><th>Score</th><th>Rating</th></tr>
-        <tr><td>&ge; 80%</td><td><span class="badge good">Good / On Track</span></td></tr>
-        <tr><td>70&ndash;79%</td><td><span class="badge mid">Needs Improvement</span></td></tr>
-        <tr><td>&lt; 70%</td><td><span class="badge low">Immediate Attention</span></td></tr></table></div>
-    <div class="card"><div class="hc-title">YTD average</div>
-      <div class="reason">The Weekly average is the mean of every completed, scored week's Final KPI %; the Monthly average is the mean of every completed month's score &mdash; the same numbers shown on the Weekly and Monthly tabs. Tap a person's report to see each week and open its breakdown.</div></div>
-    <div class="card"><div class="hc-title">Annual review blend &amp; recognition bands</div>
-      <div class="reason">Final KPI Score = (Daily Reporting KPI &times; 60%) + (Staff Ministry &amp; Performance Observation &times; 40%), then converted to a 0&ndash;5 scale (Final % &times; 5).</div>
-      <table class="hc-table"><tr><th>Score (0-5)</th><th>Level</th><th>Increment</th><th>Bonus</th></tr>
-        <tr><td>4.50&ndash;5.00</td><td>Outstanding</td><td>6%</td><td>1.5 months</td></tr>
-        <tr><td>3.80&ndash;4.49</td><td>Exceeds Expectations</td><td>4%&ndash;5%</td><td>1.0 month</td></tr>
-        <tr><td>3.00&ndash;3.79</td><td>Meets Expectations</td><td>2%&ndash;3%</td><td>0.5 month</td></tr>
-        <tr><td>2.00&ndash;2.99</td><td>Below Expectations</td><td>0%&ndash;1% (Discretionary)</td><td>Discretionary</td></tr>
-        <tr><td>Below 2.00</td><td>Needs Improvement</td><td>No Increment</td><td>No Bonus</td></tr></table>
-      <div class="reason">Increment is subject to church financial position; Bonus is based on 1 month base salary unless otherwise determined.</div></div>`;
-}
-
 document.addEventListener('click', (e) => {
   const bd = e.target.closest('[data-bd]');
   if(bd){ const p = bd.dataset.bd.split('|'); openBreakdown(p[0], p[1], p.slice(2).join('|')); return; }
+  const rp = e.target.closest('[data-report]');
+  if(rp){ const p = rp.dataset.report.split('|'); openReport(p[0], p.slice(1).join('|')); return; }
   const tg = e.target.closest('[data-toggle]');
-  if(tg){ const box = tg.closest('.card').querySelector('.fullbox'); if(box) box.style.display = box.style.display === 'none' ? 'block' : 'none'; }
+  if(tg){ const box = tg.closest('.card').querySelector('.fullbox'); if(box) box.style.display = box.style.display === 'none' ? 'block' : 'none'; return; }
+  if(e.target.closest('[data-rvgo]')){ switchTab('review'); return; }
+  const dm = e.target.closest('[data-rvdismiss]');
+  if(dm){ try{ localStorage.setItem('tow_rv_dismiss', dm.dataset.rvdismiss); }catch(x){} renderReviewBanner(); return; }
+  const ro = e.target.closest('[data-reopen]');
+  if(ro){
+    const staff = reviewStaffPicker.value;
+    if(!confirm('Re-open the ' + (ro.dataset.reopen === 'mid' ? 'Mid-Year' : 'Year-End') + ' self-review for ' + staff + '? They will be able to edit and re-submit it.')) return;
+    reviewCloudCall('reopen', {staff, period: ro.dataset.reopen}).then(() => loadReviewCloud()).then(() => { renderReviewCategories(staff); renderReviewBanner(); });
+  }
 });
+
 // ===================== end v3.1 additions =====================
 
+document.getElementById('frClose').addEventListener('click', () => document.getElementById('frModal').classList.remove('open'));
+document.getElementById('frModal').addEventListener('click', (e) => { if(e.target.id === 'frModal') e.target.classList.remove('open'); });
+document.getElementById('frPrintBtn').addEventListener('click', () => printModal('portrait'));
 document.getElementById('bdClose').addEventListener('click', () => document.getElementById('bdModal').classList.remove('open'));
 document.getElementById('bdModal').addEventListener('click', (e) => { if(e.target.id === 'bdModal') e.target.classList.remove('open'); });
 document.getElementById('bdPrintBtn').addEventListener('click', () => printModal('portrait'));
@@ -1905,6 +2327,8 @@ async function init(){
     staffPicker.innerHTML = Object.keys(DATA.portfolio).sort().map(s => `<option value="${s}">${s}</option>`).join('');
     loadingEl.style.display = 'none';
     switchTab('daily');
+    renderReviewBanner();
+    loadReviewCloud().then(renderReviewBanner);
   } catch(err){
     loadingEl.innerHTML = `
       <div class="load-error">

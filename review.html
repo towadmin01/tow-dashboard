@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Self-Review — Tabernacle of Worship</title>
+<style>
+:root{--navy:#1F3864;--gold:#C9A227;--bg:#F8F6EF;--line:#E4DFCC;--green:#1E7B3A}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#2b2a22}
+header{background:var(--navy);color:#fff;padding:16px} header small{color:var(--gold);letter-spacing:.12em;font-weight:700;font-size:11px;text-transform:uppercase}
+header h1{margin:2px 0 0;font-size:19px} main{max-width:680px;margin:0 auto;padding:14px 14px 90px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:14px;font-weight:600;cursor:pointer}
+.tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.cat{background:var(--navy);color:#fff;border-radius:9px;padding:9px 12px;margin:16px 0 8px;display:flex;justify-content:space-between;font-weight:700;font-size:14px}
+.crit h3{margin:0 0 2px;font-size:14.5px;color:var(--navy)} .crit p{margin:0 0 8px;font-size:12.5px;color:#6b6552;line-height:1.45}
+.rate{display:flex;gap:6px;margin-bottom:8px}.rate label{flex:1;text-align:center}
+.rate input{display:none}.rate span{display:block;padding:10px 0;border:1px solid var(--line);border-radius:9px;font-weight:700;cursor:pointer;background:#fff}
+.rate input:checked + span{background:var(--gold);color:#fff;border-color:var(--gold)}
+textarea{width:100%;min-height:54px;padding:9px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:13.5px;resize:vertical}
+.scale{font-size:11.5px;color:#6b6552;margin-top:6px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 14px;display:flex;gap:8px;justify-content:center}
+.bar button{flex:1;max-width:300px;padding:13px;border-radius:10px;border:none;font-size:15px;font-weight:700;cursor:pointer}
+.save{background:#ECE7D6;color:#3a3626}.submit{background:var(--green);color:#fff}
+.msg{padding:12px;border-radius:10px;font-size:13.5px;margin-bottom:12px}.ok{background:#EAF5EC;color:#1a5c2c}.err{background:#FCE0E0;color:#7a0006}.info{background:#FFF7E0;color:#6b4a00}
+button:disabled{opacity:.5}
+</style></head><body>
+<header><small>Tabernacle of Worship</small><h1>My Self-Review</h1></header>
+<main id="app"><div class="msg info">Loading…</div></main>
+<script>
+const STRUCT = [{"code": "A", "name": "Ministry & Church Culture", "weight": 0.25, "criteria": [{"title": "Spiritual Maturity & Christ-like Conduct", "desc": "Demonstrates integrity, humility, honesty, and Christ-like behaviour in all interactions."}, {"title": "Punctuality & Reliability", "desc": "Reports to work, meetings, and ministry responsibilities on time, prepared, and consistently fulfils commitments."}, {"title": "Alignment with Church Vision", "desc": "Supports and carries out the Church's vision, mission, values, and leadership direction with unity and commitment."}, {"title": "Teamwork & Unity", "desc": "Builds positive relationships, collaborates effectively, and contributes to a spirit of unity within the ministry team."}, {"title": "Integrity & confidentiality", "desc": "Handles responsibilities, confidential information, and church resources with integrity, professionalism, and accountability."}]}, {"code": "B", "name": "Professional Excellence", "weight": 0.35, "criteria": [{"title": "Accountability & Ownership", "desc": "Takes responsibility for assigned tasks, follows through on commitments, and is accountable for work outcomes."}, {"title": "Communication Effectiveness", "desc": "Communicates clearly, respectfully, and promptly with leaders, colleagues, volunteers, and church members."}, {"title": "Initiative & Problem Solving", "desc": "Demonstrates initiative by identifying challenges, proposing practical solutions, and taking appropriate action."}, {"title": "Quality of Work", "desc": "Produces accurate, organised, timely, and high-quality work that meets ministry expectations."}, {"title": "Stewardship of Resources", "desc": "Uses church resources, finances, equipment, and time wisely, responsibly, and efficiently."}]}, {"code": "C", "name": "Role Competency", "weight": 0.25, "criteria": [{"title": "Job Knowledge & Competency", "desc": "Demonstrates the knowledge, skills, and expertise required to perform the responsibilities of the role effectively."}, {"title": "Planning & Coordination", "desc": "Plans, prioritises, and coordinates work effectively to achieve ministry objectives and deadlines."}, {"title": "Service Delivery & Execution", "desc": "Delivers dependable, timely, and people-centred service while maintaining high standards of excellence."}, {"title": "Leadership & Ministry Contribution", "desc": "Positively contributes to ministry initiatives by taking initiative, supporting the team, and influencing others constructively."}]}, {"code": "D", "name": "Growth & Development", "weight": 0.15, "criteria": [{"title": "Teachable Attitude", "desc": "Demonstrates humility and remains open to learning, coaching, and guidance."}, {"title": "Receptiveness to Feedback", "desc": "Accepts constructive feedback with maturity and applies it to improve performance and relationships."}, {"title": "Continuous Learning & Improvement", "desc": "Actively pursues spiritual, professional, and personal growth while striving for excellence."}, {"title": "Leadership Potential", "desc": "Demonstrates initiative, responsibility, and the potential to lead and influence others effectively in ministry."}]}];
+const q = new URLSearchParams(location.search), API = q.get('api') || '', TOK = q.get('t') || '';
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let me = null, period = (new Date().getMonth() >= 5 && new Date().getMonth() < 8) ? 'mid' : (new Date().getMonth() >= 9 ? 'final' : 'mid'), local = {};
+function msg(c, t){ $('msg').className = 'msg ' + c; $('msg').innerHTML = t; $('msg').style.display = t ? 'block' : 'none'; window.scrollTo({top:0, behavior:'smooth'}); }
+async function call(body){ const r = await fetch(API, {method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(Object.assign({t: TOK}, body))}); return r.json(); }
+async function load(){
+  if(!API || !TOK){ $('app').innerHTML = '<div class="msg err">This link is incomplete. Please use the exact link the office sent you.</div>'; return; }
+  try{
+    const j = await (await fetch(API + (API.includes('?') ? '&' : '?') + 'action=me&t=' + encodeURIComponent(TOK))).json();
+    if(!j.ok){ $('app').innerHTML = '<div class="msg err">' + esc(j.error || 'Could not open your review.') + '</div>'; return; }
+    me = j; local = j.data || {}; draw();
+  }catch(e){ $('app').innerHTML = '<div class="msg err">Could not reach the review service. Please check your internet and try again.</div>'; }
+}
+function submittedOn(){ return (local.__submitted || {})[period]; }
+function draw(){
+  const done = submittedOn(), f = period === 'mid' ? 'mid' : 'final';
+  let h = '<div id="msg" class="msg" style="display:none"></div>';
+  h += '<div class="card"><b>' + esc(me.staff) + '</b><div class="scale">Rate yourself honestly from 1 to 5 for each area, and add a short remark where helpful. Your leaders will add their own ratings separately. 1 = Needs significant improvement &middot; 3 = Meets expectations &middot; 5 = Outstanding.</div></div>';
+  h += '<div class="tabs"><button data-p="mid" class="' + (period === 'mid' ? 'on' : '') + '">Mid-Year Review</button><button data-p="final" class="' + (period === 'final' ? 'on' : '') + '">Final Year-End Review</button></div>';
+  if(done) h += '<div class="msg ok">&#10003; You submitted this review on ' + esc(done) + '. Thank you. If you need to change something, please ask the office to re-open it.</div>';
+  STRUCT.forEach(cat => {
+    h += '<div class="cat"><span>' + cat.code + '. ' + esc(cat.name) + '</span></div>';
+    cat.criteria.forEach((c, i) => {
+      const k = cat.code + '_' + i, rec = local[k] || {}, v = rec[f + 'Self'] || '', rm = rec[f + 'SelfRemark'] || '';
+      h += '<div class="card crit" data-k="' + k + '"><h3>' + esc(c.title) + '</h3><p>' + esc(c.desc) + '</p><div class="rate">' +
+        [1,2,3,4,5].map(n => '<label><input type="radio" name="r_' + k + '" value="' + n + '" ' + (String(v) === String(n) ? 'checked' : '') + (done ? ' disabled' : '') + '><span>' + n + '</span></label>').join('') +
+        '</div><textarea placeholder="Remarks (optional)" ' + (done ? 'disabled' : '') + '>' + esc(rm) + '</textarea></div>';
+    });
+  });
+  h += '<div class="bar">' + (done ? '' : '<button class="save" id="bSave">Save draft</button><button class="submit" id="bSub">Submit</button>') + '</div>';
+  $('app').innerHTML = h;
+  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { collect(); period = b.dataset.p; draw(); });
+  if($('bSave')) $('bSave').onclick = () => save(false);
+  if($('bSub')) $('bSub').onclick = () => { if(confirm('Submit your ' + (period === 'mid' ? 'Mid-Year' : 'Final Year-End') + ' self-review? You will not be able to change it afterwards.')) save(true); };
+}
+function collect(){
+  const f = period === 'mid' ? 'mid' : 'final', out = {};
+  document.querySelectorAll('.crit').forEach(el => {
+    const k = el.dataset.k, r = el.querySelector('input:checked');
+    out[k] = {}; out[k][f + 'Self'] = r ? r.value : ''; out[k][f + 'SelfRemark'] = el.querySelector('textarea').value;
+    local[k] = Object.assign(local[k] || {}, out[k]);
+  });
+  return out;
+}
+async function save(submit){
+  const data = collect();
+  if(submit){
+    const f = period === 'mid' ? 'mid' : 'final';
+    const missing = Object.keys(data).filter(k => !data[k][f + 'Self']).length;
+    if(missing){ msg('err', 'Please give a rating (1–5) for every area before submitting. ' + missing + ' still missing.'); return; }
+  }
+  document.querySelectorAll('.bar button').forEach(b => b.disabled = true);
+  try{
+    const j = await call({action:'saveSelf', period, data, submit: !!submit});
+    if(j.ok){ local.__submitted = j.submitted || local.__submitted; draw(); msg('ok', submit ? 'Submitted — thank you!' : 'Draft saved. You can come back to this link any time to continue.'); }
+    else { document.querySelectorAll('.bar button').forEach(b => b.disabled = false); msg('err', esc(j.error || 'Could not save. Please try again.')); }
+  }catch(e){ document.querySelectorAll('.bar button').forEach(b => b.disabled = false); msg('err', 'Could not reach the review service. Your answers are still on this page — please try again.'); }
+}
+load();
+</script></body></html>
