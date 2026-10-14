@@ -264,6 +264,20 @@
     margin:8px 0 4px; padding-top:6px; border-top:1px dashed var(--line);
   }
   .rev-crit .rev-period-label:first-of-type{border-top:none; padding-top:0; margin-top:0;}
+
+  .badge.rest{background:#E8EEF4; color:#3F5873;}
+  .clickname{cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px;}
+  .chev{font-size:10px; opacity:.55;}
+  .catline{margin:3px 0; line-height:1.45;}
+  .catl{display:inline-block; min-width:84px; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:#9a927a; font-weight:700; margin-right:6px; vertical-align:top;}
+  .fullbox{margin-top:10px; padding-top:8px; border-top:1px dashed var(--line); font-size:12.5px;}
+  .fullcat b{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:#9a927a; margin:8px 0 2px;}
+  .fullitem{margin:2px 0 4px;} .fullremark{color:#6a6450; font-style:italic; margin:1px 0 0 10px;}
+  .clickscore{cursor:pointer;}
+  .bd{font-size:12px;} .bd th{text-align:left; padding:5px 4px; font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:#9a927a; border-bottom:1px solid var(--line);}
+  .bd td.up{color:var(--green); font-weight:700;} .bd td.dn{color:var(--red); font-weight:700;}
+  .bd tr.na td{color:#9a927a; font-size:11.5px;} .bd tr.tot td{font-weight:800; border-top:2px solid var(--line);}
+  .bdsub{font-size:11px; color:#8a8369; font-weight:400;} .clickrow{cursor:pointer;} .clickrow:hover{background:#F6F2E6;}
 </style>
 </head>
 <body>
@@ -462,81 +476,7 @@
     </div>
     <div id="reviewCategories"></div>
   </div>
-  <div class="view" id="view-howcalc">
-
-    <div class="card">
-      <div class="hc-title">The Final KPI Formula</div>
-      <div class="hc-formula">Final KPI % =<br>
-        (Portfolio % &times; Portfolio wt)<br>
-        + (Planning % &times; Planning wt)<br>
-        + (Submission % &times; Submission wt)<br>
-        + (Monthly Progress % &times; Monthly wt)<br>
-        + (Adhoc % &times; Adhoc wt)<br>
-        &minus; Late Penalty
-      </div>
-      <div class="reason">The same five components make up the Weekly, Monthly and YTD Average scores &mdash; only the time window and the weights differ.</div>
-    </div>
-
-    <div class="card">
-      <div class="hc-title">Weights &mdash; Administration vs Pastoral</div>
-      <table class="hc-table">
-        <tr><th></th><th>Portfolio</th><th>Planning</th><th>Submission</th><th>Monthly Prog.</th><th>Adhoc</th></tr>
-        <tr><td>Administration</td><td>45%</td><td>20%</td><td>15%</td><td>10%</td><td>10%</td></tr>
-        <tr><td>Pastoral</td><td>45%</td><td>10%</td><td>15%</td><td>10%</td><td>20%</td></tr>
-      </table>
-      <div class="reason">Pastoral & Ministerial staff carry more weight on Adhoc (they take on more unplanned ministry work) and less on Planning; Administration is the reverse.</div>
-    </div>
-
-    <div class="card">
-      <div class="hc-title">What each component means</div>
-      <div class="sec"><b>Portfolio %</b><span class="taskline">Share of that staff member's active, Medium-priority weekly (or monthly) tasks that were touched at least once in the period &mdash; any status (Completed / In Progress / Pending) counts as touched.</span></div>
-      <div class="sec"><b>Planning %</b><span class="taskline">Of the days a "planned task for tomorrow" was logged, how often that planned item actually showed up as done the next working day.</span></div>
-      <div class="sec"><b>Submission %</b><span class="taskline">Days submitted &divide; expected working days (Tue&ndash;Fri). Approved leave days are removed from the expected count, so leave is never penalised.</span></div>
-      <div class="sec"><b>Monthly Progress %</b><span class="taskline">Share of active monthly tasks touched at least once so far in the current month.</span></div>
-      <div class="sec"><b>Adhoc %</b><span class="taskline">MIN(adhoc items logged &divide; 5, 100%) &mdash; adhoc checkbox ticks plus distinct items named in free text.</span></div>
-      <div class="sec"><b>Late Penalty</b><span class="taskline">0.5% deducted per submission logged after 7:30pm.</span></div>
-    </div>
-
-    <div class="card">
-      <div class="hc-title">Rating bands</div>
-      <table class="hc-table">
-        <tr><th>Score</th><th>Rating</th></tr>
-        <tr><td>&ge; 80%</td><td><span class="badge good">Good / On Track</span></td></tr>
-        <tr><td>70&ndash;79%</td><td><span class="badge mid">Needs Improvement</span></td></tr>
-        <tr><td>&lt; 70%</td><td><span class="badge low">Immediate Attention</span></td></tr>
-      </table>
-    </div>
-
-    <div class="card">
-      <div class="hc-title">Where the "Reason" / variance text comes from</div>
-      <div class="reason">Every score on the Weekly, Monthly and YTD Avg tabs comes with a plain-English explanation, generated automatically from the same components above &mdash; not a separate judgment call:</div>
-      <div class="sec"><b>Flagged low</b><span class="taskline">Portfolio &lt; 60%, Submission &lt; 80%, or Monthly Progress &lt; 40%</span></div>
-      <div class="sec"><b>Flagged strong</b><span class="taskline">Portfolio &ge; 90%</span></div>
-      <div class="sec"><b>Adhoc called out</b><span class="taskline">Heavy load if Adhoc % &ge; 75% (i.e. 4+ items/week); "no adhoc logged" if zero</span></div>
-      <div class="sec"><b>Late submissions</b><span class="taskline">Named whenever any late-penalty days exist in the period</span></div>
-      <div class="sec"><b>Month-over-month (Monthly tab only)</b><span class="taskline">"Improved" / "Dropped" shown when the final score moves &plusmn;5% or more vs the prior month</span></div>
-    </div>
-
-    <div class="card">
-      <div class="hc-title">YTD Average (May to date)</div>
-      <div class="reason">The Weekly average is the mean of every completed week's Final KPI % so far this year; the Monthly average is the mean of every completed month's Final Monthly KPI %. Both are bounded to the calendar year &mdash; once a year closes, that year's number is final, and the next January starts counting from zero again.</div>
-    </div>
-
-    <div class="card">
-      <div class="hc-title">Annual Review Blend &amp; Recognition Bands</div>
-      <div class="reason">Final KPI Score = (Daily Reporting KPI &times; 60%) + (Staff Ministry &amp; Performance Observation &times; 40%), then converted to a 0&ndash;5 scale (Final % &times; 5) for the bands below.</div>
-      <table class="hc-table">
-        <tr><th>Score (0-5)</th><th>Level</th><th>Increment</th><th>Bonus</th></tr>
-        <tr><td>4.50&ndash;5.00</td><td>Outstanding</td><td>6%</td><td>1.5 months</td></tr>
-        <tr><td>3.80&ndash;4.49</td><td>Exceeds Expectations</td><td>4%&ndash;5%</td><td>1.0 month</td></tr>
-        <tr><td>3.00&ndash;3.79</td><td>Meets Expectations</td><td>2%&ndash;3%</td><td>0.5 month</td></tr>
-        <tr><td>2.00&ndash;2.99</td><td>Below Expectations</td><td>0%&ndash;1% (Discretionary)</td><td>Discretionary</td></tr>
-        <tr><td>Below 2.00</td><td>Needs Improvement</td><td>No Increment</td><td>No Bonus</td></tr>
-      </table>
-      <div class="reason">Increment is subject to church financial position; Bonus is based on 1 month base salary unless otherwise determined.</div>
-    </div>
-
-  </div>
+  <div class="view" id="view-howcalc"><div id="howcalcBody"></div></div>
 </main>
 
 <footer>Snapshot generated from the workbook &middot; covers every date on file</footer>
@@ -582,6 +522,16 @@
       </div>
     </div>
     <div class="modal-body" id="adhocModalBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="bdModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="bdTitle">Score breakdown</h2>
+      <div class="modal-head-actions"><button class="modal-print-btn" id="bdPrintBtn">Print</button><button class="modal-close" id="bdClose">&times;</button></div>
+    </div>
+    <div class="modal-body" id="bdBody"></div>
   </div>
 </div>
 
@@ -682,7 +632,7 @@ function buildRemark(rows, periodLabel){
 }
 
 async function loadLiveData(){
-  const [rawDaily, weeklyCalc, monthlyCalc, weeklyTaskSummary, monthlyTaskSummary, taskReference, accumWeekly, accumMonthly, leaveLog, workdayCalendar] = await Promise.all([
+  const [rawDaily, weeklyCalc, monthlyCalc, weeklyTaskSummary, monthlyTaskSummary, taskReference, accumWeekly, accumMonthly, leaveLog, workdayCalendar, kpiWeightsRows, flexRows] = await Promise.all([
     fetchSheetRows('Raw Daily Log'),
     fetchSheetRows('Weekly Calc'),
     fetchSheetRows('Monthly Calc'),
@@ -693,6 +643,8 @@ async function loadLiveData(){
     fetchSheetRows('Accum. Monthly Score (YTD)'),
     fetchSheetRows('Leave Log'),
     fetchSheetRows('Workday Calendar'),
+    fetchSheetRows('KPI Weights').catch(() => []),
+    fetchSheetRows('Flexible Arrangement Staff').catch(() => []),
   ]);
 
   // ---- Real workdays only (Tue-Fri, minus public holidays) — used to keep
@@ -707,46 +659,77 @@ async function loadLiveData(){
   const leaveByStaffDate = {};
   leaveLog.forEach(r => {
     const staff = r['Staff']; const date = toISODate(r['Date']);
-    if(staff && date) leaveByStaffDate[staff + '|' + date] = r['Leave Type'] || 'On Leave';
+    if(staff && date) leaveByStaffDate[staff + '|' + date] = {type: r['Leave Type'] || 'On Leave', duration: r['Duration'] || ''};
   });
 
   // ---- Staff list & dept map (from Weekly Calc) ----
   const staffDept = {};
-  weeklyCalc.forEach(r => { staffDept[r['Staff']] = r['Dept']; });
+  weeklyCalc.forEach(r => { if(r['Staff']) staffDept[r['Staff']] = r['Dept']; });
   const STAFF_LIST = Object.keys(staffDept);
 
-  // ---- portfolio ----
+  // ---- portfolio (current tasks + tasks that ended with the September form revision) ----
   const portfolio = {};
+  const taskFull = {};
   taskReference.forEach(r => {
+    taskFull[r['Task ID']] = r['Full Task Name'];
     if(r['Active'] !== 'YES') return;
     const staff = r['Staff'];
     (portfolio[staff] = portfolio[staff] || []).push({
-      category: r['Category'], full: r['Full Task Name'], short: r['Short Name'], weight: toNum(r['Weight'])
+      id: r['Task ID'], category: r['Category'], full: r['Full Task Name'], short: r['Short Name'], weight: toNum(r['Weight']),
+      scored: r['In Score?'] === 'Yes',
+      start: toISODate(r['Start Date (blank = from the beginning)']), end: toISODate(r['End Date (blank = still current)']),
+      scoreFrom: toISODate(r['Scores From (blank = same as Start Date; reported but not scored before this date)']) ||
+        ((/^ps\./i.test(String(staff||'').trim()) && /ministerial\s+reading|ministry\s+training/i.test(String(r['Full Task Name']||''))) ? '2027-01-01' : '')
     });
   });
+
+  // ---- scoring weights + flexible-schedule staff ----
+  const weights = {
+    Administration: {port:.45, plan:.10, sub:.15, mon:.10, adhoc:.15, qtr:.05},
+    Pastoral:       {port:.45, plan:.10, sub:.15, mon:.05, adhoc:.20, qtr:.05}
+  };
+  kpiWeightsRows.forEach(r => {
+    const p = r['Profile']; if(!p) return;
+    const k = p === 'Administration' ? 'Administration' : 'Pastoral';
+    const g = (col, d) => { const v = toNum(r[col]); return v === null ? d : v; };
+    weights[k] = {port: g('Portfolio', weights[k].port), plan: g('Planning', weights[k].plan), sub: g('Submission', weights[k].sub),
+                  mon: g('Monthly Progress', weights[k].mon), adhoc: g('Adhoc', weights[k].adhoc), qtr: g('Quarterly', weights[k].qtr)};
+  });
+  const flexSet = new Set(flexRows.map(r => String(r['Staff Name'] || r['Staff'] || '').trim()).filter(Boolean));
+  const wdList = Array.from(workdayKeySet).sort();
+  const nextWorkdayOf = d => wdList.find(x => x > d) || null;
+  const prevWorkdayOf = d => { let p = null; for(const x of wdList){ if(x >= d) break; p = x; } return p; };
 
   // ---- daily ----
   const dailyByDate = {};
   rawDaily.forEach(r => {
     const date = toISODate(r['Date']);
     if(!date) return;
+    let detail = null;
+    try{ detail = r['Detail (JSON)'] ? JSON.parse(r['Detail (JSON)']) : null; }catch(e){ detail = null; }
     (dailyByDate[date] = dailyByDate[date] || {}).__set = true;
     dailyByDate[date][r['Staff']] = {
       staff: r['Staff'], dept: r['Dept'], status: r['Timing'], time: r['Time'] || '',
-      leave: r['On Leave'] || '', today: r['Today Summary (short)'] || '', plan: r['Planned Tomorrow (short)'] || ''
+      leave: r['On Leave'] || '', today: r['Today Summary (short)'] || '', plan: r['Planned Tomorrow (short)'] || '', detail
     };
   });
   const daily = {};
   const dailyDates = Object.keys(dailyByDate).filter(d => workdayKeySet.has(d)).sort();
   dailyDates.forEach(date => {
     const present = dailyByDate[date];
+    const nd = nextWorkdayOf(date), pd = prevWorkdayOf(date);
     const rows = STAFF_LIST.map(s => {
-      if(present[s]) return present[s];
-      const leaveType = leaveByStaffDate[s + '|' + date];
-      if(leaveType) return {staff:s, dept:staffDept[s], status:'On Leave', time:'', leave:'Yes', today:leaveType, plan:''};
-      return {staff:s, dept:staffDept[s], status:'NOT SUBMITTED', time:'', leave:'', today:'', plan:''};
+      const li = leaveByStaffDate[s + '|' + date] || null;
+      const nl = nd ? (leaveByStaffDate[s + '|' + nd] || null) : null;
+      const prevRec = (pd && dailyByDate[pd]) ? dailyByDate[pd][s] : null;
+      const restPlanned = !!(prevRec && prevRec.detail && prevRec.detail.p && prevRec.detail.p.ps === 'Rest & Recovery');
+      const extra = {leaveInfo: li, nextLeave: nl, flex: flexSet.has(s), restPlanned};
+      if(present[s]) return Object.assign({}, present[s], extra);
+      if(li) return Object.assign({staff:s, dept:staffDept[s], status:'On Leave', time:'', leave:'Yes', today:li.type, plan:'', detail:null}, extra);
+      if(flexSet.has(s)) return Object.assign({staff:s, dept:staffDept[s], status:'Rest & Recovery', time:'', leave:'', today:'', plan:'', detail:null}, extra);
+      return Object.assign({staff:s, dept:staffDept[s], status:'NOT SUBMITTED', time:'', leave:'', today:'', plan:'', detail:null}, extra);
     });
-    const order = {'NOT SUBMITTED':0,'Late':1,'Early':2,'On-time':3,'On Leave':4};
+    const order = {'NOT SUBMITTED':0,'Late':1,'Early':2,'On-time':3,'On Leave':4,'Rest & Recovery':5};
     rows.sort((a,b) => (order[a.status]??4) - (order[b.status]??4) || a.staff.localeCompare(b.staff));
     daily[date] = rows;
   });
@@ -758,13 +741,23 @@ async function loadLiveData(){
   const weeklyRaw = {}; // for accum breakdown
   weeklyCalc.forEach(r => {
     const wk = toISODate(r['Week Start']);
+    if(!wk || !r['Staff']) return;
     const wts = wtsByKey[r['Key']] || {};
+    const score = toNum(r['Final KPI %']);
+    const calc = {
+      profile: r['Profile'], expDays: toNum(r['Expected Workdays']) || 0, submitted: toNum(r['Submitted']) || 0, sub: toNum(r['Submission %']),
+      expW: toNum(r['Expected Wkly Wt']) || 0, doneW: toNum(r['Completed Wkly Wt']) || 0, port: toNum(r['Portfolio %']),
+      expM: toNum(r['Expected Mthly Wt']) || 0, doneM: toNum(r['Completed Mthly Wt (cum.)']) || 0, mprog: toNum(r['Monthly Progress %']) || 0,
+      adhoc: toNum(r['Adhoc Count']) || 0, adhocPct: toNum(r['Adhoc %']), planDays: toNum(r['Plan Days']) || 0, matchDays: toNum(r['Match Days']) || 0, plan: toNum(r['Planning %']),
+      latePen: toNum(r['Late Penalty']) || 0, expQ: toNum(r['Expected Qtrly Wt']) || 0, doneQ: toNum(r['Completed Qtrly Wt (cum.)']) || 0, qprog: toNum(r['Quarterly Progress %']) || 0
+    };
     (weekly[wk] = weekly[wk] || []).push({
-      staff: r['Staff'], dept: r['Dept'], score: toNum(r['Final KPI %']), rating: r['Rating'], reason: r['Reason'],
-      completed: wts['Completed'] || '—', inprogress: wts['In Progress'] || '—', deferred: wts['Deferred'] || '—'
+      staff: r['Staff'], dept: r['Dept'], score, rating: r['Rating'], reason: r['Reason'],
+      completed: wts['Completed'] || '—', inprogress: wts['In Progress'] || '—', deferred: wts['Deferred'] || '—',
+      deferredApproved: wts['Deferred (Approved)'] || '—', adhocItems: wts['Adhoc Items'] || '—', calc
     });
     (weeklyRaw[r['Staff']] = weeklyRaw[r['Staff']] || []).push({
-      wk, port: toNum(r['Portfolio %']), sub: toNum(r['Submission %']), plan: toNum(r['Planning %']),
+      wk, score, port: toNum(r['Portfolio %']), sub: toNum(r['Submission %']), plan: toNum(r['Planning %']),
       mprog: toNum(r['Monthly Progress %']), adhocPct: toNum(r['Adhoc %']), adhoc: toNum(r['Adhoc Count']), late: toNum(r['Late Days'])
     });
   });
@@ -777,13 +770,21 @@ async function loadLiveData(){
   const monthlyRaw = {};
   monthlyCalc.forEach(r => {
     const mo = toISODate(r['Month']);
+    if(!mo || !r['Staff']) return;
     const mts = mtsByKey[r['Key']] || {};
+    const score = toNum(r['Final Monthly KPI %']);
+    const calc = {
+      profile: r['Profile'], port: toNum(r['Avg Portfolio %']), mprog: toNum(r['Monthly Progress % (final)']) || 0, plan: toNum(r['Avg Planning %']),
+      sub: toNum(r['Avg Submission %']), adhoc: toNum(r['Total Adhoc']) || 0, adhocPct: toNum(r['Adhoc %']), latePen: toNum(r['Late Penalty']) || 0,
+      expM: toNum(r['Expected Mthly Wt']) || 0, expQ: toNum(r['Expected Qtrly Wt']) || 0, qprog: toNum(r['Quarterly Progress %']) || 0
+    };
     (monthly[mo] = monthly[mo] || []).push({
-      staff: r['Staff'], dept: r['Dept'], score: toNum(r['Final Monthly KPI %']), rating: r['Rating'], reason: r['Reason / Variance vs Prev Month'],
-      completed: mts['Completed'] || '—', inprogress: mts['In Progress'] || '—', deferred: mts['Deferred / Not Started'] || '—'
+      staff: r['Staff'], dept: r['Dept'], score, rating: r['Rating'], reason: r['Reason / Variance vs Prev Month'],
+      completed: mts['Completed'] || '—', inprogress: mts['In Progress'] || '—', deferred: mts['Deferred / Not Started'] || '—',
+      deferredApproved: mts['Deferred (Approved)'] || '—', adhocItems: mts['Adhoc Items'] || '—', calc
     });
     (monthlyRaw[r['Staff']] = monthlyRaw[r['Staff']] || []).push({
-      mo, port: toNum(r['Avg Portfolio %']), sub: toNum(r['Avg Submission %']), plan: toNum(r['Avg Planning %']),
+      mo, score, port: toNum(r['Avg Portfolio %']), sub: toNum(r['Avg Submission %']), plan: toNum(r['Avg Planning %']),
       mprog: toNum(r['Monthly Progress % (final)']), adhocPct: toNum(r['Adhoc %']), adhoc: toNum(r['Total Adhoc']), late: toNum(r['Total Late Days'])
     });
   });
@@ -804,8 +805,8 @@ async function loadLiveData(){
   });
   STAFF_LIST.forEach(staff => {
     const a = accum[staff]; if(!a) return;
-    const wr = (weeklyRaw[staff] || []).filter(r => r.port !== null);
-    const mr = (monthlyRaw[staff] || []).filter(r => r.port !== null);
+    const wr = (weeklyRaw[staff] || []).filter(r => r.score !== null);
+    const mr = (monthlyRaw[staff] || []).filter(r => r.score !== null);
     const avg = (rows,k) => { const v = rows.map(r=>r[k]).filter(x=>x!==null); return v.length? v.reduce((x,y)=>x+y,0)/v.length : 0; };
     const sum = (rows,k) => rows.reduce((x,r)=>x+(r[k]||0),0);
     a.breakdown = {
@@ -840,17 +841,21 @@ async function loadLiveData(){
   });
   Object.keys(adhocLog).forEach(s => adhocLog[s].sort((a,b)=>a.date.localeCompare(b.date)));
 
-  return {daily, dailyDates, weekly, weekStarts, monthly, months, accum, portfolio, adhocLog, weeklyRaw, monthlyRaw};
+  return {daily, dailyDates, weekly, weekStarts, monthly, months, accum, portfolio, adhocLog, weeklyRaw, monthlyRaw, weights, flexSet, taskFull, leaveByStaffDate};
 }
 
 let DATA = null;
 let currentTab = 'daily';
 
 const TODAY_KEY = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })();
+const keyOf = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+// a week is "complete" once its Friday has arrived; a month once its last day has passed (partial periods would show misleading scores)
+const weekDone = wk => { const d = new Date(wk+'T00:00:00'); d.setDate(d.getDate()+4); return keyOf(d) <= TODAY_KEY; };
+const monthDone = mo => { const d = new Date(mo+'T00:00:00'); return keyOf(new Date(d.getFullYear(), d.getMonth()+1, 0)) < TODAY_KEY; };
 const KEYLIST = {
   get daily(){ return DATA.dailyDates; },
-  get weekly(){ return DATA.weekStarts.filter(wk => wk <= TODAY_KEY); },
-  get monthly(){ return DATA.months.filter(mo => mo <= TODAY_KEY); }
+  get weekly(){ return DATA.weekStarts.filter(weekDone); },
+  get monthly(){ return DATA.months.filter(monthDone); }
 };
 const ROWS = {
   get daily(){ return DATA.daily; },
@@ -885,6 +890,7 @@ function statusBadgeClass(status){
   if(status === 'Early') return 'early';
   if(status === 'On-time') return 'ontime';
   if(status === 'On Leave') return 'onleave';
+  if(status === 'Rest & Recovery') return 'rest';
   return '';
 }
 function ratingClass(rating){
@@ -895,49 +901,40 @@ function ratingClass(rating){
 }
 function pct(v){
   if(v === null || v === undefined || v === '') return '—';
-  return Math.round(v*100) + '%';
+  return (Math.round(v*1000)/10) + '%';
 }
 
 function renderDaily(key){
   const el = document.getElementById('view-daily');
   const rows = ROWS.daily[key] || [];
   if(!rows.length){ el.innerHTML = '<div class="empty">No submissions on file for this date.</div>'; return; }
-  el.innerHTML = rows.map(r => `
-    <div class="card">
-      <div class="row1">
-        <div>
-          <div class="staff">${r.staff}</div>
-          <div class="dept">${r.dept}</div>
-        </div>
-        <span class="badge ${statusBadgeClass(r.status)}">${r.status}${r.time ? ' &middot; '+r.time : ''}</span>
-      </div>
-      ${r.leave === 'Yes' ? '<div class="sec"><b>Leave</b><span class="taskline">On approved leave</span></div>' : ''}
-      <div class="sec"><b>Today</b><span class="taskline ${(!r.today||r.today==='—')?'dash':''}">${r.today || '—'}</span></div>
-      <div class="sec"><b>Planned tomorrow</b><span class="taskline ${(!r.plan||r.plan==='—')?'dash':''}">${r.plan || '—'}</span></div>
-    </div>
-  `).join('');
+  el.innerHTML = rows.map(r => dailyCardHtml(r, DATA.taskFull)).join('');
 }
 
 function renderPeriod(view, key){
   const el = document.getElementById('view-'+view);
   const rows = ROWS[view][key] || [];
   if(!rows.length){ el.innerHTML = '<div class="empty">No data on file for this period.</div>'; return; }
+  const line = (label, v) => (v && v !== '—') ? `<div class="sec"><b>${label}</b><span class="taskline">${esc(v)}</span></div>` : '';
   el.innerHTML = rows.map(r => `
     <div class="card">
       <div class="row1">
         <div>
-          <div class="staff">${r.staff}</div>
-          <div class="dept">${r.dept}</div>
+          <div class="staff">${esc(r.staff)}</div>
+          <div class="dept">${esc(r.dept)}</div>
         </div>
         <div style="text-align:right">
-          <div class="score">${pct(r.score)}</div>
-          <span class="badge ${ratingClass(r.rating)}">${(r.rating||'').replace(/^\\d - /,'')}</span>
+          <div class="score ${r.score !== null && r.calc ? 'clickscore' : ''}" ${r.score !== null && r.calc ? `data-bd="${view}|${key}|${esc(r.staff)}" title="Tap to see how this score was built"` : ''}>${pct(r.score)}${r.score !== null && r.calc ? ' <span class="chev">&#9662;</span>' : ''}</div>
+          <span class="badge ${ratingClass(r.rating)}">${esc((r.rating||'').replace(/^\d - /,''))}</span>
         </div>
       </div>
-      <div class="reason">${r.reason || ''}</div>
-      <div class="sec"><b>Completed</b><span class="taskline ${(!r.completed||r.completed==='—')?'dash':''}">${r.completed || '—'}</span></div>
-      <div class="sec"><b>In progress</b><span class="taskline ${(!r.inprogress||r.inprogress==='—')?'dash':''}">${r.inprogress || '—'}</span></div>
-      <div class="sec"><b>Deferred</b><span class="taskline ${(!r.deferred||r.deferred==='—')?'dash':''}">${r.deferred || '—'}</span></div>
+      <div class="reason">${esc(r.reason || '')}</div>
+      ${line('Completed', r.completed)}
+      ${line('In progress', r.inprogress)}
+      ${line('Deferred (Approved) — counts as not done', r.deferredApproved)}
+      ${line('Not touched', r.deferred)}
+      ${line('Adhoc', r.adhocItems)}
+      ${(!r.completed || r.completed==='—') && (!r.inprogress || r.inprogress==='—') && (!r.deferred || r.deferred==='—') && (!r.adhocItems || r.adhocItems==='—') ? '<div class="sec"><span class="taskline dash">&mdash;</span></div>' : ''}
     </div>
   `).join('');
 }
@@ -1015,17 +1012,15 @@ function computeAccumForRangeSimple(fromKey, toKey){
     // Weeks/months where the staff was fully on leave have a blank Portfolio % in the
     // sheet (by design — excluded from scoring, not counted as 0%). Drop those here too,
     // so the YTD average doesn't quietly treat a leave week as a zero.
-    const wrScored = wr.filter(r => r.port !== null);
-    const mrScored = mr.filter(r => r.port !== null);
+    const wrScored = wr.filter(r => r.score !== null && weekDone(r.wk));
+    const mrScored = mr.filter(r => r.score !== null && monthDone(r.mo));
     const avg = (rows,k) => { const v = rows.map(r=>r[k]).filter(x=>x!==null); return v.length? v.reduce((x,y)=>x+y,0)/v.length : 0; };
     const sum = (rows,k) => rows.reduce((x,r)=>x+(r[k]||0),0);
     // reconstruct each period's own final score from its component averages using the same weights used elsewhere would
     // require KPI Weights per staff profile; simpler and consistent: average the component metrics directly as the
     // period-level KPI summary, same components the "Reason" text already uses.
-    const isPastoral = staff.startsWith('Ps.');
-    const wPlan = isPastoral ? 0.10 : 0.20, wAdhoc = isPastoral ? 0.20 : 0.10;
-    const weeklyFinal = wrScored.map(r => (r.port*0.45 + r.sub*0.15 + wPlan*(r.plan||0) + r.mprog*0.10 + Math.min(r.adhocPct||0,1)*wAdhoc) - (r.late||0)*0.005);
-    const monthlyFinal = mrScored.map(r => (r.port*0.45 + r.sub*0.15 + wPlan*(r.plan||0) + r.mprog*0.10 + Math.min(r.adhocPct||0,1)*wAdhoc) - (r.late||0)*0.005);
+    const weeklyFinal = wrScored.map(r => r.score);   // the sheet's own Final KPI % for each scored week
+    const monthlyFinal = mrScored.map(r => r.score);
     result[staff] = {
       weeksCounted: wrScored.length, monthsCounted: mrScored.length,
       avgWeekly: weeklyFinal.length ? weeklyFinal.reduce((a,b)=>a+b,0)/weeklyFinal.length : 0,
@@ -1080,6 +1075,7 @@ function switchTab(view){
   } else if(view === 'howcalc'){
     metaBar.style.display = 'none';
     if(exportBar) exportBar.style.display = 'none';
+    renderHowCalc();
   } else {
     metaBar.style.display = 'flex';
     if(exportBar) exportBar.style.display = 'flex';
@@ -1116,31 +1112,40 @@ document.getElementById('nextBtn').addEventListener('click', () => {
 const glossaryModal = document.getElementById('glossaryModal');
 const staffPicker = document.getElementById('staffPicker');
 
+function fmtShortDate(k){ return k ? new Date(k+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit', month:'short', year:'numeric'}) : ''; }
 function taskRowHtml(t){
+  const note = t.end && t.end < TODAY_KEY ? `scored up to ${fmtShortDate(t.end)}` : (t.scoreFrom && t.scoreFrom > TODAY_KEY ? `trial period \u2014 report it, but it counts toward your score from ${fmtShortDate(t.scoreFrom)}` : (t.start ? `counts from ${fmtShortDate(t.start)}` : ''));
   return `
     <div class="task-row">
       <div class="task-top">
-        <span class="task-short">${t.short}</span>
-        <span class="task-cat">${t.category} &middot; wt ${t.weight}</span>
+        <span class="task-short">${esc(t.short)}</span>
+        <span class="task-cat">${esc(t.category)} &middot; wt ${t.weight}${t.scored ? '' : ' &middot; not scored'}</span>
       </div>
-      <div class="task-full">${t.full}</div>
+      <div class="task-full">${esc(t.full)}</div>
+      ${note ? `<div class="task-full" style="font-size:11px;color:#8a8369;">${note}</div>` : ''}
     </div>
   `;
 }
 function renderPortfolio(staff){
   document.getElementById('glossaryModalTitle').textContent = 'Task Glossary & Portfolio — ' + staff;
-  const tasks = DATA.portfolio[staff] || [];
+  const all = DATA.portfolio[staff] || [];
   const el = document.getElementById('portfolioList');
-  if(!tasks.length){ el.innerHTML = '<div class="empty">No active tasks on file.</div>'; return; }
-  const order = ['Weekly','Monthly','Adhoc'];
-  const groups = {};
-  tasks.forEach(t => { (groups[t.category] = groups[t.category] || []).push(t); });
-  let html = '';
-  order.concat(Object.keys(groups).filter(k => !order.includes(k))).forEach(cat => {
-    if(!groups[cat] || !groups[cat].length) return;
-    const sorted = groups[cat].slice().sort((a,b) => a.full.localeCompare(b.full));
-    html += `<div class="portfolio-group-label">${cat} Tasks</div>` + sorted.map(taskRowHtml).join('');
-  });
+  if(!all.length){ el.innerHTML = '<div class="empty">No active tasks on file.</div>'; return; }
+  const ended = t => t.end && t.end < TODAY_KEY;
+  const order = ['Weekly','Monthly','Quarterly','Adhoc'];
+  const block = (list, titleSuffix) => {
+    const groups = {};
+    list.forEach(t => { (groups[t.category] = groups[t.category] || []).push(t); });
+    let html = '';
+    order.concat(Object.keys(groups).filter(k => !order.includes(k))).forEach(cat => {
+      if(!groups[cat] || !groups[cat].length) return;
+      html += `<div class="portfolio-group-label">${cat} Tasks${titleSuffix}</div>` + groups[cat].slice().sort((a,b) => a.full.localeCompare(b.full)).map(taskRowHtml).join('');
+    });
+    return html;
+  };
+  const current = all.filter(t => !ended(t)), previous = all.filter(ended);
+  let html = block(current, '');
+  if(previous.length) html += `<div class="portfolio-group-label" style="margin-top:18px;">Previous portfolio &mdash; history only</div><div class="reason" style="margin:0 0 6px;">These were scored up to the form revision. They are kept so past weeks and months still read correctly.</div>` + block(previous, '');
   el.innerHTML = html;
 }
 
@@ -1316,6 +1321,9 @@ function openYtdDetail(staff){
     </div>
     <div class="reason">${a.monthlyRemark || ''}</div>
     ${breakdownTableHtml(bd.monthly)}
+
+    <div class="ytd-section-title">Week by week (tap a week to see how it was scored)</div>
+    ${ytdWeeksHtml(staff)}
 
     <div class="ytd-section-title">Adhoc Activity Log</div>
     ${adhocLogHtml(staff)}
@@ -1672,6 +1680,222 @@ window.addEventListener('afterprint', () => {
   document.body.classList.remove('printing-all');
   document.getElementById('printAllContainer').innerHTML = '';
 });
+
+// ===================== v3.1 additions =====================
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function n1(v){ return (Math.round((v||0)*10)/10).toString(); }
+function stMark(s){ return s==='Completed' ? '' : s==='In Progress' ? ' <i>(in progress)</i>' : s==='Deferred (Approved)' ? ' <i>(deferred)</i>' : ' <i>('+esc(s)+')</i>'; }
+function catLine(label, items){
+  if(!items || !items.length) return '';
+  return `<div class="catline"><span class="catl">${label}</span>${items.map(it => esc(it.n) + stMark(it.s)).join(', ')}</div>`;
+}
+function planLine(label, arr){
+  if(!arr || !arr.length) return '';
+  return `<div class="catline"><span class="catl">${label}</span>${arr.map(esc).join(', ')}</div>`;
+}
+function leaveText(li){ return li ? `${esc(li.type)}${li.duration ? ' &middot; ' + esc(li.duration) : ''}` : ''; }
+
+/** One staff member's Daily card, in the layout asked for: status, Leave, Today (one line per category),
+ *  Remarks, Planned tomorrow (one line per category / leave / rest). Click the name for the full, un-abbreviated list. */
+function dailyCardHtml(r, taskFull){
+  const d = r.detail;
+  const badgeText = r.status === 'On Leave' && r.leaveInfo ? 'On Leave' : r.status;
+  const badge = `<span class="badge ${statusBadgeClass(r.status)}">${esc(badgeText)}${r.time ? ' &middot; ' + esc(r.time) : ''}</span>`;
+  let body = '';
+  if(r.leaveInfo){
+    const half = /half/i.test(r.leaveInfo.duration || '');
+    body += `<div class="sec"><b>Leave</b><span class="taskline">On approved leave &mdash; ${leaveText(r.leaveInfo)}${half && r.status !== 'On Leave' ? '<br><i>Half-day leave: submitting before 5:30pm is expected and is not penalised.</i>' : ''}</span></div>`;
+  }
+  const hasToday = d && ((d.w&&d.w.length)||(d.m&&d.m.length)||(d.q&&d.q.length)||(d.a&&d.a.length)||d.o||d.rm);
+  if(d){
+    if(hasToday){
+      body += `<div class="sec"><b>Today</b>${catLine('Weekly', d.w)}${catLine('Monthly', d.m)}${catLine('Quarterly', d.q)}${catLine('Adhoc', d.a)}${d.o ? `<div class="catline"><span class="catl">Other adhoc</span>${esc(d.o)}</div>` : ''}</div>`;
+      if(d.rm) body += `<div class="sec"><b>Remarks on tasks today</b><span class="taskline">${esc(d.rm)}</span></div>`;
+    } else if(r.leaveInfo && r.status === 'On Leave'){
+      body += `<div class="sec"><b>Today</b><span class="taskline">${esc(r.leaveInfo.type)}</span></div>`;
+    } else if(!r.status || r.status === 'NOT SUBMITTED' || r.status === 'Rest & Recovery'){
+      body += '';
+    } else {
+      body += `<div class="sec"><b>Today</b><span class="taskline dash">&mdash;</span></div>`;
+    }
+  } else if(r.status !== 'NOT SUBMITTED' && r.status !== 'Rest & Recovery' && r.today && r.today !== '—'){
+    body += `<div class="sec"><b>Today</b><span class="taskline">${esc(r.today)}</span></div>`;
+  }
+  // planned tomorrow
+  let plan = '';
+  const p = d && d.p;
+  if(r.nextLeave) plan = `<div class="catline"><span class="catl"></span>On planned leave &mdash; ${leaveText(r.nextLeave)}</div>`;
+  else if(p && p.ps === 'Rest & Recovery') plan = `<div class="catline"><span class="catl"></span>Planned Rest &amp; Recovery day</div>`;
+  else if(p && p.ps === 'Leave') plan = `<div class="catline"><span class="catl"></span>On planned leave</div>`;
+  else if(p) plan = planLine('Weekly', p.w) + planLine('Monthly', p.m) + planLine('Quarterly', p.q) + planLine('Adhoc', p.a) + (p.o ? `<div class="catline"><span class="catl">Other adhoc</span>${esc(p.o)}</div>` : '');
+  else if(!d && r.plan && r.plan !== '—') plan = `<div class="catline">${esc(r.plan)}</div>`;
+  const submitted = r.status !== 'NOT SUBMITTED' && r.status !== 'Rest & Recovery';
+  if(submitted || plan) body += `<div class="sec"><b>Planned tomorrow</b>${plan || '<span class="taskline dash">&mdash;</span>'}</div>`;
+  if(r.status === 'Rest & Recovery') body = `<div class="sec"><b>Status</b><span class="taskline">${r.restPlanned ? 'Planned Rest &amp; Recovery day (flexible schedule) &mdash; no report required.' : 'Flexible schedule &mdash; no report today. Scored on tasks completed by Friday, not on daily reports.'}</span></div>` + body;
+
+  // full, un-abbreviated view (opens when the name is clicked)
+  let full = '';
+  if(d){
+    const fl = (label, items) => (items && items.length) ? `<div class="fullcat"><b>${label}</b>${items.map(it => `<div class="fullitem">${esc((taskFull && taskFull[it.id]) || it.n)} &mdash; <i>${esc(it.s)}</i>${it.r ? `<div class="fullremark">&ldquo;${esc(it.r)}&rdquo;</div>` : ''}</div>`).join('')}</div>` : '';
+    full = fl('Weekly', d.w) + fl('Monthly', d.m) + fl('Quarterly', d.q) + fl('Adhoc', d.a)
+      + (d.o ? `<div class="fullcat"><b>Other adhoc</b><div class="fullitem">${esc(d.o)}</div></div>` : '')
+      + (d.rm ? `<div class="fullcat"><b>Remarks</b><div class="fullitem">${esc(d.rm)}</div></div>` : '')
+      + (p && (p.pr) ? `<div class="fullcat"><b>Tomorrow &mdash; answer given</b><div class="fullitem">${esc(p.pr)}</div></div>` : '');
+  }
+  return `<div class="card">
+    <div class="row1"><div><div class="staff ${full ? 'clickname' : ''}" ${full ? 'data-toggle="1"' : ''}>${esc(r.staff)}${full ? ' <span class="chev">&#9662;</span>' : ''}</div><div class="dept">${esc(r.dept)}</div></div>${badge}</div>
+    ${body}
+    ${full ? `<div class="fullbox" style="display:none">${full}</div>` : ''}
+  </div>`;
+}
+
+// ---------- score breakdown (mirrors the sheet's formulas exactly) ----------
+function breakdownCalc(kind, c, profile, flex, W){
+  const w = W[profile === 'Pastoral' ? 'Pastoral' : 'Administration'];
+  const comps = [];
+  const add = (key, name, value, weight, applies, detail, why) => comps.push({key, name, value, weight, applies, detail, why});
+  if(kind === 'weekly'){
+    add('port', 'Portfolio (weekly tasks)', c.port, w.port, c.port !== null, `${n1(c.doneW)} of ${n1(c.expW)} task points completed or in progress`, '');
+    add('plan', 'Planning', c.plan, w.plan, !flex && c.plan !== null, c.planDays ? `${n1(c.matchDays)} of ${c.planDays} planned days accounted for the next working day` : '', flex ? 'Not applied: flexible-schedule staff are scored on task completion' : (c.plan === null ? 'Not applied: no plan was logged this week' : ''));
+    add('sub', 'Submission', c.sub, w.sub, !flex, `${c.submitted} of ${c.expDays} expected days submitted`, flex ? 'Not applied: flexible-schedule staff are not required to submit daily' : '');
+    add('mon', 'Monthly progress', c.mprog, w.mon, c.expM > 0, `${n1(c.doneM)} of ${n1(c.expM)} monthly task points touched so far this month`, c.expM > 0 ? '' : 'Not applied: no monthly tasks');
+    add('adhoc', 'Adhoc', c.adhocPct, w.adhoc, c.adhoc > 0, `${c.adhoc} adhoc item(s) (5 or more = 100%)`, c.adhoc > 0 ? '' : 'Not applied: no adhoc work logged, so its weight goes to the other components');
+    add('qtr', 'Quarterly progress', c.qprog, w.qtr, c.expQ > 0, `${n1(c.doneQ)} of ${n1(c.expQ)} quarterly task points touched so far this quarter`, c.expQ > 0 ? '' : 'Not applied: no quarterly tasks this quarter');
+  } else {
+    const monOn = c.expM > 0;
+    add('port', monOn ? 'Portfolio + monthly tasks (blended)' : 'Portfolio (weekly tasks)', monOn ? (c.port + c.mprog) / 2 : c.port, w.port + (monOn ? w.mon : 0), true,
+        monOn ? `weekly tasks ${pct(c.port)} and monthly tasks ${pct(c.mprog)}, averaged` : `average of the month's weekly portfolio scores`, '');
+    add('plan', 'Planning', c.plan, w.plan, !flex && c.plan !== null, '', flex ? 'Not applied: flexible-schedule staff are scored on task completion' : (c.plan === null ? 'Not applied: no plans logged this month' : ''));
+    add('sub', 'Submission', c.sub, w.sub, !flex, '', flex ? 'Not applied: flexible-schedule staff are not required to submit daily' : '');
+    add('adhoc', 'Adhoc', c.adhocPct, w.adhoc, c.adhoc > 0, `${c.adhoc} adhoc item(s) this month (20 or more = 100%)`, c.adhoc > 0 ? '' : 'Not applied: no adhoc work logged');
+    add('qtr', 'Quarterly progress', c.qprog, w.qtr, c.expQ > 0, '', c.expQ > 0 ? '' : 'Not applied: no quarterly tasks this quarter');
+  }
+  const den = comps.filter(x => x.applies).reduce((a, x) => a + x.weight, 0);
+  comps.forEach(x => { x.share = x.applies && den ? x.weight / den : 0; x.earned = x.applies ? (x.value || 0) * x.share : 0; x.lost = x.applies ? (1 - (x.value || 0)) * x.share : 0; });
+  const late = flex ? 0 : (c.latePen || 0);
+  const raw = comps.reduce((a, x) => a + x.earned, 0) - late;
+  return { comps, late, final: Math.max(0, Math.min(1, raw)) };
+}
+
+function adviceFor(kind, b, c, row){
+  const out = [];
+  const worst = b.comps.filter(x => x.applies && x.lost > 0.005).sort((x, y) => y.lost - x.lost).slice(0, 3);
+  worst.forEach(x => {
+    const pts = (x.lost * 100).toFixed(1);
+    if(x.key === 'port') out.push(`Portfolio cost ${pts} pts. ${row.deferred && row.deferred !== '—' ? 'Not touched: ' + esc(row.deferred) + '. ' : ''}${row.deferredApproved && row.deferredApproved !== '—' ? 'Deferred (Approved) does not count as done &mdash; ' + esc(row.deferredApproved) + ' must be completed or progressed within the period. ' : ''}`);
+    else if(x.key === 'plan') out.push(`Planning cost ${pts} pts. A planned task counts when it is worked on, or marked Deferred (Approved) with a reason in the remarks. Planned tasks that are simply ignored cost points.`);
+    else if(x.key === 'sub') out.push(`Submission cost ${pts} pts (${c.submitted} of ${c.expDays} expected days).`);
+    else if(x.key === 'mon') out.push(`Monthly progress cost ${pts} pts &mdash; ${n1(c.expM - c.doneM)} task point(s) of monthly work not yet touched this month.`);
+    else if(x.key === 'adhoc') out.push(`Adhoc cost ${pts} pts &mdash; logging 5 adhoc items in a week (20 in a month) gives full marks.`);
+    else if(x.key === 'qtr') out.push(`Quarterly progress cost ${pts} pts &mdash; ${n1(c.expQ - c.doneQ)} quarterly task point(s) still untouched this quarter.`);
+  });
+  if(b.late > 0) out.push(`Late submissions cost ${(b.late * 100).toFixed(1)} pts (0.5% each) &mdash; submit by 7:30pm.`);
+  return out;
+}
+
+function findRow(kind, key, staff){ return (ROWS[kind][key] || []).find(r => r.staff === staff); }
+function prevRowFor(kind, key, staff){
+  const keys = (kind === 'weekly' ? DATA.weekStarts : DATA.months).filter(k => k < key).reverse();
+  for(const k of keys){ const r = findRow(kind, k, staff); if(r && r.score !== null && r.calc) return {key: k, row: r}; }
+  return null;
+}
+function breakdownHtml(kind, key, staff){
+  const row = findRow(kind, key, staff);
+  if(!row || !row.calc) return '<div class="empty">A detailed breakdown is not available for this period.</div>';
+  const flex = DATA.flexSet.has(staff);
+  const b = breakdownCalc(kind, row.calc, row.calc.profile, flex, DATA.weights);
+  const label = kind === 'weekly' ? fmtWeek(key) : fmtMonth(key);
+  const prev = prevRowFor(kind, key, staff);
+  let delta = '';
+  let moved = '';
+  if(prev){
+    const pb = breakdownCalc(kind, prev.row.calc, prev.row.calc.profile, flex, DATA.weights);
+    const d = (row.score !== null ? row.score : b.final) - (prev.row.score !== null ? prev.row.score : pb.final);
+    delta = `<div class="reason">${d >= 0 ? '&#9650;' : '&#9660;'} ${(Math.abs(d) * 100).toFixed(1)} pts vs ${kind === 'weekly' ? 'the previous scored week' : 'last month'} (${pct(prev.row.score)})</div>`;
+    const diffs = b.comps.map(x => { const o = pb.comps.find(y => y.key === x.key); return {name: x.name, d: (x.earned - (o ? o.earned : 0)) * 100}; }).filter(x => Math.abs(x.d) >= 0.5).sort((x, y) => Math.abs(y.d) - Math.abs(x.d)).slice(0, 3);
+    if(diffs.length) moved = `<div class="sec"><b>What changed since ${kind === 'weekly' ? 'last week' : 'last month'}</b><span class="taskline">${diffs.map(x => `${esc(x.name)} ${x.d > 0 ? '+' : ''}${x.d.toFixed(1)} pts`).join(' &middot; ')}</span></div>`;
+  }
+  const rows = b.comps.map(x => x.applies
+    ? `<tr><td>${esc(x.name)}${x.detail ? `<div class="bdsub">${esc(x.detail)}</div>` : ''}</td><td>${pct(x.value)}</td><td>${(x.share * 100).toFixed(0)}%</td><td class="up">+${(x.earned * 100).toFixed(1)}</td><td class="dn">${x.lost > 0.0005 ? '&minus;' + (x.lost * 100).toFixed(1) : '0'}</td></tr>`
+    : `<tr class="na"><td colspan="5">${esc(x.name)} &mdash; <i>${esc(x.why || 'not applicable')}</i></td></tr>`).join('');
+  const adv = adviceFor(kind, b, row.calc, row);
+  const lists = (lab, v) => v && v !== '—' ? `<div class="sec"><b>${lab}</b><span class="taskline">${esc(v)}</span></div>` : '';
+  return `<div class="ytd-score-row"><span class="val">${pct(row.score)}</span><span class="badge ${ratingClass(row.rating)}">${esc((row.rating || '').replace(/^\d - /, ''))}</span></div>
+    <div class="reason">${esc(staff)} &middot; ${esc(label)}</div>${delta}
+    <table class="breakdown-table bd"><tr><th>Component</th><th>Result</th><th>Weight</th><th>Earned</th><th>Lost</th></tr>${rows}
+      ${b.late > 0 ? `<tr><td colspan="3">Late-submission penalty</td><td></td><td class="dn">&minus;${(b.late * 100).toFixed(1)}</td></tr>` : ''}
+      <tr class="tot"><td colspan="3">Final score</td><td colspan="2">${(b.final * 100).toFixed(1)}%</td></tr></table>
+    <div class="reason" style="margin-top:4px">Weights are re-balanced to 100% across the components that apply, so nothing is lost for work that doesn't exist for that person or period.</div>
+    ${moved}
+    ${adv.length ? `<div class="sec"><b>What would raise this score</b>${adv.map(a => `<div class="catline">${a}</div>`).join('')}</div>` : '<div class="sec"><b>What would raise this score</b><span class="taskline">Nothing is being lost &mdash; every applicable component is at 100%.</span></div>'}
+    ${lists('Completed', row.completed)}${lists('In progress', row.inprogress)}${lists('Deferred (Approved) — counts as not done', row.deferredApproved)}${lists('Not touched', row.deferred)}${lists('Adhoc', row.adhocItems)}`;
+}
+function openBreakdown(kind, key, staff){
+  document.getElementById('bdTitle').textContent = (kind === 'weekly' ? 'Weekly' : 'Monthly') + ' score breakdown';
+  document.getElementById('bdBody').innerHTML = breakdownHtml(kind, key, staff);
+  document.getElementById('bdModal').classList.add('open');
+}
+function ytdWeeksHtml(staff){
+  const list = (DATA.weeklyRaw[staff] || []).filter(r => r.score !== null && r.wk <= TODAY_KEY);
+  if(!list.length) return '<div class="empty">No scored weeks yet.</div>';
+  return `<table class="breakdown-table bd"><tr><th>Week</th><th>Score</th><th></th></tr>${list.map(r => `<tr class="clickrow" data-bd="weekly|${r.wk}|${esc(staff)}"><td>${esc(fmtWeek(r.wk))}</td><td>${pct(r.score)}</td><td>&rsaquo;</td></tr>`).join('')}</table>`;
+}
+
+// ---------- How Calc (filled from the live KPI Weights sheet) ----------
+function renderHowCalc(){
+  const W = DATA.weights;
+  const wr = (p) => { const x = W[p]; return `<tr><td>${p === 'Pastoral' ? 'Pastoral' : 'Administration'}</td><td>${Math.round(x.port*100)}%</td><td>${Math.round(x.plan*100)}%</td><td>${Math.round(x.sub*100)}%</td><td>${Math.round(x.mon*100)}%</td><td>${Math.round(x.adhoc*100)}%</td><td>${Math.round(x.qtr*100)}%</td></tr>`; };
+  const flexNames = Array.from(DATA.flexSet).join(', ') || '&mdash;';
+  document.getElementById('howcalcBody').innerHTML = `
+    <div class="card"><div class="hc-title">The Final KPI formula</div>
+      <div class="hc-formula">Final KPI % = &Sigma; (component result &times; its weight) &divide; &Sigma; (weights that apply) &minus; Late Penalty</div>
+      <div class="reason">Only the components that <b>apply</b> to that person and period are counted, and the weights are re-balanced to 100%. A component does not apply when the person has no tasks of that kind (e.g. no monthly or quarterly tasks), logged no adhoc work that week, or made no plan. Tap any score on the Weekly or Monthly tab to see exactly how it was built.</div></div>
+    <div class="card"><div class="hc-title">Weights</div>
+      <table class="hc-table"><tr><th></th><th>Portfolio</th><th>Planning</th><th>Submission</th><th>Monthly</th><th>Adhoc</th><th>Quarterly</th></tr>${wr('Administration')}${wr('Pastoral')}</table>
+      <div class="reason">At the Monthly level, Portfolio and Monthly progress are blended into one score and carry their combined weight.</div></div>
+    <div class="card"><div class="hc-title">What each component means</div>
+      <div class="sec"><b>Portfolio %</b><span class="taskline">Of the points assigned to the person's <b>Weekly</b> tasks, how many were Completed or In Progress at least once during the week. <b>Deferred (Approved) does not count as done</b> &mdash; the portfolio is a commitment, so a task still only deferred at the end of the week scores the same as one with no status.</span></div>
+      <div class="sec"><b>Monthly progress %</b><span class="taskline">Same idea for Monthly tasks, cumulative through the month (a monthly task touched in week 1 stays counted for the rest of the month).</span></div>
+      <div class="sec"><b>Quarterly progress %</b><span class="taskline">Same idea for Quarterly tasks, cumulative through the calendar quarter. Quarterly scoring starts in Q4 (1 Oct 2026). Pastoral &lsquo;new-type&rsquo; tasks (e.g. Ministerial Reading, Ministry Training) are in a trial period: you still report on them and they show in the Daily log, but they do not affect any score or Planning until <b>1 Jan 2027</b>.</span></div>
+      <div class="sec"><b>Planning %</b><span class="taskline">Of the tasks planned for tomorrow, the share <b>accounted for</b> on the next working day &mdash; worked on (Completed / In Progress) <b>or</b> marked Deferred (Approved) with the reason in remarks. A planned task that is simply ignored costs planning score. Friday's plan is checked on Tuesday (the next working day).</span></div>
+      <div class="sec"><b>Submission %</b><span class="taskline">Days submitted &divide; expected working days (Tue&ndash;Fri). Approved leave (including half-days) is removed from the expected days. A half-day leave report submitted before 5:30pm is expected and not penalised.</span></div>
+      <div class="sec"><b>Adhoc %</b><span class="taskline">Adhoc items logged &divide; 5 per week (&divide; 20 per month), capped at 100%. Only counted in weeks where adhoc work was logged.</span></div>
+      <div class="sec"><b>Late penalty</b><span class="taskline">0.5% for each report submitted after 7:30pm on the day, or on any later day.</span></div></div>
+    <div class="card"><div class="hc-title">Two scoring periods</div>
+      <div class="reason">Your portfolio was revised in the Google Form in September. Scores up to <b>18 Sep 2026</b> use the previous portfolio and frequencies exactly as they were; from <b>21 Sep 2026</b> scores use the new portfolio and frequencies. A task that changed frequency (e.g. Weekly &rarr; Monthly) appears once under each. New tasks only count from 21 Sep (Quarterly from 1 Oct), so nobody is marked down for work that did not yet exist. See <b>Task Glossary</b> for each person's current and previous tasks.</div></div>
+    <div class="card"><div class="hc-title">Flexible-schedule staff</div>
+      <div class="reason">${flexNames} ${DATA.flexSet.size > 1 ? 'work' : 'works'} on a flexible schedule: no daily report is required (shown as <b>Rest &amp; Recovery</b> rather than Not Submitted), and Submission %, Planning % and the late penalty do not apply. The score is based on Weekly, Monthly and Quarterly tasks being completed within their period (weekly tasks by Friday).</div></div>
+    <div class="card"><div class="hc-title">Leave</div>
+      <div class="reason">Approved leave of any type is never penalised. A week of full leave is excluded from scoring (shown as On Leave) and is not counted as zero in monthly or YTD averages. Partial-leave weeks are scored on the days actually available.</div></div>
+    <div class="card"><div class="hc-title">Rating bands</div>
+      <table class="hc-table"><tr><th>Score</th><th>Rating</th></tr>
+        <tr><td>&ge; 80%</td><td><span class="badge good">Good / On Track</span></td></tr>
+        <tr><td>70&ndash;79%</td><td><span class="badge mid">Needs Improvement</span></td></tr>
+        <tr><td>&lt; 70%</td><td><span class="badge low">Immediate Attention</span></td></tr></table></div>
+    <div class="card"><div class="hc-title">YTD average</div>
+      <div class="reason">The Weekly average is the mean of every completed, scored week's Final KPI %; the Monthly average is the mean of every completed month's score &mdash; the same numbers shown on the Weekly and Monthly tabs. Tap a person's report to see each week and open its breakdown.</div></div>
+    <div class="card"><div class="hc-title">Annual review blend &amp; recognition bands</div>
+      <div class="reason">Final KPI Score = (Daily Reporting KPI &times; 60%) + (Staff Ministry &amp; Performance Observation &times; 40%), then converted to a 0&ndash;5 scale (Final % &times; 5).</div>
+      <table class="hc-table"><tr><th>Score (0-5)</th><th>Level</th><th>Increment</th><th>Bonus</th></tr>
+        <tr><td>4.50&ndash;5.00</td><td>Outstanding</td><td>6%</td><td>1.5 months</td></tr>
+        <tr><td>3.80&ndash;4.49</td><td>Exceeds Expectations</td><td>4%&ndash;5%</td><td>1.0 month</td></tr>
+        <tr><td>3.00&ndash;3.79</td><td>Meets Expectations</td><td>2%&ndash;3%</td><td>0.5 month</td></tr>
+        <tr><td>2.00&ndash;2.99</td><td>Below Expectations</td><td>0%&ndash;1% (Discretionary)</td><td>Discretionary</td></tr>
+        <tr><td>Below 2.00</td><td>Needs Improvement</td><td>No Increment</td><td>No Bonus</td></tr></table>
+      <div class="reason">Increment is subject to church financial position; Bonus is based on 1 month base salary unless otherwise determined.</div></div>`;
+}
+
+document.addEventListener('click', (e) => {
+  const bd = e.target.closest('[data-bd]');
+  if(bd){ const p = bd.dataset.bd.split('|'); openBreakdown(p[0], p[1], p.slice(2).join('|')); return; }
+  const tg = e.target.closest('[data-toggle]');
+  if(tg){ const box = tg.closest('.card').querySelector('.fullbox'); if(box) box.style.display = box.style.display === 'none' ? 'block' : 'none'; }
+});
+// ===================== end v3.1 additions =====================
+
+document.getElementById('bdClose').addEventListener('click', () => document.getElementById('bdModal').classList.remove('open'));
+document.getElementById('bdModal').addEventListener('click', (e) => { if(e.target.id === 'bdModal') e.target.classList.remove('open'); });
+document.getElementById('bdPrintBtn').addEventListener('click', () => printModal('portrait'));
 
 async function init(){
   const loadingEl = document.getElementById('loadingScreen');
