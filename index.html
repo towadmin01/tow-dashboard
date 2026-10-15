@@ -398,6 +398,19 @@
   .rv-banner button{margin-left:8px; padding:5px 10px; border-radius:7px; border:1px solid #C9B36A; background:#fff; font-size:12px; cursor:pointer;}
   .rv-banner{justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap;}
   .page-label + .page-label{display:none !important;}
+  .gl-head{display:flex; align-items:center; gap:12px; padding:4px 0 12px; border-bottom:3px solid var(--gold); margin-bottom:10px;}
+  .gl-head img{height:46px; width:auto;} .gl-brand{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); font-weight:800;}
+  .gl-title{font-size:19px; font-weight:800; color:var(--navy); line-height:1.15;} .gl-sub{font-size:11px; color:#6b6552;}
+  .gl-info{display:grid; grid-template-columns:1fr 1fr; gap:6px 14px; background:#F8F6EF; border:1px solid var(--line); border-radius:9px; padding:10px 12px; margin-bottom:10px;}
+  .gl-info span{display:block; font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:#9a927a; font-weight:700;} .gl-info b{font-size:12.5px; color:#2b2a22;}
+  .gl-sum{display:flex; gap:8px; flex-wrap:wrap; margin:0 0 8px;} .gl-sum span{background:var(--navy); color:#fff; border-radius:14px; padding:3px 11px; font-size:11.5px;} .gl-sum b{color:var(--gold);}
+  .portfolio-group-label small{background:var(--gold); color:#fff; border-radius:10px; padding:0 7px; margin-left:6px; font-size:10.5px;}
+  .gl-colhead, .gl-row{display:grid; grid-template-columns:30px 1.1fr 1.6fr 34px; gap:8px; align-items:start;}
+  .gl-colhead{font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:#9a927a; font-weight:800; padding:4px 0; border-bottom:1.5px solid var(--navy);}
+  .gl-row{padding:7px 0; border-bottom:1px solid var(--line); font-size:12px; line-height:1.4; break-inside:avoid; page-break-inside:avoid;}
+  .gl-n{color:#9a927a; font-weight:700;} .gl-t b{display:block; color:var(--navy);} .gl-t i{display:block; font-size:10.5px; color:#8a8369;} .gl-d{color:#3a3626;} .gl-w{text-align:right; font-weight:700;}
+  .gl-note{font-size:11px; color:#6b6552; margin:4px 0 6px;} .gl-foot{margin-top:12px; padding-top:8px; border-top:1px solid var(--line); font-style:italic;}
+  @media print{ body.glossary-printing .modal-head{display:none !important;} body.glossary-printing .gl-head{margin-top:0;} .gl-info,.gl-sum span{-webkit-print-color-adjust:exact; print-color-adjust:exact;} }
   .rev-disc{font-size:11.5px; color:#6b6552; font-style:italic; margin:8px 0;}
 
 </style>
@@ -850,7 +863,7 @@ async function loadLiveData(){
       if(v.every(x => x !== null)) weights[p] = {port:v[0], plan:v[1], sub:v[2], adhoc:v[3]};
     });
     const sched = [];
-    for(let r = 5; r <= 60; r++){ const n = g(r,8); if(n) sched.push({staff:n, dept:g(r,9), profile:g(r,10), schedule:g(r,11) || 'Full-time', start:toISODate(g(r,12)) || '', last:toISODate(g(r,13)) || ''}); }
+    for(let r = 5; r <= 60; r++){ const n = g(r,8); if(n) sched.push({staff:n, dept:g(r,9), profile:g(r,10), schedule:g(r,11) || 'Full-time', start:toISODate(g(r,12)) || '', last:toISODate(g(r,13)) || '', position:g(r,14)}); }
     if(sched.length){ SET.schedules = sched; flexSet = new Set(sched.filter(x => /^flex/i.test(x.schedule)).map(x => x.staff)); }
   }
   const rosterOf = {}; SET.schedules.forEach(x => { rosterOf[x.staff] = x; });
@@ -1293,39 +1306,52 @@ const glossaryModal = document.getElementById('glossaryModal');
 const staffPicker = document.getElementById('staffPicker');
 
 function fmtShortDate(k){ return k ? new Date(k+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit', month:'short', year:'numeric'}) : ''; }
-function taskRowHtml(t){
-  const note = t.end && t.end < TODAY_KEY ? `scored up to ${fmtShortDate(t.end)}` : (t.scoreFrom && t.scoreFrom > TODAY_KEY ? `trial period \u2014 report it, but it counts toward your score from ${fmtShortDate(t.scoreFrom)}` : (t.start ? `counts from ${fmtShortDate(t.start)}` : ''));
-  return `
-    <div class="task-row">
-      <div class="task-top">
-        <span class="task-short">${esc(t.short)}</span>
-        <span class="task-cat">${esc(t.category)} &middot; wt ${t.weight}${t.scored ? '' : ' &middot; not scored'}</span>
-      </div>
-      <div class="task-full">${esc(t.full)}</div>
-      ${note ? `<div class="task-full" style="font-size:11px;color:#8a8369;">${note}</div>` : ''}
-    </div>
-  `;
+function taskRowHtml(t, n){
+  const full = String(t.full || '').replace(/^(weekly|monthly|quarterly|ad-?hoc|every 4 months)\s*[-–—]\s*/i, '');
+  const note = t.end && t.end < TODAY_KEY ? `Scored up to ${fmtShortDate(t.end)}` : (t.scoreFrom && t.scoreFrom > TODAY_KEY ? `Trial period — report it; counts toward the score from ${fmtShortDate(t.scoreFrom)}` : (t.scored ? '' : 'Reported, not scored'));
+  return `<div class="gl-row"><span class="gl-n">${n}</span><span class="gl-t"><b>${esc(t.short)}</b>${note ? `<i>${esc(note)}</i>` : ''}</span><span class="gl-d">${esc(full)}</span><span class="gl-w">${t.weight}</span></div>`;
 }
 function renderPortfolio(staff){
-  document.getElementById('glossaryModalTitle').textContent = 'Task Glossary & Portfolio — ' + staff;
+  document.getElementById('glossaryModalTitle').textContent = 'Task Glossary & Portfolio';
   const all = DATA.portfolio[staff] || [];
   const el = document.getElementById('portfolioList');
-  if(!all.length){ el.innerHTML = '<div class="empty">No active tasks on file.</div>'; return; }
+  const ro = (DATA.settings.schedules || []).find(x => x.staff === staff) || {};
+  const acc = DATA.accum[staff] || {};
+  const dept = ro.dept || acc.dept || '';
   const ended = t => t.end && t.end < TODAY_KEY;
-  const order = ['Weekly','Monthly','Quarterly','Adhoc'];
-  const block = (list, titleSuffix) => {
-    const groups = {};
-    list.forEach(t => { (groups[t.category] = groups[t.category] || []).push(t); });
-    let html = '';
-    order.concat(Object.keys(groups).filter(k => !order.includes(k))).forEach(cat => {
-      if(!groups[cat] || !groups[cat].length) return;
-      html += `<div class="portfolio-group-label">${cat} Tasks${titleSuffix}</div>` + groups[cat].slice().sort((a,b) => a.full.localeCompare(b.full)).map(taskRowHtml).join('');
-    });
-    return html;
-  };
   const current = all.filter(t => !ended(t)), previous = all.filter(ended);
-  let html = block(current, '');
-  if(previous.length) html += `<div class="portfolio-group-label" style="margin-top:18px;">Previous portfolio &mdash; history only</div><div class="reason" style="margin:0 0 6px;">These were scored up to the form revision. They are kept so past weeks and months still read correctly.</div>` + block(previous, '');
+  const order = ['Weekly','Monthly','Quarterly','Adhoc'];
+  const groups = list => { const g = {}; list.forEach(t => { (g[t.category] = g[t.category] || []).push(t); }); return g; };
+  const cur = groups(current);
+  const cats = order.concat(Object.keys(cur).filter(k => !order.includes(k))).filter(k => cur[k] && cur[k].length);
+  const flex = DATA.flexSet.has(staff);
+  const logo = (document.querySelector('.header-logo') || {}).src || '';
+  let html = `<div class="gl-head">
+      ${logo ? `<img src="${logo}" alt="">` : ''}
+      <div><div class="gl-brand">Tabernacle of Worship</div><div class="gl-title">Task Glossary &amp; Portfolio</div><div class="gl-sub">Performance Management System</div></div></div>
+    <div class="gl-info">
+      <div><span>Name</span><b>${esc(staff)}</b></div>
+      <div><span>Position</span><b>${esc(ro.position || '—')}</b></div>
+      <div><span>Department</span><b>${esc(dept || '—')}</b></div>
+      <div><span>Schedule</span><b>${flex ? 'Flexible' : 'Full-time'}</b></div>
+      <div><span>As at</span><b>${esc(fmtShortDate(TODAY_KEY))}</b></div>
+      <div><span>Current tasks</span><b>${current.length}</b></div>
+    </div>`;
+  if(!all.length){ el.innerHTML = html + '<div class="empty">No active tasks on file.</div>'; return; }
+  html += `<div class="gl-sum">${cats.map(c => `<span><b>${cur[c].length}</b> ${esc(c)}</span>`).join('')}</div>`;
+  const col = '<div class="gl-colhead"><span>#</span><span>Task</span><span>What it covers</span><span>Wt</span></div>';
+  cats.forEach(c => {
+    html += `<div class="portfolio-group-label">${esc(c)} tasks <small>${cur[c].length}</small></div>${col}`;
+    cur[c].slice().sort((a,b) => a.full.localeCompare(b.full)).forEach((t, i) => { html += taskRowHtml(t, i + 1); });
+  });
+  if(previous.length){
+    const pv = groups(previous);
+    html += `<div class="portfolio-group-label gl-prev">Previous portfolio &mdash; history only</div><div class="gl-note">Scored up to the September form revision. Kept so past weeks and months still read correctly.</div>${col}`;
+    order.concat(Object.keys(pv).filter(k => !order.includes(k))).filter(k => pv[k] && pv[k].length).forEach(c => {
+      pv[c].slice().sort((a,b) => a.full.localeCompare(b.full)).forEach((t, i) => { html += taskRowHtml(t, c[0] + (i + 1)); });
+    });
+  }
+  html += `<div class="gl-note gl-foot">Wt = the task's weight in the score. Weekly, monthly and quarterly tasks are all counted together in Portfolio (see How Calc.). Position and schedule are set in the Settings roster.</div>`;
   el.innerHTML = html;
 }
 
@@ -1426,7 +1452,8 @@ function insertPageLabels(container, pageHeightPx){
   blocks.forEach(el => {
     const h = el.offsetHeight + 12;
     // keep a group heading together with its first row
-    const need = (el.classList.contains('portfolio-group-label') && el.nextElementSibling) ? h + el.nextElementSibling.offsetHeight : h;
+    let need = h;
+    if(el.classList.contains('portfolio-group-label')){ let n1 = el.nextElementSibling, k = 0; while(n1 && k < 2){ need += n1.offsetHeight; n1 = n1.nextElementSibling; k++; } }
     if(used > 0 && used + need > pageHeightPx){ page++; mk(el, false); used = h; }
     else used += h;
   });
@@ -1510,7 +1537,12 @@ function printModal(defaultOrientation){
   const orientation = (orientationSelect && orientationSelect.value) || defaultOrientation;
   document.getElementById('pageSizeStyle').textContent = `@page { size: A4 ${orientation}; margin: 12mm; }`;
 
-  const openModal = document.querySelector('.modal-overlay.open .modal-body');
+  const isGlossary = !!document.querySelector('#glossaryModal.open');
+  if(isGlossary){   // report layout: let the browser paginate naturally (no forced breaks); page numbers via @page
+    document.getElementById('pageSizeStyle').textContent = `@page { size: A4 ${orientation}; margin: 12mm 12mm 16mm; @bottom-right { content: "Page " counter(page) " of " counter(pages); font-size: 9px; color: #888; } @bottom-left { content: "Tabernacle of Worship \u2014 Task Glossary"; font-size: 9px; color: #888; } }`;
+    clearPageLabels(document.querySelector('#glossaryModal .modal-body'));
+  }
+  const openModal = isGlossary ? null : document.querySelector('.modal-overlay.open .modal-body');
   if(openModal){
     const pageHeightMM = orientation === 'landscape' ? 210 : 297;
     const pageHeightPx = (pageHeightMM - 24) * PX_PER_MM - 65; // minus @page margins and modal-head estimate
@@ -1518,9 +1550,10 @@ function printModal(defaultOrientation){
   }
 
   document.body.classList.add('modal-printing');
+  if(document.querySelector('#glossaryModal.open')) document.body.classList.add('glossary-printing');
   window.print();
 }
-window.addEventListener('afterprint', () => document.body.classList.remove('modal-printing'));
+window.addEventListener('afterprint', () => { document.body.classList.remove('modal-printing'); document.body.classList.remove('glossary-printing'); });
 
 
 // ---- Performance Review form (TOW Staff Ministry & Performance Observation, 40%) ----
@@ -1557,7 +1590,8 @@ function renderReviewHeader(staff){
   const rows = [`<tr><td>Staff Name</td><td>${staff}</td></tr>`,
                 `<tr><td>Department</td><td>${accum.dept || ''}</td></tr>`];
   REVIEW_HEADER_FIELDS.forEach(f => {
-    rows.push(`<tr><td>${f.label}</td><td><input type="${f.type||'text'}" class="rev-header-input" data-field="${f.key}" value="${(header[f.key]||'').replace(/"/g,'&quot;')}"></td></tr>`);
+    const dv = header[f.key] || (f.key === 'positionHeld' ? (((DATA.settings.schedules || []).find(x => x.staff === staff) || {}).position || '') : '');
+    rows.push(`<tr><td>${f.label}</td><td><input type="${f.type||'text'}" class="rev-header-input" data-field="${f.key}" value="${String(dv).replace(/"/g,'&quot;')}"></td></tr>`);
   });
   document.getElementById('reviewHeaderTable').innerHTML = rows.join('');
   document.querySelectorAll('.rev-header-input').forEach(el => {
