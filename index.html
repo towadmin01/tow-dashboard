@@ -707,10 +707,10 @@ async function fetchSheetGrid(sheetName){
   if(!res.ok) throw new Error('Failed to fetch sheet: ' + sheetName);
   return parseCsvLine(await res.text());
 }
-async function fetchSheetRows(sheetName){
+async function fetchSheetRows(sheetName, bust){
   const encodedSheet = encodeURIComponent(sheetName).replace(/\(/g,'%28').replace(/\)/g,'%29');
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodedSheet}`;
-  const res = await fetch(url);
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodedSheet}${bust ? '&cb=' + Date.now() : ''}`;
+  const res = await fetch(url, bust ? {cache: 'no-store'} : undefined);
   if(!res.ok) throw new Error('Failed to fetch sheet: ' + sheetName);
   const text = await res.text();
   const rows = parseCsvLine(text);
@@ -795,8 +795,8 @@ async function loadLiveData(){
     fetchSheetRows('Flexible Arrangement Staff').catch(() => []),
     fetchSheetRows('Maintenance Log').catch(() => []),
     fetchSheetGrid('Settings').catch(() => null),
-    fetchSheetRows('Email Log').catch(() => []),
-    fetchSheetRows('Email Queue').catch(() => []),
+    fetchSheetRows('Email Log', true).catch(() => []),
+    fetchSheetRows('Email Queue', true).catch(() => []),
   ]);
 
   // ---- Real workdays only (Tue-Fri, minus public holidays) — used to keep
@@ -2349,7 +2349,7 @@ function renderEmails(){
   const btn = 'padding:6px 12px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:13px';
   el.innerHTML = `
   <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>To be sent${qd ? ' — ' + esc(qd) : ''}</b><button id="qTog" style="${btn}">${queueOpen ? 'Hide' : 'Show'}</button></div>
-    ${queueOpen ? (ql.length ? `<div style="overflow-x:auto;margin-top:8px"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr style="text-align:left"><th style="padding:6px 8px">Staff</th><th style="padding:6px 8px">Type</th><th style="padding:6px 8px">Missed days</th><th style="padding:6px 8px">Status</th></tr></thead><tbody>${qbody}</tbody></table></div><div style="margin-top:8px;font-size:12px;color:#777">Prepared about 5:00 pm. To hold someone back, set <b>Send?</b> to No in the <b>Email Queue</b> tab of the sheet before 5:30 pm.</div>` : `<div style="margin-top:8px;color:#888;font-size:13px">No queue yet. It is prepared about 5:00 pm on work days.</div>`) : ''}</div>
+    ${queueOpen ? (ql.length ? `<div style="overflow-x:auto;margin-top:8px"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr style="text-align:left"><th style="padding:6px 8px">Staff</th><th style="padding:6px 8px">Type</th><th style="padding:6px 8px">Missed days</th><th style="padding:6px 8px">Status</th></tr></thead><tbody>${qbody}</tbody></table></div><div style="margin-top:8px;font-size:12px;color:#777">Prepared about 5:00 pm. To hold someone back, set <b>Send?</b> to No in the <b>Email Queue</b> tab of the sheet before 5:30 pm.</div>` : `<div style="margin-top:8px;color:#888;font-size:13px">No queue read yet. It is prepared about 5:00 pm on work days (or run previewFollowUps in Apps Script). If you already ran it, wait 1–2 minutes and reload — Google can delay showing a brand-new tab.</div>`) : ''}</div>
   <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Sent history (${list.length})</b><button id="hTog" style="${btn}">${emailOpen ? 'Hide' : 'Show'}</button></div>
   ${emailOpen ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0">
     <select id="emailSel" class="orientation-select"><option value="all">All staff</option>${staff.map(s => `<option ${s === emailStaff ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
