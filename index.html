@@ -431,6 +431,7 @@
       <div class="brand">Tabernacle of Worship</div>
       <h1>Staff Performance Dashboard</h1>
     </div>
+    <a id="sheetLink" href="https://docs.google.com/spreadsheets/d/1tztxHxKnxeRKSDcrBzHRtt5oTsSMagZH6lUhENnwehA/edit" target="_blank" rel="noopener" title="Open the Google Sheet (admin)" aria-label="Open the Google Sheet" style="display:none;align-items:center;justify-content:center;width:34px;height:34px;margin-right:8px;border-radius:8px;background:rgba(255,255,255,.15);color:#fff;text-decoration:none;font-size:18px;flex:none">&#128202;</a>
     <button class="glossary-btn" id="glossaryBtn">Task Glossary</button>
   </div>
   <div class="tabs">
@@ -1054,6 +1055,14 @@ async function loadLiveData(){
   return {settings: SET, workdays: wdList, maintenance, emails, emailQueue, daily, dailyDates, weekly, weekStarts, monthly, months, accum, portfolio, adhocLog, weeklyRaw, monthlyRaw, weights, flexSet, taskFull, leaveByStaffDate};
 }
 
+// Admin-only sheet shortcut: open this page once with ?me=1 to show the icon on this device (?me=0 hides it)
+(function(){ try {
+  const u = new URLSearchParams(location.search);
+  if(u.get('me') === '1') localStorage.setItem('tow_admin', '1');
+  if(u.get('me') === '0') localStorage.removeItem('tow_admin');
+  if(u.has('me')){ u.delete('me'); const q = u.toString(); history.replaceState(null, '', location.pathname + (q ? '?' + q : '')); }
+  if(localStorage.getItem('tow_admin') === '1') document.getElementById('sheetLink').style.display = 'inline-flex';
+} catch(e){} })();
 let DATA = null;
 let currentTab = 'daily';
 
