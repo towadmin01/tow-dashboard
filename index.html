@@ -439,6 +439,7 @@
     <div class="tab" data-view="monthly">Monthly</div>
     <div class="tab" data-view="ytd">YTD Avg</div>
     <div class="tab" data-view="maint">Maint.</div>
+    <div class="tab" data-view="emails">Emails</div>
     <div class="tab" data-view="review">Review</div>
     <div class="tab" data-view="howcalc">How Calc.</div>
     <div class="tab" data-view="settings">Settings</div>
@@ -593,6 +594,7 @@
   <div class="view" id="view-monthly"></div>
   <div class="view" id="view-ytd"></div>
   <div class="view" id="view-maint"></div>
+  <div class="view" id="view-emails"></div>
   <div class="view" id="view-review">
     <div id="reviewStatus"></div>
     <div class="card">
@@ -778,7 +780,7 @@ function buildRemark(rows, periodLabel){
 
 const TODAY_KEY_EARLY = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })();
 async function loadLiveData(){
-  const [rawDaily, weeklyCalc, monthlyCalc, weeklyTaskSummary, monthlyTaskSummary, taskReference, accumWeekly, accumMonthly, leaveLog, workdayCalendar, kpiWeightsRows, flexRows, maintRows, settingsGrid] = await Promise.all([
+  const [rawDaily, weeklyCalc, monthlyCalc, weeklyTaskSummary, monthlyTaskSummary, taskReference, accumWeekly, accumMonthly, leaveLog, workdayCalendar, kpiWeightsRows, flexRows, maintRows, settingsGrid, emailRows, queueRows] = await Promise.all([
     fetchSheetRows('Raw Daily Log'),
     fetchSheetRows('Weekly Calc'),
     fetchSheetRows('Monthly Calc'),
@@ -793,6 +795,8 @@ async function loadLiveData(){
     fetchSheetRows('Flexible Arrangement Staff').catch(() => []),
     fetchSheetRows('Maintenance Log').catch(() => []),
     fetchSheetGrid('Settings').catch(() => null),
+    fetchSheetRows('Email Log').catch(() => []),
+    fetchSheetRows('Email Queue').catch(() => []),
   ]);
 
   // ---- Real workdays only (Tue-Fri, minus public holidays) — used to keep
@@ -912,8 +916,8 @@ async function loadLiveData(){
       if(flexSet.has(s)) return Object.assign({staff:s, dept:staffDept[s], status:'Rest & Recovery', time:'', leave:'', today:'', plan:'', detail:null}, extra);
       return Object.assign({staff:s, dept:staffDept[s], status:'NOT SUBMITTED', time:'', leave:'', today:'', plan:'', detail:null}, extra);
     });
-    const order = {'NOT SUBMITTED':0,'Late':1,'Early':1,'On-time':1,'On Leave':2,'Rest & Recovery':3};
-    // submitted reports are listed in the order they were sent (a report sent on a later day, shown as "18:45 (20 Oct)", goes after the same-day ones)
+    const order = {'NOT SUBMITTED':0,'Late':1,'Early':2,'On-time':2,'On Leave':3,'Rest & Recovery':4};
+    // top to bottom: not submitted, late (latest first), on-time (latest first, earliest at the bottom), on leave, rest. A report sent on a later day, shown as "18:45 (20 Oct)", counts as later than same-day ones
     const MONS = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
     const sentKey = r => {
       const m = /^\s*(\d{1,2})[:.](\d{2})(?:\s*\((\d{1,2})\s+([A-Za-z]{3})[a-z]*\))?/.exec(r.time || '');
@@ -924,7 +928,7 @@ async function loadLiveData(){
     };
     rows.forEach(r => { r._k = sentKey(r); });
     rows.sort((a,b) => (order[a.status]??4) - (order[b.status]??4)
-      || ((a._k === null ? 1e9 : a._k) - (b._k === null ? 1e9 : b._k))
+      || ((b._k === null ? -1e9 : b._k) - (a._k === null ? -1e9 : a._k))
       || a.staff.localeCompare(b.staff));
     daily[date] = rows;
   });
@@ -1045,7 +1049,9 @@ async function loadLiveData(){
   Object.keys(adhocLog).forEach(s => adhocLog[s].sort((a,b)=>a.date.localeCompare(b.date)));
 
   const maintenance = maintRows.map(r => ({date: toISODate(r['Date']), report: r['Report'], staff: r['Staff'], task: r['Task'] || '', remark: r['What was done (remarks)'] || '', dayRemark: r['Day remarks'] || ''})).filter(r => r.date && r.report);
-  return {settings: SET, workdays: wdList, maintenance, daily, dailyDates, weekly, weekStarts, monthly, months, accum, portfolio, adhocLog, weeklyRaw, monthlyRaw, weights, flexSet, taskFull, leaveByStaffDate};
+  const emails = (emailRows || []).map(r => ({sent: String(r['Sent at'] || '').trim(), staff: r['Staff'] || '', type: r['Type'] || '', missed: r['Missed days'] || '', note: r['Note'] || ''})).filter(r => r.sent && r.staff).sort((a, b) => b.sent.localeCompare(a.sent));
+  const emailQueue = (queueRows || []).map(r => ({date: String(r['Date'] || '').trim(), staff: r['Staff'] || '', type: r['Type'] || '', missed: r['Missed days'] || '', send: String(r['Send? (Yes/No)'] || r['Send?'] || '').trim()})).filter(r => r.date && r.staff);
+  return {settings: SET, workdays: wdList, maintenance, emails, emailQueue, daily, dailyDates, weekly, weekStarts, monthly, months, accum, portfolio, adhocLog, weeklyRaw, monthlyRaw, weights, flexSet, taskFull, leaveByStaffDate};
 }
 
 let DATA = null;
@@ -1272,6 +1278,10 @@ function switchTab(view){
     metaBar.style.display = 'none';
     if(exportBar) exportBar.style.display = 'flex';
     renderYTD();
+  } else if(view === 'emails'){
+    metaBar.style.display = 'none';
+    if(exportBar) exportBar.style.display = 'none';
+    renderEmails();
   } else if(view === 'maint'){
     metaBar.style.display = 'none';
     if(exportBar) exportBar.style.display = 'flex';
@@ -2318,6 +2328,46 @@ const MAINT_REPORTS = {
 let maintReport = 'Vehicle Maintenance', maintYear = 'all';
 function maintEntries(){
   return (DATA.maintenance || []).filter(r => r.report === maintReport && (maintYear === 'all' || r.date.slice(0,4) === maintYear)).sort((a, b) => b.date.localeCompare(a.date));
+}
+let emailStaff = 'all', emailType = 'all', emailFrom = '', emailTo = '', emailShown = 10, emailOpen = true, queueOpen = true;
+function renderEmails(){
+  const el = document.getElementById('view-emails');
+  const all = DATA.emails || [];
+  const q = DATA.emailQueue || [];
+  const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  const staff = Array.from(new Set(all.map(r => r.staff))).sort();
+  const types = Array.from(new Set(all.map(r => r.type))).sort();
+  if(emailStaff !== 'all' && !staff.includes(emailStaff)) emailStaff = 'all';
+  if(emailType !== 'all' && !types.includes(emailType)) emailType = 'all';
+  const list = all.filter(r => (emailStaff === 'all' || r.staff === emailStaff) && (emailType === 'all' || r.type === emailType) && (!emailFrom || r.sent.slice(0,10) >= emailFrom) && (!emailTo || r.sent.slice(0,10) <= emailTo));
+  const shown = list.slice(0, emailShown);
+  const body = shown.length ? shown.map(r => `<tr><td style="white-space:nowrap;padding:6px 8px">${esc(r.sent)}</td><td style="padding:6px 8px">${esc(r.staff)}</td><td style="padding:6px 8px">${esc(r.type)}</td><td style="padding:6px 8px">${esc(r.missed) || '—'}</td></tr>`).join('') : `<tr><td colspan="4" style="padding:16px;color:#888">No follow-up emails match. Test emails are not logged.</td></tr>`;
+  // queue = the list prepared before the 5:30 pm send (latest date only)
+  const qd = q.length ? q.map(r => r.date).sort().pop() : '';
+  const ql = q.filter(r => r.date === qd);
+  const qbody = ql.map(r => `<tr><td style="padding:6px 8px">${esc(r.staff)}</td><td style="padding:6px 8px">${esc(r.type)}</td><td style="padding:6px 8px">${esc(r.missed) || '—'}</td><td style="padding:6px 8px;font-weight:bold;color:${/^no/i.test(r.send) ? '#d93025' : '#188038'}">${/^no/i.test(r.send) ? 'On hold' : 'Will send'}</td></tr>`).join('');
+  const btn = 'padding:6px 12px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:13px';
+  el.innerHTML = `
+  <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>To be sent${qd ? ' — ' + esc(qd) : ''}</b><button id="qTog" style="${btn}">${queueOpen ? 'Hide' : 'Show'}</button></div>
+    ${queueOpen ? (ql.length ? `<div style="overflow-x:auto;margin-top:8px"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr style="text-align:left"><th style="padding:6px 8px">Staff</th><th style="padding:6px 8px">Type</th><th style="padding:6px 8px">Missed days</th><th style="padding:6px 8px">Status</th></tr></thead><tbody>${qbody}</tbody></table></div><div style="margin-top:8px;font-size:12px;color:#777">Prepared about 5:00 pm. To hold someone back, set <b>Send?</b> to No in the <b>Email Queue</b> tab of the sheet before 5:30 pm.</div>` : `<div style="margin-top:8px;color:#888;font-size:13px">No queue yet. It is prepared about 5:00 pm on work days.</div>`) : ''}</div>
+  <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Sent history (${list.length})</b><button id="hTog" style="${btn}">${emailOpen ? 'Hide' : 'Show'}</button></div>
+  ${emailOpen ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0">
+    <select id="emailSel" class="orientation-select"><option value="all">All staff</option>${staff.map(s => `<option ${s === emailStaff ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
+    <select id="emailTyp" class="orientation-select"><option value="all">All types</option>${types.map(s => `<option ${s === emailType ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
+    <input type="date" id="emailFrom" value="${emailFrom}" class="orientation-select"><input type="date" id="emailTo" value="${emailTo}" class="orientation-select">
+    <button id="emailClr" style="${btn}">Clear</button></div>
+  <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr style="text-align:left"><th style="padding:6px 8px">Sent</th><th style="padding:6px 8px">Staff</th><th style="padding:6px 8px">Type</th><th style="padding:6px 8px">Missed days</th></tr></thead><tbody>${body}</tbody></table></div>
+  ${list.length > emailShown ? `<div style="margin-top:10px"><button id="emailMore" style="${btn}">Show 10 more (${list.length - emailShown} left)</button></div>` : (emailShown > 10 && list.length > 10 ? `<div style="margin-top:10px"><button id="emailLess" style="${btn}">Show less</button></div>` : '')}` : ''}</div>`;
+  const on = (id, fn) => { const n = document.getElementById(id); if(n) n.addEventListener(id.startsWith('email') && n.tagName !== 'BUTTON' ? 'change' : 'click', fn); };
+  on('qTog', () => { queueOpen = !queueOpen; renderEmails(); });
+  on('hTog', () => { emailOpen = !emailOpen; renderEmails(); });
+  on('emailSel', e => { emailStaff = e.target.value; emailShown = 10; renderEmails(); });
+  on('emailTyp', e => { emailType = e.target.value; emailShown = 10; renderEmails(); });
+  on('emailFrom', e => { emailFrom = e.target.value; emailShown = 10; renderEmails(); });
+  on('emailTo', e => { emailTo = e.target.value; emailShown = 10; renderEmails(); });
+  on('emailClr', () => { emailStaff = 'all'; emailType = 'all'; emailFrom = ''; emailTo = ''; emailShown = 10; renderEmails(); });
+  on('emailMore', () => { emailShown += 10; renderEmails(); });
+  on('emailLess', () => { emailShown = 10; renderEmails(); });
 }
 function renderMaint(){
   const el = document.getElementById('view-maint');
