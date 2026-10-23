@@ -807,7 +807,7 @@ async function loadLiveData(){
   const leaveByStaffDate = {};
   leaveLog.forEach(r => {
     const staff = r['Staff']; const date = toISODate(r['Date']);
-    if(staff && date) leaveByStaffDate[staff + '|' + date] = {type: r['Leave Type'] || 'On Leave', duration: r['Duration'] || ''};
+    if(staff && date && !/brief absence/i.test((r['Leave Type']||'') + ' ' + (r['Duration']||''))) leaveByStaffDate[staff + '|' + date] = {type: r['Leave Type'] || 'On Leave', duration: r['Duration'] || ''};
   });
 
   // ---- Staff list & dept map (from Weekly Calc) ----
@@ -846,24 +846,33 @@ async function loadLiveData(){
   });
   let flexSet = new Set(flexRows.map(r => String(r['Staff Name'] || r['Staff'] || '').trim()).filter(Boolean));
   // ---- Settings tab (single place to change how scoring works) ----
-  const SET = {fromSheet:false, latePen:.005, lateAfter:'19:30', earlyBefore:'17:30', adhocWeek:5, adhocMonth:20, bonusOnly:true, qStart:.667, good:.8, ok:.7,
+  const SET = {fromSheet:false, latePen:.005, lateAfter:'19:30', earlyBefore:'17:30', adhocWeek:5, adhocMonth:20, bonusOnly:true, qStart:.667, good:.8, ok:.7, lateSame:.05, late1:.10, late2:.20, lateFrom:'2026-10-26', catchup:5,
                goLive:'2026-10-01', trial:'2027-01-01', mid:'06-30', final:'12-31', email:'', schedules:[]};
   if(settingsGrid && settingsGrid.length > 10){
-    const g = (r, c) => ((settingsGrid[r-1] || [])[c] || '').trim();
-    const num = (r, d) => { const n = toNum(g(r,1)); return n === null ? d : n; };
+    // rows are found by their LABEL (the CSV feed can drop or shift blank/title rows, so fixed row numbers are not safe)
+    const cell = (r, c) => String((settingsGrid[r] || [])[c] || '').trim();
+    const find = (re, col) => { col = col || 0; for(let r = 0; r < settingsGrid.length; r++){ if(re.test(cell(r, col))) return r; } return -1; };
+    const val = (re, def) => { const r = find(re); return r < 0 ? def : (cell(r, 1) || def); };
+    const numv = (re, def) => { const r = find(re); if(r < 0) return def; const n = toNum(cell(r, 1)); return n === null ? def : n; };
     SET.fromSheet = true;
-    SET.latePen = num(5, SET.latePen); SET.lateAfter = g(6,1) || SET.lateAfter; SET.earlyBefore = g(7,1) || SET.earlyBefore;
-    SET.adhocWeek = num(8, 5); SET.adhocMonth = num(9, 20); SET.bonusOnly = !/^no/i.test(g(10,1));
-    SET.qStart = num(11, .667); SET.good = num(12, .8); SET.ok = num(13, .7);
-    SET.goLive = toISODate(g(14,1)) || SET.goLive; SET.trial = toISODate(g(15,1)) || SET.trial;
-    SET.mid = g(16,1) || SET.mid; SET.final = g(17,1) || SET.final; SET.email = g(18,1);
-    ['Administration','Pastoral'].forEach((p, i) => {
-      const r = 24 + i; if(g(r,0) !== p) return;
-      const v = [1,2,3,4].map(c => toNum(g(r,c)));
-      if(v.every(x => x !== null)) weights[p] = {port:v[0], plan:v[1], sub:v[2], adhoc:v[3]};
+    SET.latePen = numv(/^(old rule|late-report penalty)/i, SET.latePen);
+    SET.lateAfter = val(/^report deadline/i, SET.lateAfter); SET.earlyBefore = val(/^early cut-off/i, SET.earlyBefore);
+    SET.adhocWeek = numv(/^adhoc items.*per week/i, 5); SET.adhocMonth = numv(/^adhoc items.*per month/i, 20);
+    SET.bonusOnly = !/^no/i.test(val(/^adhoc is a bonus/i, 'Yes'));
+    SET.qStart = numv(/^quarterly tasks start counting/i, .667); SET.good = numv(/^rating.*good/i, .8); SET.ok = numv(/^rating.*needs/i, .7);
+    SET.goLive = toISODate(val(/^quarterly scoring starts/i, '')) || SET.goLive; SET.trial = toISODate(val(/^new-type pastoral/i, '')) || SET.trial;
+    SET.mid = val(/^mid-year/i, SET.mid); SET.final = val(/^year-end/i, SET.final); SET.email = val(/^send review reminder/i, '');
+    SET.lateSame = numv(/^late report.*same day/i, SET.lateSame); SET.late1 = numv(/^late report.*1 day/i, SET.late1); SET.late2 = numv(/^late report.*2 or more/i, SET.late2);
+    SET.catchup = numv(/^catch-up/i, SET.catchup);
+    SET.lateFrom = toISODate(val(/^late-report rule above applies/i, '')) || SET.lateFrom;
+    ['Administration','Pastoral'].forEach(pn => {
+      const r = find(new RegExp('^' + pn + '$')); if(r < 0) return;
+      const v = [1,2,3,4].map(c => toNum(cell(r, c)));
+      if(v.every(x => x !== null)) weights[pn] = {port:v[0], plan:v[1], sub:v[2], adhoc:v[3]};
     });
     const sched = [];
-    for(let r = 5; r <= 60; r++){ const n = g(r,8); if(n) sched.push({staff:n, dept:g(r,9), profile:g(r,10), schedule:g(r,11) || 'Full-time', start:toISODate(g(r,12)) || '', last:toISODate(g(r,13)) || '', position:g(r,14)}); }
+    const hr = find(/^staff( \(|$)/i, 8);
+    if(hr >= 0) for(let r = hr + 1; r < Math.min(settingsGrid.length, hr + 60); r++){ const n = cell(r, 8); if(n) sched.push({staff:n, dept:cell(r,9), profile:cell(r,10), schedule:cell(r,11) || 'Full-time', start:toISODate(cell(r,12)) || '', last:toISODate(cell(r,13)) || '', position:cell(r,14)}); }
     if(sched.length){ SET.schedules = sched; flexSet = new Set(sched.filter(x => /^flex/i.test(x.schedule)).map(x => x.staff)); }
   }
   const rosterOf = {}; SET.schedules.forEach(x => { rosterOf[x.staff] = x; });
@@ -903,8 +912,20 @@ async function loadLiveData(){
       if(flexSet.has(s)) return Object.assign({staff:s, dept:staffDept[s], status:'Rest & Recovery', time:'', leave:'', today:'', plan:'', detail:null}, extra);
       return Object.assign({staff:s, dept:staffDept[s], status:'NOT SUBMITTED', time:'', leave:'', today:'', plan:'', detail:null}, extra);
     });
-    const order = {'NOT SUBMITTED':0,'Late':1,'Early':2,'On-time':3,'On Leave':4,'Rest & Recovery':5};
-    rows.sort((a,b) => (order[a.status]??4) - (order[b.status]??4) || a.staff.localeCompare(b.staff));
+    const order = {'NOT SUBMITTED':0,'Late':1,'Early':1,'On-time':1,'On Leave':2,'Rest & Recovery':3};
+    // submitted reports are listed in the order they were sent (a report sent on a later day, shown as "18:45 (20 Oct)", goes after the same-day ones)
+    const MONS = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+    const sentKey = r => {
+      const m = /^\s*(\d{1,2})[:.](\d{2})(?:\s*\((\d{1,2})\s+([A-Za-z]{3})[a-z]*\))?/.exec(r.time || '');
+      if(!m) return null;
+      let k = (+m[1]) * 60 + (+m[2]);
+      if(m[3]){ const rd = new Date(date + 'T00:00:00'); let sd = new Date(rd.getFullYear(), MONS[m[4].toLowerCase()], +m[3]); if(sd < rd - 183*864e5) sd = new Date(rd.getFullYear()+1, sd.getMonth(), sd.getDate()); k += Math.round((sd - rd) / 864e5) * 1440; }
+      return k;
+    };
+    rows.forEach(r => { r._k = sentKey(r); });
+    rows.sort((a,b) => (order[a.status]??4) - (order[b.status]??4)
+      || ((a._k === null ? 1e9 : a._k) - (b._k === null ? 1e9 : b._k))
+      || a.staff.localeCompare(b.staff));
     daily[date] = rows;
   });
 
@@ -924,14 +945,14 @@ async function loadLiveData(){
       expW: toNum(r['Expected Wkly Wt']) || 0, doneW: toNum(r['Completed Wkly Wt']) || 0, port: toNum(r['Portfolio %']),
       expM: toNum(r['Expected Mthly Wt']) || 0, doneM: toNum(r['Completed Mthly Wt (cum.)']) || 0, mprog: toNum(r['Monthly Progress %']) || 0,
       adhoc: toNum(r['Adhoc Count']) || 0, adhocPct: toNum(r['Adhoc %']), planDays: toNum(r['Plan Days']) || 0, matchDays: toNum(r['Match Days']) || 0, plan: toNum(r['Planning %']),
-      latePen: toNum(r['Late Penalty']) || 0, expQ: toNum(r['Expected Qtrly Wt']) || 0, doneQ: toNum(r['Completed Qtrly Wt (cum.)']) || 0, qprog: toNum(r['Quarterly Progress %']) || 0,
+      latePen: toNum(r['Late Penalty']) || 0, lateN: [toNum(r['Late: same day']) || 0, toNum(r['Late: 1 day later']) || 0, toNum(r['Late: 2+ days later']) || 0], wkStart: wk, expQ: toNum(r['Expected Qtrly Wt']) || 0, doneQ: toNum(r['Completed Qtrly Wt (cum.)']) || 0, qprog: toNum(r['Quarterly Progress %']) || 0,
       portAll: toNum(r['Portfolio (all tasks) %']), fracM: toNum(r['Monthly share due']), fracQ: toNum(r['Quarterly share due']),
       fracW: (toNum(r['Weekly share due (leave)']) === null ? 1 : toNum(r['Weekly share due (leave)']))
     };
     (weekly[wk] = weekly[wk] || []).push({
       staff: r['Staff'], dept: r['Dept'], score, rating: r['Rating'], reason: r['Reason'],
       completed: wts['Completed'] || '—', inprogress: wts['In Progress'] || '—', deferred: wts['Deferred'] || '—',
-      deferredApproved: wts['Deferred (Approved)'] || '—', adhocItems: wts['Adhoc Items'] || '—', calc
+      deferredApproved: wts['Deferred (Approved)'] || '—', adhocItems: wts['Adhoc Items'] || '—', trialItems: wts['Trial Items (not scored)'] || '—', calc
     });
     (weeklyRaw[r['Staff']] = weeklyRaw[r['Staff']] || []).push({
       wk, score, port: toNum(r['Portfolio %']), sub: toNum(r['Submission %']), plan: toNum(r['Planning %']),
@@ -960,7 +981,7 @@ async function loadLiveData(){
     (monthly[mo] = monthly[mo] || []).push({
       staff: r['Staff'], dept: r['Dept'], score, rating: r['Rating'], reason: r['Reason / Variance vs Prev Month'],
       completed: mts['Completed'] || '—', inprogress: mts['In Progress'] || '—', deferred: mts['Deferred / Not Started'] || '—',
-      deferredApproved: mts['Deferred (Approved)'] || '—', adhocItems: mts['Adhoc Items'] || '—', calc
+      deferredApproved: mts['Deferred (Approved)'] || '—', adhocItems: mts['Adhoc Items'] || '—', trialItems: mts['Trial Items (not scored)'] || '—', calc
     });
     (monthlyRaw[r['Staff']] = monthlyRaw[r['Staff']] || []).push({
       mo, score, port: toNum(r['Avg Portfolio %']), sub: toNum(r['Avg Submission %']), plan: toNum(r['Avg Planning %']),
@@ -2045,6 +2066,15 @@ function portFallback(kind, c){
   const den = U + c.expM*fm + c.expQ*fq;
   return den <= 0 ? (c.port || 0) : Math.min(1, ((c.port||0)*U + Math.min(c.mprog, fm)*c.expM + Math.min(c.qprog, fq)*c.expQ) / den);
 }
+const lateTierText = () => { const S = DATA.settings; const q = x => (x*100).toFixed(0) + '%'; return `same day ${q(S.lateSame)} &middot; 1 day later ${q(S.late1)} &middot; 2 or more days later ${q(S.late2)}`; };
+function lateRuleText(kind, c){
+  const S = DATA.settings;
+  if(kind !== 'weekly' || !c.lateN || !c.wkStart || c.wkStart < S.lateFrom) return '';
+  const n = c.lateN[0] + c.lateN[1] + c.lateN[2];
+  if(!n || !c.expDays) return '';
+  const lost = (c.lateN[0]*S.lateSame + c.lateN[1]*S.late1 + c.lateN[2]*S.late2) / c.expDays;
+  return `<br>${n} late report(s) took ${(lost*100).toFixed(1)}% off Submission (${lateTierText()} of that day's credit)`;
+}
 function breakdownCalc(kind, c, profile, flex, W){
   const w = W[profile === 'Pastoral' ? 'Pastoral' : 'Administration'];
   const comps = [];
@@ -2062,7 +2092,8 @@ function breakdownCalc(kind, c, profile, flex, W){
   add('plan', 'Planning', c.plan, w.plan, !flex && c.plan !== null,
       kind === 'weekly' ? (c.planDays ? `${c.planDays} day(s) had a plan for the next working day; ${pct(c.plan)} of the planned tasks were reported (or deferred with a reason) the next working day` : '') : `Average over the month: ${pct(c.plan)} of planned tasks followed through`,
       flex ? 'Does not apply: flexible-schedule staff are scored on task completion' : (c.plan === null ? 'Does not apply: no plan was logged' : ''));
-  add('sub', 'Submission', c.sub, w.sub, !flex, kind === 'weekly' ? `Reports submitted on ${c.submitted} of ${c.expDays} expected days` : `Average over the month: ${pct(c.sub)} of expected days submitted`,
+  const lateRule = lateRuleText(kind, c);
+  add('sub', 'Submission', c.sub, w.sub, !flex, (kind === 'weekly' ? `Reports submitted on ${c.submitted} of ${c.expDays} expected days` : `Average over the month: ${pct(c.sub)} of expected days submitted`) + lateRule,
       flex ? 'Does not apply: flexible-schedule staff are not required to report daily' : '');
   const target = kind === 'weekly' ? DATA.settings.adhocWeek : DATA.settings.adhocMonth;
   add('adhoc', 'Adhoc work', c.adhocPct, w.adhoc, c.adhoc > 0, `${c.adhoc} adhoc item(s) logged &mdash; ${target} or more in the ${kind === 'weekly' ? 'week' : 'month'} earns full marks`, c.adhoc > 0 ? '' : 'Does not apply: no adhoc work logged');
@@ -2120,7 +2151,7 @@ function whyLost(kind, key, staff, row, b, c){
       const si = submissionIssues(staff, from, to);
       const parts = [];
       if(si.missed.length) parts.push(`<b>No report on:</b> ${si.missed.map(fmtDay).join(', ')}.`);
-      if(si.late.length) parts.push(`<b>Reports sent late on:</b> ${si.late.map(l => fmtDay(l.d)).join(', ')}.`);
+      if(si.late.length) parts.push(`<b>Reports sent late on:</b> ${si.late.map(l => fmtDay(l.d)).join(', ')}. Each late report loses part of that day's credit (${lateTierText()}).`);
       text = parts.join('<br>') || `Reports submitted on ${pct(x.value)} of expected days.`;
       fix = 'Submit your daily report every working day by ' + DATA.settings.lateAfter + ' (leave days are excluded).';
     } else if(x.key === 'adhoc'){
@@ -2176,10 +2207,11 @@ function breakdownHtml(kind, key, staff){
     <div class="bx-sub">${esc(staff)} &middot; ${esc(label)}${delta}</div>${sheetNote}
     <div class="bx-legend"><b>How to read this:</b> every score is out of 100 points. The points are shared between the parts that apply to ${flex ? 'this person (flexible schedule)' : 'this person'}: <b>Portfolio ${wtxt.port || 0}</b>${wtxt.plan !== undefined ? ` &middot; <b>Planning ${wtxt.plan}</b>` : ''}${wtxt.sub !== undefined ? ` &middot; <b>Submission ${wtxt.sub}</b>` : ''}${wtxt.adhoc !== undefined ? ` &middot; <b>Adhoc ${wtxt.adhoc}</b>` : ''}. Each part earns its share in proportion to the result (e.g. 80% of 15 pts = 12 pts). ${b.late > 0 ? 'Late reports then cost 0.5 pt each. ' : ''}<b>Adhoc is a bonus:</b> it is counted only when it raises the score, never to lower it. Other parts that do not apply are left out and the rest scaled up to 100.</div>
     <div class="bx-h">How the score was built</div>${parts}
+    ${row.trialItems && row.trialItems !== '—' ? `<div class="bx-h">Plus point &mdash; reported early (not scored yet)</div><div class="bx-ok">${esc(row.trialItems)}. These new-type pastoral tasks start counting from ${esc(fmtShortDate(DATA.settings.trial))}; reporting them early is noted here as a bonus and does not change the score.</div>` : ''}
     <div class="bx-h">Where points were lost &mdash; and how to win them back</div>${lostHtml}
     ${moved}
     <details class="bx-det"><summary>Task detail for this ${kind === 'weekly' ? 'week' : 'month'}</summary>
-      ${lists('Completed', row.completed)}${lists('In progress', row.inprogress)}${lists('Deferred (Approved) — counts as not done', row.deferredApproved)}${lists('Not touched', row.deferred)}${lists('Adhoc', row.adhocItems)}
+      ${lists('Completed', row.completed)}${lists('In progress', row.inprogress)}${lists('Deferred (Approved) — counts as not done', row.deferredApproved)}${lists('Not touched', row.deferred)}${lists('Adhoc', row.adhocItems)}${lists('Reported early — not scored yet', row.trialItems)}
     </details>`;
 }
 function openBreakdown(kind, key, staff){
@@ -2240,7 +2272,7 @@ function renderHowCalc(){
     <div class="card"><div class="hc-title">The score in one line</div>
       <div class="reason">Every week and every month is scored out of 100 points, shared between four parts. Each part earns its share in proportion to its result (80% of a 15-point part = 12 points).</div>
       <table class="hc-table"><tr><th>Points</th><th>Portfolio</th><th>Planning</th><th>Submission</th><th>Adhoc</th></tr>${wr('Administration')}${wr('Pastoral')}</table>
-      <div class="reason">A part that does not apply (no adhoc logged, no plan, flexible schedule) is left out and the others scale up to 100. Each report sent after ${DATA.settings.lateAfter} costs ${(DATA.settings.latePen*100).toFixed(1)} pt.</div></div>
+      <div class="reason">A part that does not apply (no adhoc logged, no plan, flexible schedule) is left out and the others scale up to 100. A report sent after ${DATA.settings.lateAfter} loses part of that day's Submission credit: ${lateTierText()} (a day with no report earns 0). A missed day can still be reported until day ${DATA.settings.catchup} of the next month (it then counts as 2+ days late); from the next day the month is closed and it stays at 0. Example: Submission is worth 15 points; in a 4-day week with one report late the same day, 3 on time: (100+100+100+95) &divide; 4 = 98.75% &times; 15 = 14.8 points.</div></div>
 
     <div class="card"><div class="hc-title">The four parts</div>
       <div class="hc-grid">
@@ -2435,7 +2467,10 @@ function renderSettings(){
       </ol></div>
     <div class="card"><div class="hc-title">Rules in force</div>
       <table class="hc-table">
-        ${kv('Late-report penalty', (S.latePen * 100).toFixed(1) + '% per late report')}
+        ${kv('Late report: same day / 1 day later / 2+ days later', (S.lateSame*100).toFixed(0) + '% / ' + (S.late1*100).toFixed(0) + '% / ' + (S.late2*100).toFixed(0) + '% of that day\'s Submission credit')}
+        ${kv('New late rule applies from week of', esc(fmtShortDate(S.lateFrom)))}
+        ${kv('Catch-up for missed reports', 'until day ' + S.catchup + ' of the next month')}
+        ${kv('Old late rule (earlier weeks)', (S.latePen * 100).toFixed(1) + '% per late report')}
         ${kv('Report deadline', esc(S.lateAfter))}
         ${kv('Adhoc for full marks', S.adhocWeek + ' per week &middot; ' + S.adhocMonth + ' per month')}
         ${kv('Adhoc is a bonus only', S.bonusOnly ? 'Yes &mdash; counted only when it raises the score' : 'No &mdash; always scored')}
