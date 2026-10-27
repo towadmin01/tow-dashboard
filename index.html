@@ -50,6 +50,8 @@
     padding:10px 16px; font-size:12.5px; color:#5b5748; background:#F1ECDF;
     border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:10px;
   }
+  /* keep the week / month / day picker visible while scrolling (it sticks just under the header) */
+  .meta{position:sticky; top:var(--hdr-h,118px); z-index:4; background:var(--cream); box-shadow:0 2px 6px rgba(0,0,0,.06);}
   .meta select{
     font-size:14px; font-weight:700; color:var(--ink); background:#fff;
     border:1px solid var(--line); border-radius:8px; padding:7px 10px;
@@ -611,6 +613,7 @@
         <span class="val" id="reviewTotalScore">0.00</span>
         <span class="badge" id="reviewBand"></span>
       </div>
+      <div style="display:flex;gap:8px;align-items:center;margin:4px 0 8px;"><span class="lbl" style="margin:0;">Count daily-reporting scores from</span><select id="reviewFromSel" class="orientation-select" style="flex:none;"></select></div>
       <div class="reason" id="reviewBlendLine"></div>
       <table class="breakdown-table" id="reviewBlendTable"></table>
       <div class="rev-disc">Increment and bonus amounts are subject to the Church&rsquo;s financial standing.</div>
@@ -851,7 +854,7 @@ async function loadLiveData(){
   });
   let flexSet = new Set(flexRows.map(r => String(r['Staff Name'] || r['Staff'] || '').trim()).filter(Boolean));
   // ---- Settings tab (single place to change how scoring works) ----
-  const SET = {fromSheet:false, latePen:.005, lateAfter:'19:30', earlyBefore:'17:30', adhocWeek:5, adhocMonth:20, bonusOnly:true, qStart:.667, good:.8, ok:.7, lateSame:.05, late1:.10, late2:.20, lateFrom:'2026-10-26', catchup:5,
+  const SET = {fromSheet:false, latePen:.005, lateAfter:'19:30', earlyBefore:'17:30', adhocWeek:5, adhocMonth:20, bonusOnly:true, qStart:.667, good:.8, ok:.7, lateSame:.05, late1:.10, late2:.20, lateFrom:'2026-09-21', catchup:5, adhocRec:1,
                goLive:'2026-10-01', trial:'2027-01-01', mid:'06-30', final:'12-31', email:'', schedules:[]};
   if(settingsGrid && settingsGrid.length > 10){
     // rows are found by their LABEL (the CSV feed can drop or shift blank/title rows, so fixed row numbers are not safe)
@@ -868,7 +871,7 @@ async function loadLiveData(){
     SET.goLive = toISODate(val(/^quarterly scoring starts/i, '')) || SET.goLive; SET.trial = toISODate(val(/^new-type pastoral/i, '')) || SET.trial;
     SET.mid = val(/^mid-year/i, SET.mid); SET.final = val(/^year-end/i, SET.final); SET.email = val(/^send review reminder/i, '');
     SET.lateSame = numv(/^late report.*same day/i, SET.lateSame); SET.late1 = numv(/^late report.*1 day/i, SET.late1); SET.late2 = numv(/^late report.*2 or more/i, SET.late2);
-    SET.catchup = numv(/^catch-up/i, SET.catchup);
+    SET.catchup = numv(/^catch-up/i, SET.catchup); SET.adhocRec = numv(/^adhoc recovery/i, SET.adhocRec);
     SET.lateFrom = toISODate(val(/^late-report rule above applies/i, '')) || SET.lateFrom;
     ['Administration','Pastoral'].forEach(pn => {
       const r = find(new RegExp('^' + pn + '$')); if(r < 0) return;
@@ -1063,6 +1066,11 @@ async function loadLiveData(){
   if(u.has('me')){ u.delete('me'); const q = u.toString(); history.replaceState(null, '', location.pathname + (q ? '?' + q : '')); }
   if(localStorage.getItem('tow_admin') === '1') document.getElementById('sheetLink').style.display = 'inline-flex';
 } catch(e){} })();
+(function(){ const hd = document.querySelector('header'); if(!hd) return;
+  const set = () => document.documentElement.style.setProperty('--hdr-h', hd.offsetHeight + 'px');
+  set(); window.addEventListener('resize', set); window.addEventListener('load', set);
+  if(window.ResizeObserver) new ResizeObserver(set).observe(hd);
+})();
 let DATA = null;
 let currentTab = 'daily';
 
@@ -1165,15 +1173,26 @@ function ratingFromScore(score){
   return '1 - Immediate Attention';
 }
 let ytdFromKey = null, ytdToKey = null;
+// "Count scores from" month: one choice shared by YTD, the full report, CSV export and the Review tab (kept on this device)
+const REVAMP_MONTH = '2026-09-01';
+function getScoreFrom(){
+  try { const v = localStorage.getItem('tow_score_from'); if(v === 'all') return DATA.months[0]; if(v && DATA.months.includes(v)) return v; } catch(e){}
+  return DATA.months.includes(REVAMP_MONTH) ? REVAMP_MONTH : DATA.months[0];
+}
+function setScoreFrom(v){ try { localStorage.setItem('tow_score_from', v === DATA.months[0] ? 'all' : v); } catch(e){} ytdFromKey = v; }
+function scopedAccum(staff){
+  const from = ytdFromKey || getScoreFrom(), to = ytdToKey || DATA.months[DATA.months.length - 1];
+  return (computeAccumForRangeSimple(from, to) || {})[staff] || DATA.accum[staff] || {};
+}
 
 function renderYTD(){
   const el = document.getElementById('view-ytd');
-  if(!ytdFromKey) ytdFromKey = DATA.months[0];
+  if(!ytdFromKey) ytdFromKey = getScoreFrom();
   if(!ytdToKey) ytdToKey = DATA.months[DATA.months.length-1];
 
   const periodPicker = `
     <div class="card" style="padding:12px 14px;">
-      <div class="lbl" style="margin-bottom:6px;">Period (within this year)</div>
+      <div class="lbl" style="margin-bottom:6px;">Count scores from</div>
       <div style="display:flex; gap:8px; align-items:center;">
         <select id="ytdFromSelect" style="flex:1; padding:7px; border-radius:8px; border:1px solid var(--line); font-size:12.5px;">
           ${DATA.months.map(m => `<option value="${m}" ${m===ytdFromKey?'selected':''}>${fmtMonth(m)}</option>`).join('')}
@@ -1183,6 +1202,11 @@ function renderYTD(){
           ${DATA.months.map(m => `<option value="${m}" ${m===ytdToKey?'selected':''}>${fmtMonth(m)}</option>`).join('')}
         </select>
       </div>
+      <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+        <button class="adhoc-link" id="ytdRevamp" style="margin:0;padding:5px 10px;font-size:12px;">Since the revamp (${fmtMonth(DATA.months.includes(REVAMP_MONTH) ? REVAMP_MONTH : DATA.months[0])})</button>
+        <button class="adhoc-link" id="ytdAll" style="margin:0;padding:5px 10px;font-size:12px;">All months</button>
+      </div>
+      <div style="font-size:11px;color:#8a826b;margin-top:6px;">Your choice is remembered on this device and is also used by the full report and the Review tab.</div>
     </div>
   `;
 
@@ -1217,7 +1241,9 @@ function renderYTD(){
     </div>`;
   }).join('');
 
-  document.getElementById('ytdFromSelect').addEventListener('change', (e) => { ytdFromKey = e.target.value; renderYTD(); });
+  document.getElementById('ytdFromSelect').addEventListener('change', (e) => { setScoreFrom(e.target.value); renderYTD(); });
+  document.getElementById('ytdRevamp').addEventListener('click', () => { setScoreFrom(DATA.months.includes(REVAMP_MONTH) ? REVAMP_MONTH : DATA.months[0]); renderYTD(); });
+  document.getElementById('ytdAll').addEventListener('click', () => { setScoreFrom(DATA.months[0]); renderYTD(); });
   document.getElementById('ytdToSelect').addEventListener('change', (e) => { ytdToKey = e.target.value; renderYTD(); });
 }
 
@@ -1446,8 +1472,8 @@ function buildCsvForCurrentView(){
   } else if(currentTab === 'ytd'){
     headers = ['Staff','Department','Weeks Counted','Avg Weekly Score','Weekly Rating','Months Counted','Avg Monthly Score','Monthly Rating','Status'];
     rows = Object.keys(DATA.accum).map(staff => {
-      const a = DATA.accum[staff];
-      return [staff, a.dept, a.weeksCounted, pct(a.avgWeekly), (a.weeklyRating||'').replace(/^\d - /,''), a.monthsCounted, pct(a.avgMonthly), (a.monthlyRating||'').replace(/^\d - /,''), a.weeklyStatus||''];
+      const a = scopedAccum(staff), base = DATA.accum[staff];
+      return [staff, base.dept, a.weeksCounted, pct(a.avgWeekly), ratingFromScore(a.avgWeekly).replace(/^\d - /,''), a.monthsCounted, pct(a.avgMonthly), ratingFromScore(a.avgMonthly).replace(/^\d - /,''), 'From ' + fmtMonth(ytdFromKey || getScoreFrom())];
     });
   }
   const lines = [headers.map(csvEscape).join(',')].concat(rows.map(r => r.map(csvEscape).join(',')));
@@ -1540,29 +1566,31 @@ function breakdownTableHtml(b){
   `;
 }
 function openYtdDetail(staff){
-  const a = DATA.accum[staff];
+  const from = ytdFromKey || getScoreFrom(), to = ytdToKey || DATA.months[DATA.months.length - 1];
+  const a = scopedAccum(staff);
   const bd = a.breakdown || {};
-  document.getElementById('ytdDetailTitle').textContent = 'YTD Report — ' + staff;
+  const per = fmtMonth(from) + (from === to ? '' : ' to ' + fmtMonth(to));
+  document.getElementById('ytdDetailTitle').textContent = 'Report — ' + staff + ' (' + per + ')';
   const body = document.getElementById('ytdDetailBody');
   body.innerHTML = `
-    <div class="ytd-section-title">Weekly Average (May to date)</div>
+    <div class="ytd-section-title">Weekly Average (${esc(per)})</div>
     <div class="ytd-score-row">
       <span class="val">${pct(a.avgWeekly)}</span>
-      <span class="badge ${ratingClass(a.weeklyRating)}">${(a.weeklyRating||'').replace(/^\d - /,'')}</span>
+      <span class="badge ${ratingClass(ratingFromScore(a.avgWeekly))}">${ratingFromScore(a.avgWeekly).replace(/^\d - /,'')}</span>
     </div>
-    <div class="ys">${summarizePeriods(staff, 'weekly', DATA.months[0], DATA.months[DATA.months.length-1])}</div>
+    <div class="ys">${summarizePeriods(staff, 'weekly', from, to)}</div>
     ${breakdownTableHtml(bd.weekly)}
 
-    <div class="ytd-section-title">Monthly Average (May to date)</div>
+    <div class="ytd-section-title">Monthly Average (${esc(per)})</div>
     <div class="ytd-score-row">
       <span class="val">${pct(a.avgMonthly)}</span>
-      <span class="badge ${ratingClass(a.monthlyRating)}">${(a.monthlyRating||'').replace(/^\d - /,'')}</span>
+      <span class="badge ${ratingClass(ratingFromScore(a.avgMonthly))}">${ratingFromScore(a.avgMonthly).replace(/^\d - /,'')}</span>
     </div>
-    <div class="ys">${summarizePeriods(staff, 'monthly', DATA.months[0], DATA.months[DATA.months.length-1])}</div>
+    <div class="ys">${summarizePeriods(staff, 'monthly', from, to)}</div>
     ${breakdownTableHtml(bd.monthly)}
 
     <div class="ytd-section-title">Week by week (tap a week to see how it was scored)</div>
-    ${ytdWeeksHtml(staff)}
+    ${ytdWeeksHtml(staff, from, to)}
 
   `;
   ytdDetailModal.classList.add('open');
@@ -1743,9 +1771,11 @@ function computeReviewScore(staff){
   const observationScore = totalPerformanceScore * 0.40;
 
   const accum = DATA.accum[staff] || {};
-  const kpiFraction = accum.avgMonthly !== undefined ? accum.avgMonthly : (accum.avgWeekly || 0);
+  const scp = scopedAccum(staff);
+  const kpiFraction = scp.monthsCounted > 0 ? scp.avgMonthly : (scp.weeksCounted > 0 ? scp.avgWeekly : 0);
   const dailyReportingScore = kpiFraction * 5;
   const finalScore = (dailyReportingScore * 0.60) + observationScore;
+  { const sel = document.getElementById('reviewFromSel'); if(sel){ const cur = ytdFromKey || getScoreFrom(); sel.innerHTML = DATA.months.map(m => `<option value="${m}" ${m === cur ? 'selected' : ''}>${fmtMonth(m)}</option>`).join(''); } }
 
   document.getElementById('reviewTotalScore').textContent = finalScore.toFixed(2) + ' / 5';
   let band, cls;
@@ -1758,7 +1788,7 @@ function computeReviewScore(staff){
   bandEl.textContent = band;
   bandEl.className = 'badge ' + cls;
   document.getElementById('reviewBlendLine').textContent =
-    `Daily Reporting KPI (running avg, 0-5): ${dailyReportingScore.toFixed(2)} x 60% + Observation (Final Year-End, weighted 40%): ${observationScore.toFixed(2)}`;
+    `Daily Reporting KPI (average from ${fmtMonth(ytdFromKey || getScoreFrom())}, 0-5): ${dailyReportingScore.toFixed(2)} x 60% + Observation (Final Year-End, weighted 40%): ${observationScore.toFixed(2)}`;
   document.getElementById('reviewBlendTable').innerHTML = `
     <tr><td>Daily Reporting KPI contribution</td><td>${(dailyReportingScore*0.6).toFixed(2)}</td></tr>
     <tr><td>Observation contribution (Final Year-End)</td><td>${observationScore.toFixed(2)}</td></tr>
@@ -1767,6 +1797,7 @@ function computeReviewScore(staff){
 }
 
 document.getElementById('reviewStaffPicker').addEventListener('change', (e) => renderReviewCategories(e.target.value));
+document.getElementById('reviewFromSel').addEventListener('change', (e) => { setScoreFrom(e.target.value); renderReviewCategories(reviewStaffPicker.value); });
 document.getElementById('reviewSaveBtn').addEventListener('click', () => {
   const staff = reviewStaffPicker.value;
   const data = collectReviewData();
@@ -1799,7 +1830,8 @@ function computeReviewSummaryFor(staff){
   });
   const observationScore = totalPerformanceScore * 0.40;
   const accum = DATA.accum[staff] || {};
-  const kpiFraction = accum.avgMonthly !== undefined ? accum.avgMonthly : (accum.avgWeekly || 0);
+  const scp = scopedAccum(staff);
+  const kpiFraction = scp.monthsCounted > 0 ? scp.avgMonthly : (scp.weeksCounted > 0 ? scp.avgWeekly : 0);
   const dailyReportingScore = kpiFraction * 5;
   const finalScore = (dailyReportingScore * 0.60) + observationScore;
   let band;
@@ -2106,7 +2138,7 @@ function breakdownCalc(kind, c, profile, flex, W){
     const done = Math.min(c.doneW, c.expW*fw) + Math.min(c.doneM, c.expM*fm) + Math.min(c.doneQ, c.expQ*fq);
     portWhat = `${n1(done)} of ${n1(due)} task points done (completed or in progress)` + (fw < 0.999 ? `<br>Weekly tasks scaled to your ${c.expDays} available working day(s) this week (leave)` : '');
   } else portWhat = `all weekly, monthly and quarterly task points that were due, blended`;
-  const mix = `Weekly tasks ${pct(c.port)}${c.expM > 0 ? ' &middot; Monthly tasks ' + pct(Math.min(c.mprog, c.fracM == null ? 1 : c.fracM) / ((c.fracM == null || c.fracM === 0) ? 1 : c.fracM)) : ''}${c.expQ > 0 ? ' &middot; Quarterly tasks ' + pct(c.qprog) : ''}`;
+  const mix = `Weekly tasks ${pct(c.port)}${(c.expM > 0 && (c.fracM == null || c.fracM >= 0.999)) ? ' &middot; Monthly tasks ' + pct(c.mprog) : (c.expM > 0 ? ' &middot; Monthly tasks: not due yet' : '')}${(c.expQ > 0 && (c.fracQ == null || c.fracQ >= 0.999)) ? ' &middot; Quarterly tasks ' + pct(c.qprog) : (c.expQ > 0 ? ' &middot; Quarterly tasks: not due yet' : '')}`;
   add('port', 'Portfolio (your task list)', port, w.port, port !== null, portWhat + '<br>' + mix, '');
   add('plan', 'Planning', c.plan, w.plan, !flex && c.plan !== null,
       kind === 'weekly' ? (c.planDays ? `${c.planDays} day(s) had a plan for the next working day; ${pct(c.plan)} of the planned tasks were reported (or deferred with a reason) the next working day` : '') : `Average over the month: ${pct(c.plan)} of planned tasks followed through`,
@@ -2114,22 +2146,32 @@ function breakdownCalc(kind, c, profile, flex, W){
   const lateRule = lateRuleText(kind, c);
   add('sub', 'Submission', c.sub, w.sub, !flex, (kind === 'weekly' ? `Reports submitted on ${c.submitted} of ${c.expDays} expected days` : `Average over the month: ${pct(c.sub)} of expected days submitted`) + lateRule,
       flex ? 'Does not apply: flexible-schedule staff are not required to report daily' : '');
-  const target = kind === 'weekly' ? DATA.settings.adhocWeek : DATA.settings.adhocMonth;
-  add('adhoc', 'Adhoc work', c.adhocPct, w.adhoc, c.adhoc > 0, `${c.adhoc} adhoc item(s) logged &mdash; ${target} or more in the ${kind === 'weekly' ? 'week' : 'month'} earns full marks`, c.adhoc > 0 ? '' : 'Does not apply: no adhoc work logged');
+  const fwA = (kind === 'weekly' && c.fracW != null && c.fracW > 0) ? Math.min(1, c.fracW) : 1;
+  const target = (kind === 'weekly' ? DATA.settings.adhocWeek : DATA.settings.adhocMonth) * fwA;
+  add('adhoc', 'Adhoc work', c.adhocPct, w.adhoc, c.adhoc > 0, `${c.adhoc} adhoc item(s) logged &mdash; ${n1(target)} or more in the ${kind === 'weekly' ? 'week' : 'month'} earns full marks` + (fwA < 0.999 ? ` (scaled to your ${c.expDays} available working day(s), leave)` : ''), c.adhoc > 0 ? '' : 'Does not apply: no adhoc work logged');
   const adh = comps.find(x => x.key === 'adhoc');
-  if(adh && adh.applies && DATA.settings.bonusOnly){
-    const o = comps.filter(x => x.applies && x.key !== 'adhoc');
-    const d0 = o.reduce((a, x) => a + x.weight, 0), n0 = o.reduce((a, x) => a + (x.value || 0) * x.weight, 0);
-    if(d0 > 0 && (n0 + (adh.value || 0) * adh.weight) / (d0 + adh.weight) < n0 / d0 - 1e-9){
-      adh.applies = false;
-      adh.why = `${c.adhoc} adhoc item(s) logged &mdash; not counted this ${kind === 'weekly' ? 'week' : 'month'}, because adhoc only ever adds to the score and never lowers it`;
-    }
-  }
-  const den = comps.filter(x => x.applies).reduce((a, x) => a + x.weight, 0);
-  comps.forEach(x => { x.share = x.applies && den ? x.weight / den : 0; x.earned = x.applies ? (x.value || 0) * x.share : 0; x.lost = x.applies ? (1 - (x.value || 0)) * x.share : 0; });
+  const pc = comps.find(x => x.key === 'port'); pc.applies = true;
+  // Fixed weights: Planning and Submission keep their own points. The Adhoc points (and any part that does not apply:
+  // flexible schedule, no plan logged) sit in Portfolio. Adhoc then FILLS lost points on any part, but a score never goes above 100%.
+  const tot = comps.reduce((a, x) => a + x.weight, 0) || 1;
+  let freedW = w.adhoc; comps.forEach(x => { if(x.key !== 'port' && x.key !== 'adhoc' && !x.applies) freedW += x.weight; });
+  comps.forEach(x => {
+    if(x.key === 'adhoc'){ x.applies = false; x.share = 0; x.earned = 0; x.lost = 0; return; }
+    const wgt = x.key === 'port' ? x.weight + freedW : x.weight;
+    x.share = x.applies ? wgt / tot : 0; x.earned = x.applies ? (x.value || 0) * x.share : 0; x.lost = x.applies ? (1 - (x.value || 0)) * x.share : 0;
+  });
   const late = flex ? 0 : (c.latePen || 0);
-  const raw = comps.reduce((a, x) => a + x.earned, 0) - late;
-  return { comps, late, final: Math.max(0, Math.min(1, raw)), target };
+  const base = comps.reduce((a, x) => a + x.earned, 0);
+  const recF = DATA.settings.adhocRec == null ? 1 : DATA.settings.adhocRec;
+  const recPot = c.adhoc > 0 ? recF * Math.min(1, c.adhocPct || 0) * (w.adhoc / tot) : 0;
+  const planComp = comps.find(x => x.key === 'plan');
+  const planGap = planComp && planComp.applies ? planComp.lost : 0;
+  const recov = Math.min(recPot, planGap + late, Math.max(0, 1 - base + late));
+  adh.earned = recov;
+  adh.why = c.adhoc > 0
+    ? `${c.adhoc} adhoc item(s) logged (${pct(Math.min(1, c.adhocPct || 0))} of the ${n1(target)}-item target${fwA < 0.999 ? ', scaled for leave' : ''}) &mdash; ` + (recov > 0.0005 ? `<b>fills +${(recov * 100).toFixed(1)} point(s) of planning gaps / late penalties</b> (never missed submissions or task scores; a score never goes above 100%)` : 'nothing to fill: no planning gap or late penalty this period')
+    : 'no adhoc logged &mdash; nothing to fill any lost points';
+  return { comps, late, recov, recPot, final: Math.max(0, Math.min(1, base + recov - late)), target };
 }
 
 function whyLost(kind, key, staff, row, b, c){
@@ -2144,14 +2186,14 @@ function whyLost(kind, key, staff, row, b, c){
       const parts = [];
       if(kind === 'weekly'){
         if(t.w.length) parts.push(`<b>Weekly tasks not done this week:</b> ${listJoin(t.w)}.`);
-        if(t.m.length) parts.push(`<b>Monthly tasks still untouched this month:</b> ${listJoin(t.m)}.`);
-        if(t.q.length && (c.fracQ || 0) > 0) parts.push(`<b>Quarterly tasks still untouched (counted in the last month of the quarter):</b> ${listJoin(t.q)}.`);
+        if(t.m.length && (c.fracM == null || c.fracM >= 0.999)) parts.push(`<b>Monthly tasks not done this month:</b> ${listJoin(t.m)}.`);
+        if(t.q.length && (c.fracQ || 0) >= 0.999) parts.push(`<b>Quarterly tasks not done this quarter:</b> ${listJoin(t.q)}.`);
       } else {
         const open = t.w.concat(t.m);
-        if(open.length) parts.push(`<b>Monthly tasks not done this month:</b> ${listJoin(open)}.`);
+        if(open.length && (c.fracM == null || c.fracM >= 0.999)) parts.push(`<b>Monthly tasks not done this month:</b> ${listJoin(open)}.`);
         const wk = (DATA.weeklyRaw[staff] || []).filter(r => r.wk >= from && r.wk <= to && r.score !== null && r.port !== null && r.port < 0.995);
         if(wk.length) parts.push(`<b>Weeks where weekly tasks were missed:</b> ${wk.map(r => fmtDay(addDaysKey(r.wk,1)) + ' (' + pct(r.port) + ')').join(', ')}.`);
-        const open2 = t.q; if(open2.length && (c.fracQ || 0) > 0) parts.push(`<b>Quarterly tasks still untouched:</b> ${listJoin(open2)}.`);
+        const open2 = t.q; if(open2.length && (c.fracQ || 0) >= 0.999) parts.push(`<b>Quarterly tasks not done this quarter:</b> ${listJoin(open2)}.`);
       }
       const dall = da.w.concat(da.m, da.q);
       if(dall.length) parts.push(`<b>Marked Deferred (Approved) but still open:</b> ${listJoin(dall)} &mdash; protects your Planning score but still counts as not done.`);
@@ -2162,8 +2204,8 @@ function whyLost(kind, key, staff, row, b, c){
       const miss = planMisses(staff, from, to);
       if(miss.length){
         const by = {}; miss.forEach(m => { (by[m.task] = by[m.task] || []).push(m); });
-        const lines = Object.keys(by).slice(0, 6).map(k => `<b>${esc(k)}</b> &mdash; planned ${by[k].map(m => fmtDay(m.planned)).join(' · ')}; ${by[k].every(m => m.noReport) ? 'no report the next working day' : 'not reported the next working day'}`);
-        text = `Planned for the next working day but not reported (as Completed, In Progress or Deferred with a reason):<br>${lines.join('<br>')}${Object.keys(by).length > 6 ? `<br>&hellip; and ${Object.keys(by).length - 6} more` : ''}`;
+        const lines = Object.keys(by).map(k => `<b>${esc(k)}</b> &mdash; planned ${by[k].map(m => fmtDay(m.planned)).join(' · ')}; ${by[k].every(m => m.noReport) ? 'no report the next working day' : 'not reported the next working day'}`);
+        text = `Planned for the next working day but not reported (as Completed, In Progress or Deferred with a reason):<br>${lines.join('<br>')}`;
       } else text = `${pct(x.value)} of the tasks planned for the next working day were followed through.`;
       fix = 'The next working day, report each planned task as Completed / In Progress &mdash; or Deferred (Approved) with the reason in remarks. Leave it out of the plan if you will not do it.';
     } else if(x.key === 'sub'){
@@ -2175,7 +2217,7 @@ function whyLost(kind, key, staff, row, b, c){
       fix = 'Submit your daily report every working day by ' + DATA.settings.lateAfter + ' (leave days are excluded).';
     } else if(x.key === 'adhoc'){
       const per = (x.share * 100 / b.target).toFixed(1);
-      text = `${c.adhoc} adhoc item(s) logged; ${b.target} earns full marks. Each item adds ${per} pts.${row.adhocItems && row.adhocItems !== '—' ? '<br><b>Logged:</b> ' + esc(row.adhocItems) : ''}`;
+      text = `${c.adhoc} adhoc item(s) logged; ${n1(b.target)} earns full marks. Each item adds ${per} pts.${row.adhocItems && row.adhocItems !== '—' ? '<br><b>Logged:</b> ' + esc(row.adhocItems) : ''}`;
       fix = 'Record work outside your listed tasks as adhoc each day (adhoc tasks or &ldquo;Other adhoc&rdquo;).';
     }
     items.push({name: x.name, pts, text, fix});
@@ -2218,16 +2260,23 @@ function breakdownHtml(kind, key, staff){
         <div class="bx-what"><b>${pct(x.value)}</b> &mdash; ${x.what}</div></div>`
     : `<div class="bx-na">${esc(x.name)} &mdash; ${x.why || 'does not apply'}</div>`).join('');
   const lost = whyLost(kind, key, staff, row, b, row.calc);
+  const tt0 = splitTagged(row.deferred), cc = row.calc;
+  const mOpen = kind === 'weekly' ? tt0.m : tt0.w.concat(tt0.m), qOpen = kind === 'weekly' ? tt0.q : tt0.q;
+  const heads = [];
+  if(mOpen.length && cc.fracM != null && cc.fracM < 0.999) heads.push(`<b>Monthly tasks not touched yet:</b> ${listJoin(mOpen)} &mdash; still time until the end of the month, so no effect on the score yet.`);
+  if(qOpen.length && cc.fracQ != null && cc.fracQ < 0.999) heads.push(`<b>Quarterly tasks not touched yet:</b> ${listJoin(qOpen)} &mdash; still time until the end of the quarter, so no effect on the score yet.`);
+  const headsHtml = heads.length ? `<div class="bx-h">Heads-up &mdash; not scored yet</div><div class="bx-ok">${heads.join('<br>')}</div>` : '';
   const lostHtml = lost.length ? lost.map(l => `<div class="bx-lost"><div class="t">${esc(l.name)} <span>&minus;${l.pts} pts</span></div>${l.text}${l.fix ? `<div class="fix">&#10148; ${l.fix}</div>` : ''}</div>`).join('')
     : '<div class="bx-ok">Nothing was lost &mdash; every part that applies is at 100%.</div>';
   const lists = (lab, v) => v && v !== '—' ? `<div class="sec"><b>${lab}</b><span class="taskline">${esc(v)}</span></div>` : '';
   const wtxt = Object.assign({}, ...b.comps.filter(x => x.applies).map(x => ({[x.key]: Math.round(x.share * 100)})));
   return `<div class="bx-top"><span class="val">${pct(row.score)}</span><span class="badge ${ratingClass(row.rating)}">${esc((row.rating || '').replace(/^\d - /, ''))}</span></div>
     <div class="bx-sub">${esc(staff)} &middot; ${esc(label)}${delta}</div>${sheetNote}
-    <div class="bx-legend"><b>How to read this:</b> every score is out of 100 points. The points are shared between the parts that apply to ${flex ? 'this person (flexible schedule)' : 'this person'}: <b>Portfolio ${wtxt.port || 0}</b>${wtxt.plan !== undefined ? ` &middot; <b>Planning ${wtxt.plan}</b>` : ''}${wtxt.sub !== undefined ? ` &middot; <b>Submission ${wtxt.sub}</b>` : ''}${wtxt.adhoc !== undefined ? ` &middot; <b>Adhoc ${wtxt.adhoc}</b>` : ''}. Each part earns its share in proportion to the result (e.g. 80% of 15 pts = 12 pts). ${b.late > 0 ? 'Late reports then cost 0.5 pt each. ' : ''}<b>Adhoc is a bonus:</b> it is counted only when it raises the score, never to lower it. Other parts that do not apply are left out and the rest scaled up to 100.</div>
+    <div class="bx-legend"><b>How to read this:</b> every score is out of 100 points. The points are shared between the parts that apply to ${flex ? 'this person (flexible schedule)' : 'this person'}: <b>Portfolio ${wtxt.port || 0}</b>${wtxt.plan !== undefined ? ` &middot; <b>Planning ${wtxt.plan}</b>` : ''}${wtxt.sub !== undefined ? ` &middot; <b>Submission ${wtxt.sub}</b>` : ''}${wtxt.adhoc !== undefined ? ` &middot; <b>Adhoc ${wtxt.adhoc}</b>` : ''}. Each part earns its share in proportion to the result (e.g. 80% of 15 pts = 12 pts). ${b.late > 0 ? 'Late reports then cost 0.5 pt each. ' : ''}<b>Adhoc fills only planning gaps and late-report penalties</b> (not missed submissions or task scores), and a score never goes above 100%. Monthly tasks count after the month ends and quarterly tasks after the quarter ends.<br>${b.recov > 0.0005 ? '' : ''}</div>
     <div class="bx-h">How the score was built</div>${parts}
     ${row.trialItems && row.trialItems !== '—' ? `<div class="bx-h">Plus point &mdash; reported early (not scored yet)</div><div class="bx-ok">${esc(row.trialItems)}. These new-type pastoral tasks start counting from ${esc(fmtShortDate(DATA.settings.trial))}; reporting them early is noted here as a bonus and does not change the score.</div>` : ''}
     <div class="bx-h">Where points were lost &mdash; and how to win them back</div>${lostHtml}
+    ${headsHtml}
     ${moved}
     <details class="bx-det"><summary>Task detail for this ${kind === 'weekly' ? 'week' : 'month'}</summary>
       ${lists('Completed', row.completed)}${lists('In progress', row.inprogress)}${lists('Deferred (Approved) — counts as not done', row.deferredApproved)}${lists('Not touched', row.deferred)}${lists('Adhoc', row.adhocItems)}${lists('Reported early — not scored yet', row.trialItems)}
@@ -2291,14 +2340,14 @@ function renderHowCalc(){
     <div class="card"><div class="hc-title">The score in one line</div>
       <div class="reason">Every week and every month is scored out of 100 points, shared between four parts. Each part earns its share in proportion to its result (80% of a 15-point part = 12 points).</div>
       <table class="hc-table"><tr><th>Points</th><th>Portfolio</th><th>Planning</th><th>Submission</th><th>Adhoc</th></tr>${wr('Administration')}${wr('Pastoral')}</table>
-      <div class="reason">A part that does not apply (no adhoc logged, no plan, flexible schedule) is left out and the others scale up to 100. A report sent after ${DATA.settings.lateAfter} loses part of that day's Submission credit: ${lateTierText()} (a day with no report earns 0). A missed day can still be reported until day ${DATA.settings.catchup} of the next month (it then counts as 2+ days late); from the next day the month is closed and it stays at 0. Example: Submission is worth 15 points; in a 4-day week with one report late the same day, 3 on time: (100+100+100+95) &divide; 4 = 98.75% &times; 15 = 14.8 points.</div></div>
+      <div class="reason">Planning (15) and Submission (15) are fixed. The Adhoc points (20) are held in Portfolio, so Portfolio is worth 70; for flexible staff, or when no plan was logged, the unused Planning / Submission points also sit in Portfolio. <b>Adhoc then fills lost points:</b> Adhoc % &times; 20 points can win back points lost on <i>any</i> part (Portfolio, Planning or Submission), but a score never goes above 100%. Staff with everything perfect simply score 100%.<br>A report sent after ${DATA.settings.lateAfter} loses part of that day's Submission credit: ${lateTierText()} (a day with no report earns 0). A missed day can still be reported until day ${DATA.settings.catchup} of the next month (it then counts as 2+ days late); from the next day the month is closed and it stays at 0.<br><b>When tasks fall due:</b> weekly tasks count every week. <b>Monthly tasks count only after the month's last working day</b> and <b>quarterly tasks only after the quarter's last working day</b>, so nobody is marked down part-way through; until then an untouched task is only listed as a heads-up. A plan made for the next working day is judged only once that day's report is due.<br>Example: Submission is worth 15 points; in a 4-day week with one report late the same day, 3 on time: (100+100+100+95) &divide; 4 = 98.75% &times; 15 = 14.8 points.</div></div>
 
     <div class="card"><div class="hc-title">The four parts</div>
       <div class="hc-grid">
-        <div><b>Portfolio</b><span>Your listed tasks. Points of tasks Completed or In Progress &divide; points that were due. Weekly, monthly and quarterly tasks are blended; a monthly task is only &ldquo;due&rdquo; in proportion to how much of the month has passed, and a quarterly task only starts counting in the <b>last month of the quarter</b>. Tasks you finish earlier are always credited.</span></div>
+        <div><b>Portfolio</b><span>Your listed tasks. Points of tasks Completed or In Progress &divide; points that were due. Weekly tasks are due every week (scaled down for leave days). Monthly tasks fall due after the month's last working day and quarterly tasks after the quarter's last working day &mdash; until then an untouched one is only a heads-up, with no deduction. In a month's score: your weekly-task results are averaged, and the monthly (and, at quarter end, quarterly) tasks are blended in once due.</span></div>
         <div><b>Planning</b><span>Of the tasks you planned for tomorrow, the share you reported the next working day (Completed / In Progress, or Deferred (Approved) with the reason).</span></div>
         <div><b>Submission</b><span>Days reported &divide; working days expected (Tue&ndash;Fri, leave removed).</span></div>
-        <div><b>Adhoc</b><span>A bonus for extra work. Items logged (Completed or In Progress) &divide; ${DATA.settings.adhocWeek} per week (${DATA.settings.adhocMonth} per month), capped at 100%. ${DATA.settings.bonusOnly ? 'It is counted only when it <b>raises</b> your score, so a few items never pull it down, and an adhoc still in progress at week-end is fine.' : 'It is always a scored part.'}</span></div>
+        <div><b>Adhoc</b><span>Extra work outside your listed tasks. Items logged (Completed or In Progress) &divide; ${DATA.settings.adhocWeek} per week (${DATA.settings.adhocMonth} per month, scaled down for leave days), capped at 100%. It can fill points lost on Portfolio, Planning or Submission (up to 20 points), but never takes a score above 100%.</span></div>
       </div></div>
 
     <div class="card"><div class="hc-title">Good to know</div>
@@ -2316,7 +2365,7 @@ function renderHowCalc(){
       <table class="hc-table"><tr><td>${Math.round(DATA.settings.good*100)}% and above</td><td><span class="badge good">Good</span></td></tr>
         <tr><td>${Math.round(DATA.settings.ok*100)}&ndash;${Math.round(DATA.settings.good*100)-1}%</td><td><span class="badge mid">Needs Improvement</span></td></tr>
         <tr><td>Below ${Math.round(DATA.settings.ok*100)}%</td><td><span class="badge low">Immediate Attention</span></td></tr></table>
-      <div class="reason">YTD = the average of all completed, scored weeks (and months).</div></div>
+      <div class="reason">YTD = the average of the completed, scored weeks (and months) from the month you choose on the YTD tab (it starts from the Sep revamp and remembers your choice on this device).</div></div>
 
     <div class="card"><div class="hc-title">Annual review</div>
       <div class="reason">Final score = Daily Reporting KPI &times; 60% + Staff Observation (Mid-Year / Year-End review) &times; 40%, shown out of 5.</div>
@@ -2477,8 +2526,9 @@ function applyCloudToStored(staff, stored){
   return out;
 }
 
-function ytdWeeksHtml(staff){
-  const list = (DATA.weeklyRaw[staff] || []).filter(r => r.score !== null && r.wk <= TODAY_KEY);
+function ytdWeeksHtml(staff, from, to){
+  const f7 = (from || DATA.months[0]).slice(0,7), t7 = (to || DATA.months[DATA.months.length - 1]).slice(0,7);
+  const list = (DATA.weeklyRaw[staff] || []).filter(r => r.score !== null && r.wk <= TODAY_KEY && r.wk.slice(0,7) >= f7 && r.wk.slice(0,7) <= t7);
   if(!list.length) return '<div class="empty">No scored weeks yet.</div>';
   return `<table class="breakdown-table bd"><tr><th>Week</th><th>Score</th><th></th></tr>${list.map(r => `<tr class="clickrow" data-bd="weekly|${r.wk}|${esc(staff)}"><td>${esc(fmtWeek(r.wk))}</td><td>${pct(r.score)}</td><td>&rsaquo;</td></tr>`).join('')}</table>`;
 }
@@ -2533,7 +2583,7 @@ function renderSettings(){
         ${kv('Old late rule (earlier weeks)', (S.latePen * 100).toFixed(1) + '% per late report')}
         ${kv('Report deadline', esc(S.lateAfter))}
         ${kv('Adhoc for full marks', S.adhocWeek + ' per week &middot; ' + S.adhocMonth + ' per month')}
-        ${kv('Adhoc is a bonus only', S.bonusOnly ? 'Yes &mdash; counted only when it raises the score' : 'No &mdash; always scored')}
+        ${kv('Adhoc recovery', Math.round((S.adhocRec == null ? 1 : S.adhocRec) * 100) + '% &mdash; adhoc fills planning gaps and late penalties only, capped at 100%')}
         ${kv('Quarterly tasks start counting', 'after ' + p(S.qStart) + ' of the quarter')}
         ${kv('Rating: Good from', p(S.good))}
         ${kv('Rating: Needs Improvement from', p(S.ok))}
