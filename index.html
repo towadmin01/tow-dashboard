@@ -854,7 +854,7 @@ async function loadLiveData(){
   });
   let flexSet = new Set(flexRows.map(r => String(r['Staff Name'] || r['Staff'] || '').trim()).filter(Boolean));
   // ---- Settings tab (single place to change how scoring works) ----
-  const SET = {fromSheet:false, latePen:.005, lateAfter:'19:30', earlyBefore:'17:30', adhocWeek:5, adhocMonth:20, bonusOnly:true, qStart:.667, good:.8, ok:.7, lateSame:.05, late1:.10, late2:.20, lateFrom:'2026-09-21', catchup:5, adhocRec:1, adhocItem:3, adhocCap:.6,
+  const SET = {fromSheet:false, latePen:.005, lateAfter:'19:30', earlyBefore:'17:30', adhocWeek:5, adhocMonth:20, bonusOnly:true, qStart:.667, good:.8, ok:.7, lateSame:.5, late1:1.5, late2:2.5, missDay:3.75, planDay:3.75, lateFrom:'2026-09-21', catchup:5, adhocRec:1, adhocItem:3, adhocCap:.6,
                goLive:'2026-10-01', trial:'2027-01-01', mid:'06-30', final:'12-31', email:'', schedules:[]};
   if(settingsGrid && settingsGrid.length > 10){
     // rows are found by their LABEL (the CSV feed can drop or shift blank/title rows, so fixed row numbers are not safe)
@@ -870,7 +870,7 @@ async function loadLiveData(){
     SET.qStart = numv(/^quarterly tasks start counting/i, .667); SET.good = numv(/^rating.*good/i, .8); SET.ok = numv(/^rating.*needs/i, .7);
     SET.goLive = toISODate(val(/^quarterly scoring starts/i, '')) || SET.goLive; SET.trial = toISODate(val(/^new-type pastoral/i, '')) || SET.trial;
     SET.mid = val(/^mid-year/i, SET.mid); SET.final = val(/^year-end/i, SET.final); SET.email = val(/^send review reminder/i, '');
-    SET.lateSame = numv(/^late report.*same day/i, SET.lateSame); SET.late1 = numv(/^late report.*1 day/i, SET.late1); SET.late2 = numv(/^late report.*2 or more/i, SET.late2);
+    SET.missDay = numv(/^day with no report/i, SET.missDay); SET.planDay = numv(/^planning .*points lost/i, SET.planDay); SET.lateSame = numv(/^late report.*same day/i, SET.lateSame); SET.late1 = numv(/^late report.*1 day/i, SET.late1); SET.late2 = numv(/^late report.*2 or more/i, SET.late2);
     SET.catchup = numv(/^catch-up/i, SET.catchup); SET.adhocRec = numv(/^adhoc (recovery|cover switch)/i, SET.adhocRec); SET.adhocItem = numv(/^adhoc item value/i, SET.adhocItem); SET.adhocCap = numv(/^adhoc cover cap/i, SET.adhocCap);
     SET.lateFrom = toISODate(val(/^late-report rule above applies/i, '')) || SET.lateFrom;
     ['Administration','Pastoral'].forEach(pn => {
@@ -2081,7 +2081,12 @@ function planMisses(staff, fromKey, toKey){
       if(!tl.some(x => !(x.scoreFrom && d < x.scoreFrom))) return;     // trial-period tasks don't count in planning
       planned.push(n);
     });
-    if(!planned.length) return;
+    if(!planned.length){
+      const rawN = [].concat(p.w||[], p.m||[], p.q||[], p.a||[]).length;
+      // a submitted working day with NO plan at all counts as a missed planning day (from the new-rule date)
+      if(!rawN && !(p.o && String(p.o).trim()) && d >= DATA.settings.lateFrom && !(nd === TODAY_KEY && !dayRow(staff, nd))) out.push({task:null, noPlan:true, planned:d, next:nd});
+      return;
+    }
     const nrec = dayRow(staff, nd);
     const acc = new Set();
     if(nrec && nrec.detail) CATS.forEach(([k]) => (nrec.detail[k]||[]).forEach(it => { if(ACCOUNTED[it.s]) acc.add(String(it.n).trim().toLowerCase()); }));
@@ -2117,14 +2122,14 @@ function portFallback(kind, c){
   const den = U + c.expM*fm + c.expQ*fq;
   return den <= 0 ? (c.port || 0) : Math.min(1, ((c.port||0)*U + Math.min(c.mprog, fm)*c.expM + Math.min(c.qprog, fq)*c.expQ) / den);
 }
-const lateTierText = () => { const S = DATA.settings; const q = x => (x*100).toFixed(0) + '%'; return `same day ${q(S.lateSame)} &middot; 1 day later ${q(S.late1)} &middot; 2 or more days later ${q(S.late2)}`; };
+const lateTierText = () => { const S = DATA.settings; const q = x => (Math.round(x * 100) / 100) + ' pt'; return `same day ${q(S.lateSame)} &middot; 1 day later ${q(S.late1)} &middot; 2 or more days later ${q(S.late2)} per report; a day never reported ${q(S.missDay)}`; };
 function lateRuleText(kind, c){
   const S = DATA.settings;
   if(kind !== 'weekly' || !c.lateN || !c.wkStart || c.wkStart < S.lateFrom) return '';
   const n = c.lateN[0] + c.lateN[1] + c.lateN[2];
   if(!n || !c.expDays) return '';
-  const lost = (c.lateN[0]*S.lateSame + c.lateN[1]*S.late1 + c.lateN[2]*S.late2) / c.expDays;
-  return `<br>${n} late report(s) took ${(lost*100).toFixed(1)}% off Submission (${lateTierText()} of that day's credit)`;
+  const lost = c.lateN[0]*S.lateSame + c.lateN[1]*S.late1 + c.lateN[2]*S.late2;
+  return `<br>${n} late report(s) cost ${(Math.round(lost * 100) / 100)} pt off Submission (${lateTierText()})`;
 }
 function breakdownCalc(kind, c, profile, flex, W){
   const w = W[profile === 'Pastoral' ? 'Pastoral' : 'Administration'];
@@ -2210,18 +2215,19 @@ function whyLost(kind, key, staff, row, b, c){
       text = parts.join('<br>');
       fix = 'Mark each task Completed or In Progress in your daily report on a day you work on it.';
     } else if(x.key === 'plan'){
-      const miss = planMisses(staff, from, to);
-      if(miss.length){
+      const allMiss = planMisses(staff, from, to), noPlanDays = allMiss.filter(m => m.noPlan), miss = allMiss.filter(m => !m.noPlan);
+      const npTxt = noPlanDays.length ? `<b>No plan for the next working day</b> on ${noPlanDays.map(m => fmtDay(m.planned)).join(' · ')} &mdash; each of these days loses its Planning points.` : '';
+      if(miss.length || noPlanDays.length){
         const by = {}; miss.forEach(m => { (by[m.task] = by[m.task] || []).push(m); });
         const lines = Object.keys(by).map(k => `<b>${esc(k)}</b> &mdash; planned ${by[k].map(m => fmtDay(m.planned)).join(' · ')}; ${by[k].every(m => m.noReport) ? 'no report the next working day' : 'not reported the next working day'}`);
-        text = `Planned for the next working day but not reported (as Completed, In Progress or Deferred with a reason):<br>${lines.join('<br>')}`;
+        text = (lines.length ? `Planned for the next working day but not reported (as Completed, In Progress or Deferred with a reason):<br>${lines.join('<br>')}` : '') + (lines.length && npTxt ? '<br>' : '') + npTxt;
       } else text = `${pct(x.value)} of the tasks planned for the next working day were followed through.`;
-      fix = 'The next working day, report each planned task as Completed / In Progress &mdash; or Deferred (Approved) with the reason in remarks. Leave it out of the plan if you will not do it.';
+      fix = 'The next working day, report each planned task as Completed / In Progress &mdash; or Deferred (Approved) with the reason in remarks. Leave it out of the plan if you will not do it. Always list your plan for the next working day in the daily report.';
     } else if(x.key === 'sub'){
       const si = submissionIssues(staff, from, to);
       const parts = [];
       if(si.missed.length) parts.push(`<b>No report on:</b> ${si.missed.map(fmtDay).join(', ')}.`);
-      if(si.late.length) parts.push(`<b>Reports sent late on:</b> ${si.late.map(l => fmtDay(l.d)).join(', ')}. Each late report loses part of that day's credit (${lateTierText()}).`);
+      if(si.late.length) parts.push(`<b>Reports sent late on:</b> ${si.late.map(l => fmtDay(l.d)).join(', ')}. Each late report loses points (${lateTierText()}).`);
       text = parts.join('<br>') || `Reports submitted on ${pct(x.value)} of expected days.`;
       fix = 'Submit your daily report every working day by ' + DATA.settings.lateAfter + ' (leave days are excluded).';
     } else if(x.key === 'adhoc'){
@@ -2343,19 +2349,20 @@ function summarizePeriods(staff, kind, fromKey, toKey){
 // ---------- How Calc — short version ----------
 function renderHowCalc(){
   const W = DATA.weights;
+  const S0 = DATA.settings, f2g = x => String(Math.round((x == null ? 3.75 : x) * 100) / 100);
   const wr = p => { const x = W[p]; return `<tr><td>${p}</td><td>${Math.round(x.port*100)}</td><td>${Math.round(x.plan*100)}</td><td>${Math.round(x.sub*100)}</td><td>${Math.round(x.adhoc*100)}</td></tr>`; };
   const flexNames = Array.from(DATA.flexSet).join(', ') || '&mdash;';
   document.getElementById('howcalcBody').innerHTML = `
     <div class="card"><div class="hc-title">The score in one line</div>
       <div class="reason">Every week and every month is scored out of 100 points, shared between four parts. Each part earns its share in proportion to its result (80% of a 15-point part = 12 points).</div>
       <table class="hc-table"><tr><th>Points</th><th>Portfolio</th><th>Planning</th><th>Submission</th><th>Adhoc</th></tr>${wr('Administration')}${wr('Pastoral')}</table>
-      <div class="reason">Planning (15) and Submission (15) are fixed. The Adhoc points (20) are held in Portfolio, so Portfolio is worth 70; for flexible staff, or when no plan was logged, the unused Planning / Submission points also sit in Portfolio. <b>Adhoc then covers missed weekly tasks only</b>, at a lower value (see the Adhoc part below); a score never goes above 100%. Staff with everything perfect simply score 100%.<br>A report sent after ${DATA.settings.lateAfter} loses part of that day's Submission credit: ${lateTierText()} (a day with no report earns 0). A missed day can still be reported until day ${DATA.settings.catchup} of the next month (it then counts as 2+ days late); from the next day the month is closed and it stays at 0.<br><b>When tasks fall due:</b> weekly tasks count every week. <b>Monthly tasks count only after the month's last working day</b> and <b>quarterly tasks only after the quarter's last working day</b>, so nobody is marked down part-way through; until then an untouched task is only listed as a heads-up. A plan made for the next working day is judged only once that day's report is due.<br>Example: Submission is worth 15 points; in a 4-day week with one report late the same day, 3 on time: (100+100+100+95) &divide; 4 = 98.75% &times; 15 = 14.8 points.</div></div>
+      <div class="reason">Planning (15) and Submission (15) are fixed. The Adhoc points (20) are held in Portfolio, so Portfolio is worth 70; for flexible-schedule staff the Planning / Submission points sit in Portfolio instead (no daily report needed). A full-time staff member who does not plan or does not report loses those points. <b>Adhoc then covers missed weekly tasks only</b>, at a lower value (see the Adhoc part below); a score never goes above 100%. Staff with everything perfect simply score 100%.<br>A report sent after ${DATA.settings.lateAfter} loses points: ${lateTierText()}. A missed day can still be reported until day ${DATA.settings.catchup} of the next month (it then counts as 2+ days late); from the next day the month is closed and it stays at 0.<br><b>When tasks fall due:</b> weekly tasks count every week. <b>Monthly tasks count only after the month's last working day</b> and <b>quarterly tasks only after the quarter's last working day</b>, so nobody is marked down part-way through; until then an untouched task is only listed as a heads-up. A plan made for the next working day is judged only once that day's report is due.<br>Example: Submission is worth 15 points; in a 4-day week with one report late the same day, 3 on time: (100+100+100+95) &divide; 4 = 98.75% &times; 15 = 14.8 points.</div></div>
 
     <div class="card"><div class="hc-title">The four parts</div>
       <div class="hc-grid">
         <div><b>Portfolio</b><span>Your listed tasks. Points of tasks Completed or In Progress &divide; points that were due. Weekly tasks are due every week (scaled down for leave days). Monthly tasks fall due after the month's last working day and quarterly tasks after the quarter's last working day &mdash; until then an untouched one is only a heads-up, with no deduction. In a month's score: your weekly-task results are averaged, and the monthly (and, at quarter end, quarterly) tasks are blended in once due.</span></div>
-        <div><b>Planning</b><span>Of the tasks you planned for tomorrow, the share you reported the next working day (Completed / In Progress, or Deferred (Approved) with the reason).</span></div>
-        <div><b>Submission</b><span>Days reported &divide; working days expected (Tue&ndash;Fri, leave removed).</span></div>
+        <div><b>Planning</b><span>Each working day you report, list what you plan for the next working day. Next working day, report each planned task (Completed / In Progress, or Deferred (Approved) with the reason). A day is worth up to ${f2g(S0.planDay)} points (15 &divide; 4, the same in a leave week): no plan = the whole day is lost; a plan only partly followed = that part is lost. Flexible-schedule staff are exempt.</span></div>
+        <div><b>Submission</b><span>Report on every working day (Tue&ndash;Fri, leave excluded). Each day is worth up to ${f2g(S0.missDay)} points (15 &divide; 4, the same in a leave week). A day never reported loses all ${f2g(S0.missDay)}; a late report loses a few points depending on how late: ${lateTierText()}. You can still report a missed day until day ${S0.catchup} of the next month (at the late rate).</span></div>
         <div><b>Adhoc</b><span>Extra work outside your listed tasks. Items logged (Completed or In Progress) &divide; ${DATA.settings.adhocWeek} per week (${DATA.settings.adhocMonth} per month, scaled down for leave days), capped at 100%. Adhoc covers only <b>missed weekly tasks</b>, at a lower value: each adhoc item counts as ${DATA.settings.adhocItem == null ? 3 : DATA.settings.adhocItem} task points, and one missed task can get back at most ${Math.round((DATA.settings.adhocCap == null ? .6 : DATA.settings.adhocCap) * 100)}% of its points, so a missed task always still costs points. It never covers Planning, Submission, late penalties, or monthly / quarterly tasks, and never takes a score above 100%.</span></div>
       </div></div>
 
@@ -2402,17 +2409,17 @@ function initHcSim(){
   const F = [ // key, label, default
     ['n','Weekly tasks in the list',4],['wt','Weight (task points) of each weekly task',5],['done','Weekly tasks Completed / In Progress',3],
     ['adh','Adhoc items logged this week',1],
-    ['plan','Planning result (% of planned tasks reported)',100],
+    ['pm','Planning: days not planned / not followed up (0.5 = half followed)',0],
     ['exp','Working days expected',4],['sub','Days reported',4],['l0','Late reports: same day',0],['l1','Late reports: 1 day later',0],['l2','Late reports: 2+ days later',0]];
   const PRE = [
-    ['My example (1 missed, 1 adhoc)',{n:4,wt:5,done:3,adh:1,plan:100,exp:4,sub:4,l0:0,l1:0,l2:0}],
-    ['Perfect, no adhoc',{n:4,wt:5,done:4,adh:0,plan:100,exp:4,sub:4,l0:0,l1:0,l2:0}],
-    ['Perfect + lots of adhoc',{n:4,wt:5,done:4,adh:5,plan:100,exp:4,sub:4,l0:0,l1:0,l2:0}],
-    ['1 missed, no adhoc',{n:4,wt:5,done:3,adh:0,plan:100,exp:4,sub:4,l0:0,l1:0,l2:0}],
-    ['1 missed, 3 adhoc',{n:4,wt:5,done:3,adh:3,plan:100,exp:4,sub:4,l0:0,l1:0,l2:0}],
-    ['Planning only 50%',{n:4,wt:5,done:4,adh:2,plan:50,exp:4,sub:4,l0:0,l1:0,l2:0}],
-    ['1 day not reported',{n:4,wt:5,done:4,adh:2,plan:100,exp:4,sub:3,l0:0,l1:0,l2:0}],
-    ['2 late reports',{n:4,wt:5,done:4,adh:0,plan:100,exp:4,sub:4,l0:1,l1:0,l2:1}]];
+    ['My example (1 missed, 1 adhoc)',{n:4,wt:5,done:3,adh:1,pm:0,exp:4,sub:4,l0:0,l1:0,l2:0}],
+    ['Perfect, no adhoc',{n:4,wt:5,done:4,adh:0,pm:0,exp:4,sub:4,l0:0,l1:0,l2:0}],
+    ['Perfect + lots of adhoc',{n:4,wt:5,done:4,adh:5,pm:0,exp:4,sub:4,l0:0,l1:0,l2:0}],
+    ['1 missed, no adhoc',{n:4,wt:5,done:3,adh:0,pm:0,exp:4,sub:4,l0:0,l1:0,l2:0}],
+    ['1 missed, 3 adhoc',{n:4,wt:5,done:3,adh:3,pm:0,exp:4,sub:4,l0:0,l1:0,l2:0}],
+    ['2 days not planned',{n:4,wt:5,done:4,adh:2,pm:2,exp:4,sub:4,l0:0,l1:0,l2:0}],
+    ['1 day not reported',{n:4,wt:5,done:4,adh:2,pm:0,exp:4,sub:3,l0:0,l1:0,l2:0}],
+    ['2 late reports',{n:4,wt:5,done:4,adh:0,pm:0,exp:4,sub:4,l0:1,l1:0,l2:1}]];
   const inT = document.getElementById('hcSimIn'), outT = document.getElementById('hcSimOut'), btns = document.getElementById('hcSimBtns');
   const bs = 'padding:4px 9px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:12px';
   inT.innerHTML = F.map(f => `<tr><td>${f[1]}</td><td style="width:90px"><input type="number" min="0" step="any" data-k="${f[0]}" value="${f[2]}" style="width:80px;padding:4px;border:1px solid #d9c98a;background:#FFF8D6;border-radius:5px;font-size:13px"></td></tr>`).join('');
@@ -2420,15 +2427,16 @@ function initHcSim(){
   const val = k => Math.max(0, Number(inT.querySelector(`[data-k="${k}"]`).value) || 0);
   const f1 = x => (Math.round(x * 10) / 10).toString(), f2 = x => (Math.round(x * 100) / 100).toString();
   function calc(){
-    const n = val('n'), wt = val('wt'), done = Math.min(val('done'), n), adh = val('adh'), plan = Math.min(val('plan'), 100) / 100;
+    const n = val('n'), wt = val('wt'), done = Math.min(val('done'), n), adh = val('adh'), pmDays = val('pm');
     const exp = val('exp'), sub = Math.min(val('sub'), exp), l0 = val('l0'), l1 = val('l1'), l2 = val('l2');
     const due = n * wt, doneTP = done * wt, missed = Math.max(0, due - doneTP);
     const cover = recF * Math.min(adh * itemV, capV * missed);
     const portPct = due <= 0 ? 1 : Math.min(1, (doneTP + cover) / due);
     const portW = Wt.port + Wt.adhoc, portPts = portPct * portW;
-    const lateLoss = exp > 0 ? (l0 * S.lateSame + l1 * S.late1 + l2 * S.late2) / exp : 0;
-    const subPct = exp > 0 ? Math.max(0, Math.min(sub / exp, 1) - lateLoss) : 1;
-    const planPts = plan * Wt.plan, subPts = subPct * Wt.sub;
+    const missDay = S.missDay == null ? Wt.sub / 4 : S.missDay, missedD = Math.max(0, exp - sub);
+    const subLost = missedD * missDay + l0 * S.lateSame + l1 * S.late1 + l2 * S.late2;
+    const subPct = exp > 0 ? Math.max(0, 1 - subLost / Wt.sub) : 1;
+    const planDay = S.planDay == null ? Wt.plan / 4 : S.planDay, planPts = Math.max(0, Wt.plan - pmDays * planDay), plan = Wt.plan > 0 ? planPts / Wt.plan : 1, subPts = subPct * Wt.sub;
     const total = Math.max(0, Math.min(portPts + planPts + subPts, 100 * 1));
     const noAdh = due <= 0 ? 100 : (Math.min(1, doneTP / due) * portW + planPts + subPts);
     const r = (a, b, c) => `<tr><td>${a}</td><td>${b}</td><td style="text-align:right"><b>${c}</b></td></tr>`;
@@ -2439,8 +2447,8 @@ function initHcSim(){
       r('Adhoc cover', `min(${adh} item(s) &times; ${itemV}, ${Math.round(capV * 100)}% &times; ${f1(missed)} missed)${recF < 1 ? ' &times; ' + Math.round(recF * 100) + '%' : ''}`, f1(cover)) +
       r('Portfolio %', `(${f1(doneTP)} + ${f1(cover)}) &divide; ${f1(due)}`, Math.round(portPct * 1000) / 10 + '%') +
       r(`Portfolio score (out of ${portW})`, `${Math.round(portPct * 1000) / 10}% &times; ${portW}`, f1(portPts)) +
-      r(`Planning score (out of ${Wt.plan})`, `${Math.round(plan * 100)}% &times; ${Wt.plan}`, f1(planPts)) +
-      r(`Submission score (out of ${Wt.sub})`, `${sub} of ${exp} days${lateLoss > 0 ? ', late &minus;' + Math.round(lateLoss * 1000) / 10 + '%' : ''} = ${Math.round(subPct * 1000) / 10}% &times; ${Wt.sub}`, f1(subPts)) +
+      r(`Planning score (out of ${Wt.plan})`, `${Wt.plan} &minus; ${f2(pmDays)} day(s) &times; ${f2(planDay)}`, f1(planPts)) +
+      r(`Submission score (out of ${Wt.sub})`, `${Wt.sub} &minus; ${f2(subLost)} (${missedD} day(s) not reported &times; ${f2(missDay)} + late reports)`, f1(subPts)) +
       `<tr style="border-top:2px solid #333"><td><b>Total</b></td><td>${f1(portPts)} + ${f1(planPts)} + ${f1(subPts)}</td><td style="text-align:right"><b>${f1(total)}%</b></td></tr>`;
     document.getElementById('hcSimNote').innerHTML = cover > 0
       ? `Without adhoc this week would be ${f1(noAdh)}%. Adhoc won back ${f1(total - noAdh)} point(s), but the missed task still costs ${f1(portW * (1 - portPct))} point(s).`
@@ -2650,7 +2658,7 @@ function renderSettings(){
       </ol></div>
     <div class="card"><div class="hc-title">Rules in force</div>
       <table class="hc-table">
-        ${kv('Late report: same day / 1 day later / 2+ days later', (S.lateSame*100).toFixed(0) + '% / ' + (S.late1*100).toFixed(0) + '% / ' + (S.late2*100).toFixed(0) + '% of that day\'s Submission credit')}
+        ${kv('Late report: same day / 1 day later / 2+ days later', (Math.round(S.lateSame*100)/100) + ' / ' + (Math.round(S.late1*100)/100) + ' / ' + (Math.round(S.late2*100)/100) + ' points lost per late report; a day never reported costs ' + (Math.round((S.missDay == null ? 3.75 : S.missDay)*100)/100) + ' points')}
         ${kv('New late rule applies from week of', esc(fmtShortDate(S.lateFrom)))}
         ${kv('Catch-up for missed reports', 'until day ' + S.catchup + ' of the next month')}
         ${kv('Old late rule (earlier weeks)', (S.latePen * 100).toFixed(1) + '% per late report')}
