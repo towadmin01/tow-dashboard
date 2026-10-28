@@ -616,7 +616,7 @@
       <div style="display:flex;gap:8px;align-items:center;margin:4px 0 8px;"><span class="lbl" style="margin:0;">Count daily-reporting scores from</span><select id="reviewFromSel" class="orientation-select" style="flex:none;"></select></div>
       <div class="reason" id="reviewBlendLine"></div>
       <table class="breakdown-table" id="reviewBlendTable"></table>
-      <div class="rev-disc">Increment and bonus amounts are subject to the Church&rsquo;s financial standing.</div>
+      <div class="rev-disc" id="reviewNote">Increment and bonus amounts are subject to the Church&rsquo;s financial standing.</div>
       <button class="adhoc-link" id="reviewSaveBtn">Save this review</button>
       <button class="adhoc-link" id="reviewPrintBtn" style="margin-top:6px;">Print this review</button>
       <button class="adhoc-link" id="reviewPrintAllBtn" style="margin-top:6px;">Print whole org (all staff)</button>
@@ -854,7 +854,7 @@ async function loadLiveData(){
   });
   let flexSet = new Set(flexRows.map(r => String(r['Staff Name'] || r['Staff'] || '').trim()).filter(Boolean));
   // ---- Settings tab (single place to change how scoring works) ----
-  const SET = {fromSheet:false, latePen:.005, lateAfter:'19:30', earlyBefore:'17:30', adhocWeek:5, adhocMonth:20, bonusOnly:true, qStart:.667, good:.8, ok:.7, lateSame:.5, late1:1.5, late2:2.5, missDay:3.75, planDay:3.75, lateFrom:'2026-09-21', catchup:5, adhocRec:1, adhocItem:3, adhocCap:.6,
+  const SET = {fromSheet:false, latePen:.005, lateAfter:'19:30', earlyBefore:'17:30', adhocWeek:5, adhocMonth:20, bonusOnly:true, qStart:.667, good:.8, ok:.7, lateSame:.5, late1:1.5, late2:2.5, missDay:3.75, planDay:3.75, revNote:'Increment and bonus amounts are subject to the Church\u2019s financial standing.', revBands:[{from:4.5,level:'Outstanding',inc:'6%',bonus:'1.5 months'},{from:3.8,level:'Exceeds Expectations',inc:'4\u20135%',bonus:'1 month'},{from:3,level:'Meets Expectations',inc:'2\u20133%',bonus:'0.5 month'},{from:2,level:'Below Expectations',inc:'0\u20131%',bonus:'Discretionary'},{from:0,level:'Needs Improvement',inc:'None',bonus:'None'}], lateFrom:'2026-09-21', catchup:5, adhocRec:1, adhocItem:3, adhocCap:.6,
                goLive:'2026-10-01', trial:'2027-01-01', mid:'06-30', final:'12-31', email:'', schedules:[]};
   if(settingsGrid && settingsGrid.length > 10){
     // rows are found by their LABEL (the CSV feed can drop or shift blank/title rows, so fixed row numbers are not safe)
@@ -872,6 +872,12 @@ async function loadLiveData(){
     SET.mid = val(/^mid-year/i, SET.mid); SET.final = val(/^year-end/i, SET.final); SET.email = val(/^send review reminder/i, '');
     SET.missDay = numv(/^day with no report/i, SET.missDay); SET.planDay = numv(/^planning .*points lost/i, SET.planDay); SET.lateSame = numv(/^late report.*same day/i, SET.lateSame); SET.late1 = numv(/^late report.*1 day/i, SET.late1); SET.late2 = numv(/^late report.*2 or more/i, SET.late2);
     SET.catchup = numv(/^catch-up/i, SET.catchup); SET.adhocRec = numv(/^adhoc (recovery|cover switch)/i, SET.adhocRec); SET.adhocItem = numv(/^adhoc item value/i, SET.adhocItem); SET.adhocCap = numv(/^adhoc cover cap/i, SET.adhocCap);
+    { const br = find(/^annual review outcome/i);   // editable increment / bonus table (Settings tab)
+      if(br >= 0){
+        const rows = []; for(let q = br + 1; q < Math.min(settingsGrid.length, br + 12); q++){ const f = toNum(cell(q, 0)); if(f !== null && cell(q, 1)) rows.push({from:f, level:cell(q, 1), inc:cell(q, 2) || '\u2014', bonus:cell(q, 3) || '\u2014'}); }
+        if(rows.length >= 2) SET.revBands = rows.sort((a, b) => b.from - a.from);
+        const nr = find(/^financial standing note/i); if(nr >= 0 && cell(nr, 1)) SET.revNote = cell(nr, 1);
+      } }
     SET.lateFrom = toISODate(val(/^late-report rule above applies/i, '')) || SET.lateFrom;
     ['Administration','Pastoral'].forEach(pn => {
       const r = find(new RegExp('^' + pn + '$')); if(r < 0) return;
@@ -1747,6 +1753,11 @@ function collectReviewData(){
   return data;
 }
 
+function reviewBandFor(score){
+  const bands = DATA.settings.revBands || []; let i = bands.findIndex(b => score >= b.from - 1e-9); if(i < 0) i = bands.length - 1;
+  const b = bands[i] || {level:'', inc:'\u2014', bonus:'\u2014'};
+  return {level:b.level, inc:b.inc, bonus:b.bonus, from:b.from, cls: i <= 1 ? 'good' : (i >= bands.length - 1 ? 'low' : 'mid')};
+}
 function computeReviewScore(staff){
   const data = collectReviewData();
   let totalPerformanceScore = 0;
@@ -1778,12 +1789,8 @@ function computeReviewScore(staff){
   { const sel = document.getElementById('reviewFromSel'); if(sel){ const cur = ytdFromKey || getScoreFrom(); sel.innerHTML = DATA.months.map(m => `<option value="${m}" ${m === cur ? 'selected' : ''}>${fmtMonth(m)}</option>`).join(''); } }
 
   document.getElementById('reviewTotalScore').textContent = finalScore.toFixed(2) + ' / 5';
-  let band, cls;
-  if(finalScore >= 4.5){ band='Outstanding'; cls='good'; }
-  else if(finalScore >= 3.8){ band='Exceeds Expectations'; cls='good'; }
-  else if(finalScore >= 3.0){ band='Meets Expectations'; cls='mid'; }
-  else if(finalScore >= 2.0){ band='Below Expectations'; cls='mid'; }
-  else { band='Needs Improvement'; cls='low'; }
+  const bnd = reviewBandFor(finalScore), band = bnd.level, cls = bnd.cls;
+  { const nt = document.getElementById('reviewNote'); if(nt) nt.textContent = DATA.settings.revNote; }
   const bandEl = document.getElementById('reviewBand');
   bandEl.textContent = band;
   bandEl.className = 'badge ' + cls;
@@ -1793,6 +1800,8 @@ function computeReviewScore(staff){
     <tr><td>Daily Reporting KPI contribution</td><td>${(dailyReportingScore*0.6).toFixed(2)}</td></tr>
     <tr><td>Observation contribution (Final Year-End)</td><td>${observationScore.toFixed(2)}</td></tr>
     <tr><td>Final Recognition Score</td><td>${finalScore.toFixed(2)} / 5</td></tr>
+    <tr><td>Increment</td><td>${bnd.inc}</td></tr>
+    <tr><td>Bonus</td><td>${bnd.bonus}</td></tr>
   `;
 }
 
@@ -1834,13 +1843,8 @@ function computeReviewSummaryFor(staff){
   const kpiFraction = scp.monthsCounted > 0 ? scp.avgMonthly : (scp.weeksCounted > 0 ? scp.avgWeekly : 0);
   const dailyReportingScore = kpiFraction * 5;
   const finalScore = (dailyReportingScore * 0.60) + observationScore;
-  let band;
-  if(finalScore >= 4.5) band='Outstanding';
-  else if(finalScore >= 3.8) band='Exceeds Expectations';
-  else if(finalScore >= 3.0) band='Meets Expectations';
-  else if(finalScore >= 2.0) band='Below Expectations';
-  else band='Needs Improvement';
-  return {header, dept: accum.dept, catLines, dailyReportingScore, observationScore, finalScore, band};
+  const bnd = reviewBandFor(finalScore);
+  return {header, dept: accum.dept, catLines, dailyReportingScore, observationScore, finalScore, band: bnd.level, inc: bnd.inc, bonus: bnd.bonus};
 }
 
 function reviewScoreTableHtml(s){
@@ -1853,8 +1857,10 @@ function reviewScoreTableHtml(s){
       <tr><td>Total Performance Score (Observation, 40%)</td><td>${s.observationScore.toFixed(2)}</td></tr>
       <tr><td>Daily Reporting KPI contribution (60%)</td><td>${(s.dailyReportingScore*0.6).toFixed(2)}</td></tr>
       <tr><td><b>Final Recognition Score</b></td><td><b>${s.finalScore.toFixed(2)} / 5 \u2014 ${s.band}</b></td></tr>
+      <tr><td>Increment</td><td>${s.inc}</td></tr>
+      <tr><td>Bonus</td><td>${s.bonus}</td></tr>
     </table>
-    <div class="rev-disc">Increment and bonus amounts are subject to the Church\u2019s financial standing.</div>
+    <div class="rev-disc">${DATA.settings.revNote}</div>
   `;
 }
 
@@ -2392,13 +2398,8 @@ function renderHowCalc(){
 
     <div class="card"><div class="hc-title">Annual review</div>
       <div class="reason">Final score = Daily Reporting KPI &times; 60% + Staff Observation (Mid-Year / Year-End review) &times; 40%, shown out of 5.</div>
-      <table class="hc-table"><tr><th>Score</th><th>Level</th><th>Increment</th><th>Bonus</th></tr>
-        <tr><td>4.50&ndash;5.00</td><td>Outstanding</td><td>6%</td><td>1.5 months</td></tr>
-        <tr><td>3.80&ndash;4.49</td><td>Exceeds</td><td>4&ndash;5%</td><td>1 month</td></tr>
-        <tr><td>3.00&ndash;3.79</td><td>Meets</td><td>2&ndash;3%</td><td>0.5 month</td></tr>
-        <tr><td>2.00&ndash;2.99</td><td>Below</td><td>0&ndash;1%</td><td>Discretionary</td></tr>
-        <tr><td>&lt; 2.00</td><td>Needs Improvement</td><td>None</td><td>None</td></tr></table>
-      <div class="reason"><b>Please note:</b> increment and bonus amounts are subject to the Church&rsquo;s financial standing.</div></div>`;
+      <table class="hc-table"><tr><th>Score</th><th>Level</th><th>Increment</th><th>Bonus</th></tr>${DATA.settings.revBands.map((b, k, a) => `<tr><td>${k === 0 ? b.from.toFixed(2) + '&ndash;5.00' : (k === a.length - 1 ? '&lt; ' + a[k - 1].from.toFixed(2) : b.from.toFixed(2) + '&ndash;' + (a[k - 1].from - 0.01).toFixed(2))}</td><td>${b.level}</td><td>${b.inc}</td><td>${b.bonus}</td></tr>`).join('')}</table>
+      <div class="reason"><b>Please note:</b> ${DATA.settings.revNote} (The increment and bonus columns are set in the Settings tab.)</div></div>`;
   initHcSim();
 }
 
