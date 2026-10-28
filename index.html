@@ -854,7 +854,7 @@ async function loadLiveData(){
   });
   let flexSet = new Set(flexRows.map(r => String(r['Staff Name'] || r['Staff'] || '').trim()).filter(Boolean));
   // ---- Settings tab (single place to change how scoring works) ----
-  const SET = {fromSheet:false, latePen:.005, lateAfter:'19:30', earlyBefore:'17:30', adhocWeek:5, adhocMonth:20, bonusOnly:true, qStart:.667, good:.8, ok:.7, lateSame:.05, late1:.10, late2:.20, lateFrom:'2026-09-21', catchup:5, adhocRec:1,
+  const SET = {fromSheet:false, latePen:.005, lateAfter:'19:30', earlyBefore:'17:30', adhocWeek:5, adhocMonth:20, bonusOnly:true, qStart:.667, good:.8, ok:.7, lateSame:.05, late1:.10, late2:.20, lateFrom:'2026-09-21', catchup:5, adhocRec:1, adhocItem:3, adhocCap:.6,
                goLive:'2026-10-01', trial:'2027-01-01', mid:'06-30', final:'12-31', email:'', schedules:[]};
   if(settingsGrid && settingsGrid.length > 10){
     // rows are found by their LABEL (the CSV feed can drop or shift blank/title rows, so fixed row numbers are not safe)
@@ -871,7 +871,7 @@ async function loadLiveData(){
     SET.goLive = toISODate(val(/^quarterly scoring starts/i, '')) || SET.goLive; SET.trial = toISODate(val(/^new-type pastoral/i, '')) || SET.trial;
     SET.mid = val(/^mid-year/i, SET.mid); SET.final = val(/^year-end/i, SET.final); SET.email = val(/^send review reminder/i, '');
     SET.lateSame = numv(/^late report.*same day/i, SET.lateSame); SET.late1 = numv(/^late report.*1 day/i, SET.late1); SET.late2 = numv(/^late report.*2 or more/i, SET.late2);
-    SET.catchup = numv(/^catch-up/i, SET.catchup); SET.adhocRec = numv(/^adhoc recovery/i, SET.adhocRec);
+    SET.catchup = numv(/^catch-up/i, SET.catchup); SET.adhocRec = numv(/^adhoc (recovery|cover switch)/i, SET.adhocRec); SET.adhocItem = numv(/^adhoc item value/i, SET.adhocItem); SET.adhocCap = numv(/^adhoc cover cap/i, SET.adhocCap);
     SET.lateFrom = toISODate(val(/^late-report rule above applies/i, '')) || SET.lateFrom;
     ['Administration','Pastoral'].forEach(pn => {
       const r = find(new RegExp('^' + pn + '$')); if(r < 0) return;
@@ -2130,7 +2130,8 @@ function breakdownCalc(kind, c, profile, flex, W){
   const w = W[profile === 'Pastoral' ? 'Pastoral' : 'Administration'];
   const comps = [];
   const add = (key, name, value, weight, applies, what, why) => comps.push({key, name, value, weight, applies, what, why});
-  const port = (c.portAll !== null && c.portAll !== undefined) ? c.portAll : portFallback(kind, c);
+  const portBase = (c.portAll !== null && c.portAll !== undefined) ? c.portAll : portFallback(kind, c);
+  let port = portBase;
   let portWhat;
   if(kind === 'weekly'){
     const fm = c.fracM == null ? 1 : c.fracM, fq = c.fracQ == null ? 1 : c.fracQ;
@@ -2138,6 +2139,17 @@ function breakdownCalc(kind, c, profile, flex, W){
     const done = Math.min(c.doneW, c.expW*fw) + Math.min(c.doneM, c.expM*fm) + Math.min(c.doneQ, c.expQ*fq);
     portWhat = `${n1(done)} of ${n1(due)} task points done (completed or in progress)` + (fw < 0.999 ? `<br>Weekly tasks scaled to your ${c.expDays} available working day(s) this week (leave)` : '');
   } else portWhat = `all weekly, monthly and quarterly task points that were due, blended`;
+  // Adhoc covers ONLY missed WEEKLY task points, at a lower value (item value) and up to a cap of each missed task.
+  const recF = DATA.settings.adhocRec == null ? 1 : DATA.settings.adhocRec, itemV = DATA.settings.adhocItem == null ? 3 : DATA.settings.adhocItem, capV = DATA.settings.adhocCap == null ? .6 : DATA.settings.adhocCap;
+  let coverTP = 0, missedTP = 0;
+  if(kind === 'weekly' && port !== null){
+    const fw0 = c.fracW == null ? 1 : c.fracW, fm0 = c.fracM == null ? 1 : c.fracM, fq0 = c.fracQ == null ? 1 : c.fracQ;
+    const dW = c.expW * fw0; missedTP = Math.max(0, dW - c.doneW);
+    coverTP = recF * Math.min((c.adhoc || 0) * itemV, capV * missedTP);
+    const Dall = dW + c.expM * fm0 + c.expQ * fq0;
+    if(Dall > 0 && coverTP > 0) port = Math.min(1, portBase + coverTP / Dall);
+    if(coverTP > 0) portWhat += `<br>Adhoc covered ${n1(coverTP)} of ${n1(missedTP)} missed weekly task point(s)`;
+  }
   const mix = `Weekly tasks ${pct(c.port)}${(c.expM > 0 && (c.fracM == null || c.fracM >= 0.999)) ? ' &middot; Monthly tasks ' + pct(c.mprog) : (c.expM > 0 ? ' &middot; Monthly tasks: not due yet' : '')}${(c.expQ > 0 && (c.fracQ == null || c.fracQ >= 0.999)) ? ' &middot; Quarterly tasks ' + pct(c.qprog) : (c.expQ > 0 ? ' &middot; Quarterly tasks: not due yet' : '')}`;
   add('port', 'Portfolio (your task list)', port, w.port, port !== null, portWhat + '<br>' + mix, '');
   add('plan', 'Planning', c.plan, w.plan, !flex && c.plan !== null,
@@ -2162,16 +2174,13 @@ function breakdownCalc(kind, c, profile, flex, W){
   });
   const late = flex ? 0 : (c.latePen || 0);
   const base = comps.reduce((a, x) => a + x.earned, 0);
-  const recF = DATA.settings.adhocRec == null ? 1 : DATA.settings.adhocRec;
-  const recPot = c.adhoc > 0 ? recF * Math.min(1, c.adhocPct || 0) * (w.adhoc / tot) : 0;
-  const planComp = comps.find(x => x.key === 'plan');
-  const planGap = planComp && planComp.applies ? planComp.lost : 0;
-  const recov = Math.min(recPot, planGap + late, Math.max(0, 1 - base + late));
+  const pcomp = comps.find(x => x.key === 'port');
+  const recov = (pcomp && pcomp.applies) ? pcomp.share * Math.max(0, port - portBase) : 0, recPot = recov;
   adh.earned = recov;
   adh.why = c.adhoc > 0
-    ? `${c.adhoc} adhoc item(s) logged (${pct(Math.min(1, c.adhocPct || 0))} of the ${n1(target)}-item target${fwA < 0.999 ? ', scaled for leave' : ''}) &mdash; ` + (recov > 0.0005 ? `<b>fills +${(recov * 100).toFixed(1)} point(s) of planning gaps / late penalties</b> (never missed submissions or task scores; a score never goes above 100%)` : 'nothing to fill: no planning gap or late penalty this period')
-    : 'no adhoc logged &mdash; nothing to fill any lost points';
-  return { comps, late, recov, recPot, final: Math.max(0, Math.min(1, base + recov - late)), target };
+    ? `${c.adhoc} adhoc item(s) logged (each worth ${n1(itemV)} task points) &mdash; ` + (kind !== 'weekly' ? 'adhoc cover is applied inside each week&#39;s Portfolio result' : (recov > 0.0005 ? `<b>covers ${n1(coverTP)} of the ${n1(missedTP)} missed weekly task point(s) = +${(recov * 100).toFixed(1)} score point(s)</b> (a missed task still costs points)` : 'no missed weekly task to cover this week'))
+    : 'no adhoc logged &mdash; nothing to cover missed weekly tasks';
+  return { comps, late, recov, recPot, final: Math.max(0, Math.min(1, base - late)), target };
 }
 
 function whyLost(kind, key, staff, row, b, c){
@@ -2272,7 +2281,7 @@ function breakdownHtml(kind, key, staff){
   const wtxt = Object.assign({}, ...b.comps.filter(x => x.applies).map(x => ({[x.key]: Math.round(x.share * 100)})));
   return `<div class="bx-top"><span class="val">${pct(row.score)}</span><span class="badge ${ratingClass(row.rating)}">${esc((row.rating || '').replace(/^\d - /, ''))}</span></div>
     <div class="bx-sub">${esc(staff)} &middot; ${esc(label)}${delta}</div>${sheetNote}
-    <div class="bx-legend"><b>How to read this:</b> every score is out of 100 points. The points are shared between the parts that apply to ${flex ? 'this person (flexible schedule)' : 'this person'}: <b>Portfolio ${wtxt.port || 0}</b>${wtxt.plan !== undefined ? ` &middot; <b>Planning ${wtxt.plan}</b>` : ''}${wtxt.sub !== undefined ? ` &middot; <b>Submission ${wtxt.sub}</b>` : ''}${wtxt.adhoc !== undefined ? ` &middot; <b>Adhoc ${wtxt.adhoc}</b>` : ''}. Each part earns its share in proportion to the result (e.g. 80% of 15 pts = 12 pts). ${b.late > 0 ? 'Late reports then cost 0.5 pt each. ' : ''}<b>Adhoc fills only planning gaps and late-report penalties</b> (not missed submissions or task scores), and a score never goes above 100%. Monthly tasks count after the month ends and quarterly tasks after the quarter ends.<br>${b.recov > 0.0005 ? '' : ''}</div>
+    <div class="bx-legend"><b>How to read this:</b> every score is out of 100 points. The points are shared between the parts that apply to ${flex ? 'this person (flexible schedule)' : 'this person'}: <b>Portfolio ${wtxt.port || 0}</b>${wtxt.plan !== undefined ? ` &middot; <b>Planning ${wtxt.plan}</b>` : ''}${wtxt.sub !== undefined ? ` &middot; <b>Submission ${wtxt.sub}</b>` : ''}${wtxt.adhoc !== undefined ? ` &middot; <b>Adhoc ${wtxt.adhoc}</b>` : ''}. Each part earns its share in proportion to the result (e.g. 80% of 15 pts = 12 pts). ${b.late > 0 ? 'Late reports then cost 0.5 pt each. ' : ''}<b>Adhoc covers only missed WEEKLY tasks</b>, at a lower value (never planning, submission, late penalties, monthly or quarterly tasks), and a score never goes above 100%. Monthly tasks count after the month ends and quarterly tasks after the quarter ends.<br>${b.recov > 0.0005 ? '' : ''}</div>
     <div class="bx-h">How the score was built</div>${parts}
     ${row.trialItems && row.trialItems !== '—' ? `<div class="bx-h">Plus point &mdash; reported early (not scored yet)</div><div class="bx-ok">${esc(row.trialItems)}. These new-type pastoral tasks start counting from ${esc(fmtShortDate(DATA.settings.trial))}; reporting them early is noted here as a bonus and does not change the score.</div>` : ''}
     <div class="bx-h">Where points were lost &mdash; and how to win them back</div>${lostHtml}
@@ -2340,15 +2349,22 @@ function renderHowCalc(){
     <div class="card"><div class="hc-title">The score in one line</div>
       <div class="reason">Every week and every month is scored out of 100 points, shared between four parts. Each part earns its share in proportion to its result (80% of a 15-point part = 12 points).</div>
       <table class="hc-table"><tr><th>Points</th><th>Portfolio</th><th>Planning</th><th>Submission</th><th>Adhoc</th></tr>${wr('Administration')}${wr('Pastoral')}</table>
-      <div class="reason">Planning (15) and Submission (15) are fixed. The Adhoc points (20) are held in Portfolio, so Portfolio is worth 70; for flexible staff, or when no plan was logged, the unused Planning / Submission points also sit in Portfolio. <b>Adhoc then fills lost points:</b> Adhoc % &times; 20 points can win back points lost on <i>any</i> part (Portfolio, Planning or Submission), but a score never goes above 100%. Staff with everything perfect simply score 100%.<br>A report sent after ${DATA.settings.lateAfter} loses part of that day's Submission credit: ${lateTierText()} (a day with no report earns 0). A missed day can still be reported until day ${DATA.settings.catchup} of the next month (it then counts as 2+ days late); from the next day the month is closed and it stays at 0.<br><b>When tasks fall due:</b> weekly tasks count every week. <b>Monthly tasks count only after the month's last working day</b> and <b>quarterly tasks only after the quarter's last working day</b>, so nobody is marked down part-way through; until then an untouched task is only listed as a heads-up. A plan made for the next working day is judged only once that day's report is due.<br>Example: Submission is worth 15 points; in a 4-day week with one report late the same day, 3 on time: (100+100+100+95) &divide; 4 = 98.75% &times; 15 = 14.8 points.</div></div>
+      <div class="reason">Planning (15) and Submission (15) are fixed. The Adhoc points (20) are held in Portfolio, so Portfolio is worth 70; for flexible staff, or when no plan was logged, the unused Planning / Submission points also sit in Portfolio. <b>Adhoc then covers missed weekly tasks only</b>, at a lower value (see the Adhoc part below); a score never goes above 100%. Staff with everything perfect simply score 100%.<br>A report sent after ${DATA.settings.lateAfter} loses part of that day's Submission credit: ${lateTierText()} (a day with no report earns 0). A missed day can still be reported until day ${DATA.settings.catchup} of the next month (it then counts as 2+ days late); from the next day the month is closed and it stays at 0.<br><b>When tasks fall due:</b> weekly tasks count every week. <b>Monthly tasks count only after the month's last working day</b> and <b>quarterly tasks only after the quarter's last working day</b>, so nobody is marked down part-way through; until then an untouched task is only listed as a heads-up. A plan made for the next working day is judged only once that day's report is due.<br>Example: Submission is worth 15 points; in a 4-day week with one report late the same day, 3 on time: (100+100+100+95) &divide; 4 = 98.75% &times; 15 = 14.8 points.</div></div>
 
     <div class="card"><div class="hc-title">The four parts</div>
       <div class="hc-grid">
         <div><b>Portfolio</b><span>Your listed tasks. Points of tasks Completed or In Progress &divide; points that were due. Weekly tasks are due every week (scaled down for leave days). Monthly tasks fall due after the month's last working day and quarterly tasks after the quarter's last working day &mdash; until then an untouched one is only a heads-up, with no deduction. In a month's score: your weekly-task results are averaged, and the monthly (and, at quarter end, quarterly) tasks are blended in once due.</span></div>
         <div><b>Planning</b><span>Of the tasks you planned for tomorrow, the share you reported the next working day (Completed / In Progress, or Deferred (Approved) with the reason).</span></div>
         <div><b>Submission</b><span>Days reported &divide; working days expected (Tue&ndash;Fri, leave removed).</span></div>
-        <div><b>Adhoc</b><span>Extra work outside your listed tasks. Items logged (Completed or In Progress) &divide; ${DATA.settings.adhocWeek} per week (${DATA.settings.adhocMonth} per month, scaled down for leave days), capped at 100%. It can fill points lost on Portfolio, Planning or Submission (up to 20 points), but never takes a score above 100%.</span></div>
+        <div><b>Adhoc</b><span>Extra work outside your listed tasks. Items logged (Completed or In Progress) &divide; ${DATA.settings.adhocWeek} per week (${DATA.settings.adhocMonth} per month, scaled down for leave days), capped at 100%. Adhoc covers only <b>missed weekly tasks</b>, at a lower value: each adhoc item counts as ${DATA.settings.adhocItem == null ? 3 : DATA.settings.adhocItem} task points, and one missed task can get back at most ${Math.round((DATA.settings.adhocCap == null ? .6 : DATA.settings.adhocCap) * 100)}% of its points, so a missed task always still costs points. It never covers Planning, Submission, late penalties, or monthly / quarterly tasks, and never takes a score above 100%.</span></div>
       </div></div>
+
+    <div class="card" id="hcSim"><div class="hc-title">Try a calculation (weekly)</div>
+      <div class="reason">Change the yellow boxes, or tap a scenario, and the score is worked out step by step with the same rules the dashboard uses. Nothing here is saved.</div>
+      <div id="hcSimBtns" style="display:flex;flex-wrap:wrap;gap:6px;margin:8px 0"></div>
+      <table class="hc-table" id="hcSimIn"></table>
+      <table class="hc-table" id="hcSimOut" style="margin-top:10px"></table>
+      <div class="reason" id="hcSimNote"></div></div>
 
     <div class="card"><div class="hc-title">Good to know</div>
       <ul class="hc-list">
@@ -2376,6 +2392,63 @@ function renderHowCalc(){
         <tr><td>2.00&ndash;2.99</td><td>Below</td><td>0&ndash;1%</td><td>Discretionary</td></tr>
         <tr><td>&lt; 2.00</td><td>Needs Improvement</td><td>None</td><td>None</td></tr></table>
       <div class="reason"><b>Please note:</b> increment and bonus amounts are subject to the Church&rsquo;s financial standing.</div></div>`;
+  initHcSim();
+}
+
+// ---------- How Calc: weekly sample-calculation table ----------
+function initHcSim(){
+  const S = DATA.settings, W0 = DATA.weights.Pastoral || DATA.weights.Administration, Wt = {port: W0.port * 100, plan: W0.plan * 100, sub: W0.sub * 100, adhoc: W0.adhoc * 100};
+  const recF = S.adhocRec == null ? 1 : S.adhocRec, itemV = S.adhocItem == null ? 3 : S.adhocItem, capV = S.adhocCap == null ? .6 : S.adhocCap;
+  const F = [ // key, label, default
+    ['n','Weekly tasks in the list',4],['wt','Weight (task points) of each weekly task',5],['done','Weekly tasks Completed / In Progress',3],
+    ['adh','Adhoc items logged this week',1],
+    ['plan','Planning result (% of planned tasks reported)',100],
+    ['exp','Working days expected',4],['sub','Days reported',4],['l0','Late reports: same day',0],['l1','Late reports: 1 day later',0],['l2','Late reports: 2+ days later',0]];
+  const PRE = [
+    ['My example (1 missed, 1 adhoc)',{n:4,wt:5,done:3,adh:1,plan:100,exp:4,sub:4,l0:0,l1:0,l2:0}],
+    ['Perfect, no adhoc',{n:4,wt:5,done:4,adh:0,plan:100,exp:4,sub:4,l0:0,l1:0,l2:0}],
+    ['Perfect + lots of adhoc',{n:4,wt:5,done:4,adh:5,plan:100,exp:4,sub:4,l0:0,l1:0,l2:0}],
+    ['1 missed, no adhoc',{n:4,wt:5,done:3,adh:0,plan:100,exp:4,sub:4,l0:0,l1:0,l2:0}],
+    ['1 missed, 3 adhoc',{n:4,wt:5,done:3,adh:3,plan:100,exp:4,sub:4,l0:0,l1:0,l2:0}],
+    ['Planning only 50%',{n:4,wt:5,done:4,adh:2,plan:50,exp:4,sub:4,l0:0,l1:0,l2:0}],
+    ['1 day not reported',{n:4,wt:5,done:4,adh:2,plan:100,exp:4,sub:3,l0:0,l1:0,l2:0}],
+    ['2 late reports',{n:4,wt:5,done:4,adh:0,plan:100,exp:4,sub:4,l0:1,l1:0,l2:1}]];
+  const inT = document.getElementById('hcSimIn'), outT = document.getElementById('hcSimOut'), btns = document.getElementById('hcSimBtns');
+  const bs = 'padding:4px 9px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:12px';
+  inT.innerHTML = F.map(f => `<tr><td>${f[1]}</td><td style="width:90px"><input type="number" min="0" step="any" data-k="${f[0]}" value="${f[2]}" style="width:80px;padding:4px;border:1px solid #d9c98a;background:#FFF8D6;border-radius:5px;font-size:13px"></td></tr>`).join('');
+  btns.innerHTML = PRE.map((p, i) => `<button type="button" data-i="${i}" style="${bs}">${p[0]}</button>`).join('');
+  const val = k => Math.max(0, Number(inT.querySelector(`[data-k="${k}"]`).value) || 0);
+  const f1 = x => (Math.round(x * 10) / 10).toString(), f2 = x => (Math.round(x * 100) / 100).toString();
+  function calc(){
+    const n = val('n'), wt = val('wt'), done = Math.min(val('done'), n), adh = val('adh'), plan = Math.min(val('plan'), 100) / 100;
+    const exp = val('exp'), sub = Math.min(val('sub'), exp), l0 = val('l0'), l1 = val('l1'), l2 = val('l2');
+    const due = n * wt, doneTP = done * wt, missed = Math.max(0, due - doneTP);
+    const cover = recF * Math.min(adh * itemV, capV * missed);
+    const portPct = due <= 0 ? 1 : Math.min(1, (doneTP + cover) / due);
+    const portW = Wt.port + Wt.adhoc, portPts = portPct * portW;
+    const lateLoss = exp > 0 ? (l0 * S.lateSame + l1 * S.late1 + l2 * S.late2) / exp : 0;
+    const subPct = exp > 0 ? Math.max(0, Math.min(sub / exp, 1) - lateLoss) : 1;
+    const planPts = plan * Wt.plan, subPts = subPct * Wt.sub;
+    const total = Math.max(0, Math.min(portPts + planPts + subPts, 100 * 1));
+    const noAdh = due <= 0 ? 100 : (Math.min(1, doneTP / due) * portW + planPts + subPts);
+    const r = (a, b, c) => `<tr><td>${a}</td><td>${b}</td><td style="text-align:right"><b>${c}</b></td></tr>`;
+    outT.innerHTML = `<tr><th>Step</th><th>Working</th><th style="text-align:right">Points</th></tr>` +
+      r('Weekly task points due', `${n} tasks &times; ${wt}`, f1(due)) +
+      r('Done (Completed / In Progress)', `${done} &times; ${wt}`, f1(doneTP)) +
+      r('Missed', `${f1(due)} &minus; ${f1(doneTP)}`, f1(missed)) +
+      r('Adhoc cover', `min(${adh} item(s) &times; ${itemV}, ${Math.round(capV * 100)}% &times; ${f1(missed)} missed)${recF < 1 ? ' &times; ' + Math.round(recF * 100) + '%' : ''}`, f1(cover)) +
+      r('Portfolio %', `(${f1(doneTP)} + ${f1(cover)}) &divide; ${f1(due)}`, Math.round(portPct * 1000) / 10 + '%') +
+      r(`Portfolio score (out of ${portW})`, `${Math.round(portPct * 1000) / 10}% &times; ${portW}`, f1(portPts)) +
+      r(`Planning score (out of ${Wt.plan})`, `${Math.round(plan * 100)}% &times; ${Wt.plan}`, f1(planPts)) +
+      r(`Submission score (out of ${Wt.sub})`, `${sub} of ${exp} days${lateLoss > 0 ? ', late &minus;' + Math.round(lateLoss * 1000) / 10 + '%' : ''} = ${Math.round(subPct * 1000) / 10}% &times; ${Wt.sub}`, f1(subPts)) +
+      `<tr style="border-top:2px solid #333"><td><b>Total</b></td><td>${f1(portPts)} + ${f1(planPts)} + ${f1(subPts)}</td><td style="text-align:right"><b>${f1(total)}%</b></td></tr>`;
+    document.getElementById('hcSimNote').innerHTML = cover > 0
+      ? `Without adhoc this week would be ${f1(noAdh)}%. Adhoc won back ${f1(total - noAdh)} point(s), but the missed task still costs ${f1(portW * (1 - portPct))} point(s).`
+      : (missed > 0 ? 'No adhoc logged, so the missed task costs its full share.' : (adh > 0 ? 'Everything was done, so extra adhoc adds nothing (the score is capped at 100%). It is still shown as recognition.' : 'Everything done: 100%.'));
+  }
+  inT.addEventListener('input', calc);
+  btns.addEventListener('click', e => { const b = e.target.closest('button[data-i]'); if(!b) return; const p = PRE[+b.dataset.i][1]; Object.keys(p).forEach(k => { inT.querySelector(`[data-k="${k}"]`).value = p[k]; }); calc(); });
+  calc();
 }
 
 // ---------- Maintenance history reports (Vehicle — Ps. Kevin, Music Instruments — Ps. Kenrick) ----------
@@ -2583,7 +2656,7 @@ function renderSettings(){
         ${kv('Old late rule (earlier weeks)', (S.latePen * 100).toFixed(1) + '% per late report')}
         ${kv('Report deadline', esc(S.lateAfter))}
         ${kv('Adhoc for full marks', S.adhocWeek + ' per week &middot; ' + S.adhocMonth + ' per month')}
-        ${kv('Adhoc recovery', Math.round((S.adhocRec == null ? 1 : S.adhocRec) * 100) + '% &mdash; adhoc fills planning gaps and late penalties only, capped at 100%')}
+        ${kv('Adhoc cover', Math.round((S.adhocRec == null ? 1 : S.adhocRec) * 100) + '% &mdash; adhoc covers missed weekly tasks only (item value ' + (S.adhocItem == null ? 3 : S.adhocItem) + ' pts, up to ' + Math.round((S.adhocCap == null ? .6 : S.adhocCap) * 100) + '% of a missed task), capped at 100%')}
         ${kv('Quarterly tasks start counting', 'after ' + p(S.qStart) + ' of the quarter')}
         ${kv('Rating: Good from', p(S.good))}
         ${kv('Rating: Needs Improvement from', p(S.ok))}
