@@ -2632,6 +2632,42 @@ document.addEventListener('click', (e) => {
   }
 });
 
+// ---------- edit the main numbers from the app (leadership link only) ----------
+function settingsEditCardHtml(){
+  const S = DATA.settings, c = reviewCfg();
+  if(!c.api || !c.lk) return `<div class="card"><div class="hc-title">Edit settings in the app</div><div class="reason">To change the late-report points, the adhoc rules, the rating cut-offs and the increment / bonus table without opening the Google Sheet, open this app once with the leadership link (the same one used for the Review tab).</div></div>`;
+  const num = (row, label, val, step) => `<tr><td>${label}</td><td style="width:92px"><input type="number" step="${step || 0.01}" data-row="${row}" value="${val}" style="width:84px;padding:4px;border:1px solid #d9c98a;background:#FFF8D6;border-radius:5px;font-size:13px"></td></tr>`;
+  const t = 'padding:4px;border:1px solid #d9c98a;background:#FFF8D6;border-radius:5px;font-size:12.5px;width:100%;box-sizing:border-box';
+  const bands = S.revBands.slice(); while(bands.length < 5) bands.push({from:'', level:'', inc:'', bonus:''});
+  return `<div class="card" id="setEdit"><div class="hc-title">Edit settings in the app</div>
+    <div class="reason">Changes are saved to the Google Sheet and used straight away. Only people with the leadership link see this card.</div>
+    <table class="hc-table">
+      ${num(19, 'Late report, same day (points lost)', S.lateSame)}${num(20, 'Late report, 1 day later (points lost)', S.late1)}${num(21, 'Late report, 2+ days later (points lost)', S.late2)}
+      ${num(31, 'Day never reported (points lost)', S.missDay)}${num(32, 'Planning day missed (points lost)', S.planDay)}
+      ${num(8, 'Adhoc items for full marks, per week', S.adhocWeek, 1)}${num(9, 'Adhoc items for full marks, per month', S.adhocMonth, 1)}
+      ${num(29, 'Adhoc item value (task points)', S.adhocItem)}${num(30, 'Adhoc cap (share of a missed task, 0.6 = 60%)', S.adhocCap)}${num(28, 'Adhoc cover on/off (1 = on, 0 = off)', S.adhocRec, 1)}
+      ${num(12, 'Rating: Good from (0.8 = 80%)', S.good)}${num(13, 'Rating: Needs Improvement from (0.7 = 70%)', S.ok)}
+    </table>
+    <div class="hc-title" style="margin-top:12px">Annual review: increment &amp; bonus</div>
+    <div class="reason">Highest score first. Leave a row empty to remove that level (minimum 2).</div>
+    <table class="hc-table" id="setBands"><tr><th>Score from</th><th>Level</th><th>Increment</th><th>Bonus</th></tr>
+      ${bands.map((b, i) => `<tr><td style="width:62px"><input data-b="from" data-i="${i}" value="${b.from === '' ? '' : Number(b.from).toFixed(2)}" style="${t}"></td><td><input data-b="level" data-i="${i}" value="${esc(b.level)}" style="${t}"></td><td><input data-b="inc" data-i="${i}" value="${esc(b.inc)}" style="${t}"></td><td><input data-b="bonus" data-i="${i}" value="${esc(b.bonus)}" style="${t}"></td></tr>`).join('')}</table>
+    <div class="reason" style="margin-top:6px">Note under every review result:</div>
+    <input id="setNote" value="${esc(S.revNote)}" style="${t}">
+    <button class="adhoc-link" id="setSave" style="margin-top:10px">Save settings</button><div class="reason" id="setMsg"></div></div>`;
+}
+document.addEventListener('click', async e => {
+  if(!e.target || e.target.id !== 'setSave') return;
+  const card = document.getElementById('setEdit'), msg = document.getElementById('setMsg'); if(!card) return;
+  const rules = {}; card.querySelectorAll('input[data-row]').forEach(i => { if(i.value !== '') rules[i.dataset.row] = Number(i.value); });
+  const rows = []; for(let i = 0; i < 5; i++){ const g = k => (card.querySelector(`input[data-b="${k}"][data-i="${i}"]`) || {}).value || ''; if(g('from').trim() === '' && !g('level').trim()) continue; rows.push({from:Number(g('from')), level:g('level').trim(), inc:g('inc').trim(), bonus:g('bonus').trim()}); }
+  msg.textContent = 'Saving\u2026';
+  try{
+    const j = await reviewCloudCall('saveSettings', {rules, review:{rows, note:document.getElementById('setNote').value.trim()}});
+    if(j.ok){ msg.textContent = 'Saved \u2713 \u2014 reloading with the new settings\u2026'; setTimeout(() => location.reload(), 1200); }
+    else msg.textContent = 'Not saved: ' + (j.error || 'error');
+  }catch(err){ msg.textContent = 'Could not reach the review service. Please try again.'; }
+});
 function renderSettings(){
   const S = DATA.settings, W = DATA.weights, el = document.getElementById('view-settings');
   const sheetUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
@@ -2642,8 +2678,9 @@ function renderSettings(){
   el.innerHTML = `
     <div class="card"><div class="hc-title">Settings</div>
       <div class="reason">${S.fromSheet ? 'This is what is applied right now.' : '<b>The Settings tab has not been created yet.</b> Paste the latest Apps Script and run <b>manualRefresh</b> once &mdash; defaults shown below are the current rules.'}
-      To change anything, edit the yellow cells in the <b>Settings</b> tab of the Google Sheet, then run <b>manualRefresh</b> (or wait for the nightly refresh). This page then updates by itself.</div>
+      The main numbers can be changed in the card below (leadership link). Anything else (roster, dates) is changed in the yellow cells of the <b>Settings</b> tab of the Google Sheet, then run <b>manualRefresh</b> (or wait for the nightly refresh). This page then updates by itself.</div>
       <a class="adhoc-link" style="display:block;text-align:center;text-decoration:none;margin-top:8px" href="${sheetUrl}" target="_blank" rel="noopener">Open the Google Sheet &rsaquo;</a></div>
+    ${settingsEditCardHtml()}
     <div class="card"><div class="hc-title">Scoring weights</div>
       <table class="hc-table"><tr><th></th><th>Portfolio</th><th>Planning</th><th>Submission</th><th>Adhoc</th><th>Total</th></tr>${wrow('Administration')}${wrow('Pastoral')}</table></div>
     <div class="card"><div class="hc-title">Staff roster</div>
