@@ -444,6 +444,7 @@
     <div class="tab" data-view="maint">Maint.</div>
     <div class="tab" data-view="emails">Emails</div>
     <div class="tab" data-view="review">Review</div>
+    <div class="tab" data-view="pilot">Pilot</div>
     <div class="tab" data-view="howcalc">How Calc.</div>
     <div class="tab" data-view="settings">Settings</div>
   </div>
@@ -598,6 +599,7 @@
   <div class="view" id="view-ytd"></div>
   <div class="view" id="view-maint"></div>
   <div class="view" id="view-emails"></div>
+  <div class="view" id="view-pilot"><div id="pilotBox"></div></div>
   <div class="view" id="view-review">
     <div id="reviewLinks"></div>
     <div id="reviewStatus"></div>
@@ -1310,6 +1312,76 @@ function updateNavButtons(view, key){
   document.getElementById('nextBtn').disabled = idx >= keys.length-1;
 }
 
+
+// ---------- Pilot: reports sent through the staff app (test ground; not scored) ----------
+let PILOT_ROWS = null, pilotStaff = 'all', pilotDays = 14, pilotOpen = {};
+function pilotDt(s){
+  const m = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/.exec(String(s || '').trim()); if(!m) return null;
+  const mon = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'].indexOf(m[2].toLowerCase()); if(mon < 0) return null;
+  return new Date(+m[3], mon, +m[1], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0));
+}
+const pilotKey = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+function pilotGroups(){
+  const g = {};
+  (PILOT_ROWS || []).forEach(r => {
+    const rd = pilotDt(r['Report date']), ts = pilotDt(r['Received (server time)']), st = (r['Staff'] || '').trim(); if(!rd || !ts || !st) return;
+    const k = st + '|' + pilotKey(rd), o = g[k] = g[k] || {staff: st, date: rd, first: ts, batch: '', rows: []};
+    if(ts < o.first) o.first = ts;
+    o.rows.push(Object.assign({}, r, {_b: String(r['Batch'] || '')}));
+  });
+  Object.values(g).forEach(o => {
+    o.batch = o.rows.reduce((m, r) => r._b > m ? r._b : m, '');
+    o.cur = o.rows.filter(r => r._b === o.batch);
+    o.lead = /\+L$/.test(o.batch);
+    const f = o.first, deadline = String((DATA.settings || {}).lateAfter || '19:30').split(':'), early = String((DATA.settings || {}).earlyBefore || '17:30').split(':');
+    const mins = f.getHours() * 60 + f.getMinutes(), dayDiff = Math.round((new Date(f.getFullYear(), f.getMonth(), f.getDate()) - o.date) / 86400000);
+    o.timing = dayDiff > 0 ? 'Late' : (mins > (+deadline[0]) * 60 + (+deadline[1]) ? 'Late' : (mins < (+early[0]) * 60 + (+early[1]) ? 'Early' : 'On time'));
+    const by = k => o.cur.filter(r => r['Kind'] === k);
+    o.tasks = by('task'); o.plan = by('plan'); o.other = (by('other')[0] || {})['Status / value'] || ''; o.planOther = (by('planOther')[0] || {})['Status / value'] || '';
+    o.remarks = (by('remarks')[0] || {})['Status / value'] || ''; o.half = (by('half')[0] || {})['Status / value'] || '';
+    const dr = by('day')[0] || {}; o.dayType = dr['Status / value'] || 'Working'; o.proceed = dr['Remark'] || '';
+    o.n = {Completed: 0, 'In Progress': 0, 'Deferred (Approved)': 0}; o.tasks.forEach(t => { if(o.n[t['Status / value']] !== undefined) o.n[t['Status / value']]++; });
+  });
+  return Object.values(g).sort((a, b) => b.date - a.date || b.first - a.first);
+}
+async function renderPilot(reload){
+  const box = document.getElementById('pilotBox');
+  if(!PILOT_ROWS || reload){
+    box.innerHTML = '<div class="card"><div class="reason">Loading app reports…</div></div>';
+    try{ PILOT_ROWS = await fetchSheetRows('App Reports', true); }catch(e){ box.innerHTML = '<div class="card"><div class="reason">The “App Reports” tab could not be read yet. It is created the first time someone sends a report in the staff app.</div></div>'; return; }
+  }
+  let groups = pilotGroups();
+  const staffList = Array.from(new Set(groups.map(g => g.staff))).sort();
+  const cutoff = new Date(); cutoff.setHours(0,0,0,0); cutoff.setDate(cutoff.getDate() - pilotDays);
+  groups = groups.filter(g => (pilotStaff === 'all' || g.staff === pilotStaff) && (pilotDays === 0 || g.date >= cutoff));
+  const fmtT = d => d.toLocaleDateString('en-GB', {weekday:'short', day:'2-digit', month:'short'}) + ', ' + d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+  const rows = groups.map((g, i) => {
+    const k = g.staff + '|' + pilotKey(g.date), open = !!pilotOpen[k];
+    const badge = g.timing === 'Late' ? 'late' : (g.timing === 'Early' ? 'early' : 'ontime');
+    let det = '';
+    if(open){
+      det = `<tr><td colspan="9" style="background:#FAF8F0;padding:10px 14px">
+        ${g.dayType === 'Leave' ? '<div><b>On leave</b></div>' : ''}${g.half ? `<div><b>Half-day leave:</b> ${g.half === 'AM' ? 'morning' : 'afternoon'}</div>` : ''}
+        ${g.tasks.map(t => `<div>• <b>${esc(t['Task'])}</b> <span class="badge ${t['Status / value'] === 'Completed' ? 'good' : (t['Status / value'] === 'In Progress' ? 'mid' : 'early')}">${esc(t['Status / value'])}</span>${t['Remark'] ? ' — ' + esc(t['Remark']) : ''}</div>`).join('') || '<div class="reason">No listed task reported.</div>'}
+        ${g.other ? `<div style="margin-top:6px"><b>Other work:</b> ${esc(g.other).replace(/\n/g, '; ')}</div>` : ''}
+        <div style="margin-top:6px"><b>Next working day (${esc(g.proceed || '—')}):</b> ${g.plan.map(p => esc(p['Task'])).join(', ') || 'no listed task'}${g.planOther ? '; ' + esc(g.planOther).replace(/\n/g, '; ') : ''}</div>
+        ${g.remarks ? `<div style="margin-top:6px"><b>Remarks:</b> ${esc(g.remarks)}</div>` : ''}
+        <div class="reason" style="margin-top:6px">First sent ${esc(fmtT(g.first))}${g.lead ? ' · last edit by leadership' : ''}</div></td></tr>`;
+    }
+    return `<tr data-k="${esc(k)}" style="cursor:pointer"><td>${esc(fmtT(g.date).split(',')[0])}</td><td><b>${esc(g.staff)}</b></td><td>${esc(g.first.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}))}</td><td><span class="badge ${badge}">${g.timing}</span></td>
+      <td style="text-align:center">${g.n.Completed}</td><td style="text-align:center">${g.n['In Progress']}</td><td style="text-align:center">${g.n['Deferred (Approved)']}</td><td>${g.other ? 'Yes' : '—'}</td><td>${g.plan.length}${g.planOther ? ' +' : ''}${g.lead ? ' <span class="badge onleave">by leadership</span>' : ''}</td></tr>${det}`;
+  }).join('');
+  box.innerHTML = `<div class="card"><div class="hc-title">Pilot — reports sent through the staff app</div>
+    <div class="reason">Test ground only: nothing here changes any score. The Google Form is still the scoring source. Tap a row to see the details.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"><select id="pilStaff" class="orientation-select" style="flex:1;min-width:160px"><option value="all">All staff</option>${staffList.map(s => `<option ${s === pilotStaff ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
+    <select id="pilDays" class="orientation-select" style="flex:1;min-width:130px">${[[7,'Last 7 days'],[14,'Last 14 days'],[30,'Last 30 days'],[0,'All']].map(([v,l]) => `<option value="${v}" ${v === pilotDays ? 'selected' : ''}>${l}</option>`).join('')}</select><button class="rv-mini" id="pilRef">Refresh</button></div>
+    ${rows ? `<div style="overflow-x:auto"><table class="breakdown-table" style="width:100%"><thead><tr><th>Date</th><th>Staff</th><th>Sent</th><th>Timing</th><th>Done</th><th>In prog.</th><th>Deferred</th><th>Other work</th><th>Plan</th></tr></thead><tbody>${rows}</tbody></table></div>` : '<div class="reason">No app reports in this period yet.</div>'}</div>`;
+  document.getElementById('pilStaff').onchange = e => { pilotStaff = e.target.value; renderPilot(); };
+  document.getElementById('pilDays').onchange = e => { pilotDays = +e.target.value; renderPilot(); };
+  document.getElementById('pilRef').onclick = () => renderPilot(true);
+  box.querySelectorAll('tr[data-k]').forEach(tr => tr.onclick = () => { pilotOpen[tr.dataset.k] = !pilotOpen[tr.dataset.k]; renderPilot(); });
+}
+
 function switchTab(view){
   currentTab = view;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.view===view));
@@ -1328,6 +1400,10 @@ function switchTab(view){
     metaBar.style.display = 'none';
     if(exportBar) exportBar.style.display = 'flex';
     renderMaint();
+  } else if(view === 'pilot'){
+    metaBar.style.display = 'none';
+    if(exportBar) exportBar.style.display = 'none';
+    renderPilot();
   } else if(view === 'review'){
     metaBar.style.display = 'none';
     if(exportBar) exportBar.style.display = 'none';
