@@ -599,6 +599,7 @@
   <div class="view" id="view-maint"></div>
   <div class="view" id="view-emails"></div>
   <div class="view" id="view-review">
+    <div id="reviewLinks"></div>
     <div id="reviewStatus"></div>
     <div class="card">
       <div class="hc-title">TOW Staff Ministry &amp; Performance Observation (40%)</div>
@@ -1333,6 +1334,7 @@ function switchTab(view){
     if(reviewStaffPicker.selectedIndex < 0) reviewStaffPicker.selectedIndex = 0;
     renderReviewCategories(reviewStaffPicker.value);
     loadReviewCloud().then(() => { if(currentTab === 'review') renderReviewCategories(reviewStaffPicker.value); renderReviewBanner(); });
+    renderReviewLinks(true);
   } else if(view === 'settings'){
     metaBar.style.display = 'none';
     if(exportBar) exportBar.style.display = 'none';
@@ -1392,7 +1394,7 @@ function renderPortfolio(staff){
   const dept = ro.dept || acc.dept || '';
   const ended = t => t.end && t.end < TODAY_KEY;
   const current = all.filter(t => !ended(t)), previous = all.filter(ended);
-  const order = ['Weekly','Monthly','Quarterly','Adhoc'];
+  const order = ['Weekly','Monthly','Quarterly','Every 4 Months','Semi-Annual','Annual','Adhoc'];
   const groups = list => { const g = {}; list.forEach(t => { (g[t.category] = g[t.category] || []).push(t); }); return g; };
   const cur = groups(current);
   const cats = order.concat(Object.keys(cur).filter(k => !order.includes(k))).filter(k => cur[k] && cur[k].length);
@@ -2586,6 +2588,75 @@ function renderReviewBanner(){
   }
   el.style.display = 'flex';
   el.innerHTML = `<span>&#128276; <b>${esc(info.c.label)}</b> ${when}${status}</span><span><button data-rvgo="1">Open Review</button><button data-rvdismiss="${info.c.id}${info.year}">&times;</button></span>`;
+}
+// ---------- send each staff their own self-review link (WhatsApp / email) and watch their progress live ----------
+let REVIEW_LINKS = null, rlPeriod = null, rlTimer = null;
+function rlDefaultPeriod(){ const i = reviewDueInfo(); if(i) return i.c.id; return 'mid'; }
+function rlMessage(st, link, per){
+  const first = String(st).replace(/^Ps\.\s*/, '');
+  return per === 'mid'
+    ? `Hi ${first}, please complete your Mid-Year Checkpoint self-review using your personal link (please do not share it): ${link}\nThis is for reference only and will not affect your final score. Rate yourself 1-5 for each area, then press Submit. Thank you!`
+    : `Hi ${first}, please complete your Year-End Evaluation self-review using your personal link (please do not share it): ${link}\nThis is the final evaluation and counts toward your final score. Rate yourself 1-5 for each area, then press Submit. Thank you!`;
+}
+async function renderReviewLinks(reload){
+  const box = document.getElementById('reviewLinks'); if(!box) return;
+  const c = reviewCfg(); if(!c.api || !c.lk){ box.innerHTML = ''; return; }
+  if(!rlPeriod) rlPeriod = rlDefaultPeriod();
+  if(reload || !REVIEW_LINKS){
+    box.innerHTML = '<div class="card"><div class="hc-title">Send review links</div><div class="reason">Loading\u2026</div></div>';
+    try{ const j = await reviewCloudCall('links'); if(!j.ok){ box.innerHTML = `<div class="card"><div class="hc-title">Send review links</div><div class="reason">${esc(j.error || 'Could not load the links.')} If this is new, re-deploy the web app (Deploy &gt; Manage deployments &gt; New version).</div></div>`; return; } REVIEW_LINKS = j.data; }
+    catch(e){ box.innerHTML = '<div class="card"><div class="hc-title">Send review links</div><div class="reason">Could not reach the review service.</div></div>'; return; }
+  }
+  const per = rlPeriod, perLab = per === 'mid' ? 'Mid-Year Checkpoint' : 'Year-End Evaluation';
+  const inp = 'padding:4px 6px;border:1px solid var(--line);border-radius:6px;font-size:12px;width:100%;box-sizing:border-box';
+  const sub = st => ((REVIEW_CLOUD && REVIEW_CLOUD[st] && REVIEW_CLOUD[st].__submitted) || (REVIEW_LINKS.find(x => x.staff === st) || {}).submitted || {})[per];
+  const rows = REVIEW_LINKS.map((x, i) => {
+    const done = sub(x.staff), sent = (x.sent || {})[per];
+    return `<tr data-i="${i}"><td style="padding:6px 4px;vertical-align:top"><b>${esc(x.staff)}</b><br>${done ? `<span class="badge good">Submitted ${esc(done)}</span>` : (sent ? `<span class="badge mid">Sent ${esc(sent)}</span>` : '<span class="badge low">Not sent</span>')}</td>
+      <td style="padding:6px 4px;vertical-align:top;min-width:120px"><input class="rl-phone" placeholder="WhatsApp e.g. 60123456789" value="${esc(x.phone)}" style="${inp}"><input class="rl-email" placeholder="Email" value="${esc(x.email)}" style="${inp};margin-top:4px"></td>
+      <td style="padding:6px 4px;vertical-align:top;white-space:nowrap"><button class="rv-mini rl-wa">WhatsApp</button> <button class="rv-mini rl-em">Email</button> <button class="rv-mini rl-cp">Copy link</button> <button class="rv-mini rl-rp" title="Fill in the daily report on this person\u2019s behalf">Report as</button></td></tr>`;
+  }).join('');
+  const pending = REVIEW_LINKS.filter(x => !sub(x.staff)).length;
+  box.innerHTML = `<div class="card"><div class="hc-title">Send review links</div>
+    <div class="reason">Each staff member has their own private link. Choose the review, then tap <b>WhatsApp</b> (opens WhatsApp with the message ready &mdash; you press Send) or <b>Email</b> (sent for you). Their answers appear here by themselves; you fill in the leadership part when you meet them.</div>
+    <div style="display:flex;gap:8px;margin:8px 0;flex-wrap:wrap;align-items:center">
+      <select id="rlPer" class="orientation-select" style="flex:none"><option value="mid" ${per === 'mid' ? 'selected' : ''}>Mid-Year Checkpoint (reference only)</option><option value="final" ${per === 'final' ? 'selected' : ''}>Year-End Evaluation (final)</option></select>
+      <button class="rv-mini" id="rlAll">Email everyone who hasn't submitted (${pending})</button><button class="rv-mini" id="rlRef">Refresh</button></div>
+    <div class="reason">${per === 'mid' ? 'The Mid-Year Checkpoint is a conversation record: its scores are for reference only and do <b>not</b> change the final score.' : 'The Year-End Evaluation is final: only these ratings feed the Final Recognition Score.'}</div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">${rows}</table></div><div class="reason" id="rlMsg"></div></div>`;
+  const msg = t => { const m = document.getElementById('rlMsg'); if(m) m.textContent = t; };
+  document.getElementById('rlPer').onchange = e => { rlPeriod = e.target.value; renderReviewLinks(false); };
+  document.getElementById('rlRef').onclick = () => { loadReviewCloud().then(() => renderReviewLinks(true)); };
+  document.getElementById('rlAll').onclick = async () => {
+    const todo = REVIEW_LINKS.filter(x => !sub(x.staff) && x.email).map(x => x.staff);
+    if(!todo.length){ msg('Nobody to email (everyone has submitted, or has no email saved).'); return; }
+    if(!confirm('Email the ' + perLab + ' link to ' + todo.length + ' staff?')) return;
+    msg('Sending\u2026'); const j = await reviewCloudCall('emailLinks', {staff: todo, period: per});
+    msg(j.ok ? `Emailed ${j.sent.length}${j.skipped.length ? '; no email for: ' + j.skipped.join(', ') : ''}.` : (j.error || 'Not sent')); if(j.ok) renderReviewLinks(true);
+  };
+  box.querySelectorAll('tr[data-i]').forEach(tr => {
+    const x = REVIEW_LINKS[+tr.dataset.i], ph = tr.querySelector('.rl-phone'), em = tr.querySelector('.rl-email');
+    const saveC = async () => { x.phone = ph.value.replace(/[^\d]/g, ''); x.email = em.value.trim(); try{ await reviewCloudCall('setContact', {staff:x.staff, phone:x.phone, email:x.email}); msg('Saved contact for ' + x.staff); }catch(e){ msg('Could not save the contact.'); } };
+    ph.onchange = saveC; em.onchange = saveC;
+    tr.querySelector('.rl-wa').onclick = async () => {
+      let n = ph.value.replace(/[^\d]/g, ''); if(/^0/.test(n)) n = '6' + n;
+      if(n.length < 9){ msg('Add ' + x.staff + '\u2019s WhatsApp number first (with country code, e.g. 60123456789).'); return; }
+      window.open('https://wa.me/' + n + '?text=' + encodeURIComponent(rlMessage(x.staff, x.link + '&p=' + per, per)), '_blank');
+      if(n !== x.phone) saveC();
+      reviewCloudCall('markSent', {staff:x.staff, period:per, via:'WhatsApp'}).then(() => { x.sent = x.sent || {}; x.sent[per] = TODAY_KEY + ' (WhatsApp)'; });
+    };
+    tr.querySelector('.rl-em').onclick = async () => {
+      if(!em.value.includes('@')){ msg('Add ' + x.staff + '\u2019s email first.'); return; }
+      if(em.value.trim() !== x.email) await saveC();
+      msg('Sending\u2026'); const j = await reviewCloudCall('emailLinks', {staff:[x.staff], period: per});
+      msg(j.ok && j.sent.length ? 'Emailed ' + x.staff : (j.error || 'Not sent')); if(j.ok) renderReviewLinks(true);
+    };
+    tr.querySelector('.rl-rp').onclick = () => { const c = reviewCfg(); if(!c.api || !c.lk){ msg('Open the leadership link once on this device first.'); return; }
+      window.open('https://towadmin01.github.io/tow-dashboard/report.html?api=' + encodeURIComponent(c.api) + '&lk=' + encodeURIComponent(c.lk) + '&as=' + encodeURIComponent(x.staff), '_blank'); };
+    tr.querySelector('.rl-cp').onclick = async () => { try{ await navigator.clipboard.writeText(x.link + '&p=' + per); msg('Link copied for ' + x.staff); }catch(e){ window.prompt('Copy this link:', x.link + '&p=' + per); } };
+  });
+  clearInterval(rlTimer);   // live: refresh the submitted status while this tab is open
+  rlTimer = setInterval(() => { if(currentTab !== 'review'){ clearInterval(rlTimer); return; } loadReviewCloud().then(() => { const a = document.activeElement; if(!(a && a.closest && a.closest('#reviewLinks'))) renderReviewLinks(false); if(reviewStaffPicker) { const st = reviewStaffPicker.value; const ae = document.activeElement; if(!(ae && ae.closest && ae.closest('#view-review'))) renderReviewCategories(st); } }); }, 60000);
 }
 function reviewStatusHtml(staff){
   const c = reviewCfg();

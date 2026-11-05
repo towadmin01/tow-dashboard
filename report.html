@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Report — Tabernacle of Worship</title>
+<meta name="theme-color" content="#1F3864">
+<style>
+:root{--navy:#1F3864;--gold:#C9A227;--bg:#F8F6EF;--line:#E4DFCC;--green:#1E7B3A}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#2b2a22}
+header{background:var(--navy);color:#fff;padding:16px;display:flex;justify-content:space-between;align-items:center} header small{color:var(--gold);letter-spacing:.12em;font-weight:700;font-size:11px;text-transform:uppercase}
+header h1{margin:2px 0 0;font-size:19px} header button{background:none;border:1px solid #ffffff55;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer}
+main{max-width:1060px;margin:0 auto;padding:12px 14px 84px}
+.cols{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:900px){.cols{grid-template-columns:1.6fr 1fr;align-items:start}}
+.cols>div>.card,.cols>div>details{margin-bottom:10px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.msg{padding:12px;border-radius:10px;font-size:13.5px;margin-bottom:12px}.ok{background:#EAF5EC;color:#1a5c2c}.err{background:#FCE0E0;color:#7a0006}.info{background:#FFF7E0;color:#6b4a00}
+label.f{display:block;font-size:12.5px;font-weight:700;color:#4a4636;margin:10px 0 4px}
+input[type=text],input[type=email],input[type=date],input[type=number],select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:14px;background:#fff}
+textarea{min-height:60px;resize:vertical}
+button.pri{background:var(--green);color:#fff;border:none;border-radius:10px;padding:13px 18px;font-size:15px;font-weight:700;cursor:pointer;width:100%}
+button.sec{background:#ECE7D6;color:#3a3626;border:none;border-radius:10px;padding:11px 14px;font-size:14px;font-weight:600;cursor:pointer}
+button:disabled{opacity:.5}
+.seg{display:flex;gap:6px;flex-wrap:wrap}.seg label{flex:1;min-width:110px}.seg input{display:none}
+.seg span{display:block;text-align:center;padding:10px 6px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;font-weight:600;cursor:pointer;background:#fff}
+.seg input:checked + span{background:var(--navy);color:#fff;border-color:var(--navy)}
+details{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:10px}
+summary{padding:12px 14px;font-weight:700;color:var(--navy);cursor:pointer;display:flex;justify-content:space-between;list-style:none}
+summary::-webkit-details-marker{display:none} summary .n{font-weight:600;color:#6b6552;font-size:12.5px}
+.task{padding:7px 12px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 150px 74px;gap:4px 8px;align-items:center}
+.task .nm{font-size:13.5px;font-weight:600;line-height:1.3}.task .rmw{grid-column:1/-1;display:none}.task .rmw.show{display:block}
+.task select{padding:6px;font-size:13px}.task input[type=text]{padding:6px 8px;font-size:13px}
+.task .tm{display:flex;gap:4px;align-items:center;font-size:12px;color:#4a4636;cursor:pointer;justify-content:center}.task .tm input{width:17px;height:17px}
+.task .nt{font-size:11.5px;color:#1F3864;cursor:pointer;text-decoration:underline;margin-left:6px;font-weight:400}
+.colh{display:grid;grid-template-columns:1fr 150px 74px;gap:8px;padding:6px 12px;font-size:11px;color:#6b6552;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+@media(max-width:560px){.task,.colh{grid-template-columns:1fr 112px 56px}}
+.strip{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.strip button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 8px;font-size:12px;cursor:pointer;line-height:1.25}
+.strip button.sel{outline:2px solid var(--navy)}.strip button.y{background:#EAF5EC;border-color:#9ccaa6}.strip button.late{background:#FFF1B8;border-color:#e0c25a}.strip button.n{color:#8a8570}
+.sub{background:#EAF5EC;border:1px solid #9ccaa6;color:#1a5c2c;border-radius:10px;padding:8px 12px;font-size:13px;margin-top:8px}.sub.late{background:#FFF1B8;border-color:#e0c25a;color:#6b4a00}
+.hdr2{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.hdr2>div{flex:1;min-width:150px}
+
+.task .tag{font-size:11px;color:#8a6d00;background:#FFF1B8;border-radius:6px;padding:1px 6px;margin-left:6px;font-weight:600}
+.task select{margin-bottom:6px} .task input[type=text]{font-size:13px}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:9px 14px;border-top:1px solid var(--line);font-size:14px}.chk input{margin-top:3px;width:18px;height:18px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 14px}
+.hint{font-size:12px;color:#6b6552;margin:4px 0 0;line-height:1.45}
+.test{background:#FFF1B8;color:#6b4a00;padding:8px 14px;font-size:12.5px;text-align:center;font-weight:600}
+</style></head><body>
+<header><div><small>Tabernacle of Worship</small><h1>Daily Report</h1></div><button id="bOut" style="display:none">Sign out</button></header>
+<div class="test" id="testBar">TEST VERSION — please keep using the Google Form as usual. Entries here are only for checking.</div>
+<main id="app"><div class="msg info">Loading…</div></main>
+<script>
+const q = new URLSearchParams(location.search);
+const LS = { get(k){ try{ return localStorage.getItem(k) || ''; }catch(e){ return ''; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }, del(k){ try{ localStorage.removeItem(k); }catch(e){} } };
+if(q.get('api')){ LS.set('tow_rep_api', q.get('api')); history.replaceState(null, '', location.pathname); }
+const API = LS.get('tow_rep_api');
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const todayStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+const addDays = (s, n) => { const d = new Date(s + 'T00:00:00'); d.setDate(d.getDate() + n); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+const CATS = [['Weekly','Weekly'],['Monthly','Monthly'],['Quarterly','Quarterly (incl. every 4 months)'],['Semi-Annual','Semi-annual'],['Annual','Annual'],['Adhoc','Other listed tasks']];
+const LEAD = sessionStorage.getItem('tow_lead_s') || '';
+let S = LEAD || LS.get('tow_rep_s'), DEF = null, DATE = todayStr(), email = '';
+const LEADQ = { lk: q.get('lk') || '', as: q.get('as') || '' };
+if(LEADQ.lk){ history.replaceState(null, '', location.pathname); }
+async function call(body){
+  const r = await fetch(API, {method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(Object.assign({s: S}, body))});
+  return r.json();
+}
+function msg(c, t){ const m = $('msg'); if(!m) return; m.className = 'msg ' + c; m.innerHTML = t; m.style.display = t ? 'block' : 'none'; window.scrollTo({top:0, behavior:'smooth'}); }
+function signInView(step, note){
+  $('bOut').style.display = 'none';
+  $('app').innerHTML = `<div class="card"><b>Sign in</b><div class="hint">Use the email address the office has for you. We send a 6-digit code to it. You stay signed in on this phone / computer for about 3 months. On a shared computer, press “Sign out” when you finish.</div>
+    <div id="msg" class="msg" style="display:${note ? 'block' : 'none'}" >${note || ''}</div>
+    <label class="f">Your email</label><input type="email" id="em" autocomplete="email" value="${esc(email)}" ${step === 2 ? 'readonly' : ''}>
+    ${step === 2 ? '<label class="f">6-digit code</label><input type="text" id="cd" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456">' : ''}
+    <div style="margin-top:12px"><button class="pri" id="go">${step === 2 ? 'Sign in' : 'Send me a code'}</button></div>
+    ${step === 2 ? '<div style="margin-top:8px"><button class="sec" id="again">Use another email / send a new code</button></div>' : ''}</div>`;
+  $('go').onclick = async () => {
+    $('go').disabled = true;
+    try{
+      if(step === 1){
+        email = $('em').value.trim(); if(email.indexOf('@') < 1){ msg('err', 'Please type your email.'); $('go').disabled = false; return; }
+        const j = await call({action:'appCode', email}); if(!j.ok){ msg('err', esc(j.error)); $('go').disabled = false; return; }
+        signInView(2, '<span class="ok">If that email is registered, a code is on its way (check spam too).</span>');
+      } else {
+        const j = await call({action:'appVerify', email, code: $('cd').value.trim()});
+        if(!j.ok){ msg('err', esc(j.error || 'Could not sign in.')); $('go').disabled = false; return; }
+        S = j.token; LS.set('tow_rep_s', S); load(todayStr());
+      }
+    }catch(e){ msg('err', 'Could not reach the service. Please check your internet.'); $('go').disabled = false; }
+  };
+  if($('again')) $('again').onclick = () => signInView(1);
+}
+async function load(date){
+  if(!API){ $('app').innerHTML = '<div class="msg err">This link is incomplete. Please use the exact link the office sent you.</div>'; return; }
+  if(!S){ signInView(1); return; }
+  DATE = date || DATE;
+  try{
+    const j = await call({action:'appForm', date: DATE});
+    if(!j.ok){ if(j.expired){ LS.del('tow_rep_s'); S = ''; signInView(1, 'Please sign in again.'); return; } $('app').innerHTML = `<div class="msg err">${esc(j.error)}</div>`; return; }
+    DEF = j; draw();
+  }catch(e){ $('app').innerHTML = '<div class="msg err">Could not reach the service. Please check your internet and reload.</div>'; }
+}
+function dow(k){ return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(k + 'T00:00:00').getDay()]; }
+function strip(){
+  const days = []; for(let i = 0; i < 8; i++) days.push(addDays(todayStr(), -i));
+  return '<div class="strip">' + days.map(k => { const d = (DEF.done || {})[k], cls = d ? (d.timing === 'Late' ? 'late' : 'y') : 'n';
+    return `<button data-d="${k}" class="${cls} ${k === DATE ? 'sel' : ''}">${dow(k)} ${k.slice(8)}<br>${d ? '✓ ' + (d.timing === 'Late' ? 'late' : 'sent') : '–'}</button>`; }).join('') + '</div>';
+}
+function draw(){
+  const cur = DEF.current || {items:{}, plan:[], other:'', planOther:'', remarks:'', day:'', proceed:''};
+  const planned = new Set(DEF.planned || []);
+  $('bOut').style.display = LEAD ? 'none' : '';
+  const day = cur.day || 'Working', proceed = cur.proceed || '';
+  const dn = (DEF.done || {})[DATE], locked = !!dn && !LEAD, nx = DEF.next || '';
+  const nxL = nx ? dow(nx) + ' ' + nx.slice(8) : 'next day';
+  let h = '<div id="msg" class="msg" style="display:none"></div>';
+  if((DEF.missing || []).length && !LEAD) h += `<div class="msg err"><b>Reports still missing:</b> ${DEF.missing.map(k => `<a href="#" class="mk" data-d="${k}" style="color:inherit;font-weight:700">${dow(k)} ${k.slice(8)}/${k.slice(5,7)}</a>`).join(', ')}. Tap a date to report it now (late reports cost points; the earlier the better).</div>`;
+  const pn = (DEF.planned || []).map(id => (DEF.tasks.find(t => t.id === id) || {}).short).filter(Boolean);
+  if(pn.length && !dn && !LEAD) h += `<div class="msg info"><b>You planned for this day:</b> ${pn.map(esc).join(', ')}</div>`;
+  if(LEAD) h += `<div class="msg info">Leadership mode — you are filling in for <b>${esc(DEF.staff)}</b>. This is recorded as sent by leadership.</div>`;
+  h += `<div class="card"><div class="hdr2"><div><b style="font-size:16px">${esc(DEF.staff)}</b>
+    <label class="f" style="margin-top:6px">Report for</label><input type="date" id="dt" value="${DATE}" max="${todayStr()}" min="${addDays(todayStr(), -40)}"></div>
+    <div><label class="f" style="margin-top:0">Were you working this day?</label>
+    <div class="seg"><label><input type="radio" name="day" value="Working" ${day !== 'Leave' && !cur.half ? 'checked' : ''}><span>Full day</span></label><label><input type="radio" name="day" value="Half" ${day !== 'Leave' && cur.half ? 'checked' : ''}><span>Half-day leave</span></label><label><input type="radio" name="day" value="Leave" ${day === 'Leave' ? 'checked' : ''}><span>Full-day leave</span></label></div>
+    <div id="halfBox" class="seg" style="margin-top:6px"><label><input type="radio" name="hf" value="AM" ${cur.half === 'AM' ? 'checked' : ''}><span>Morning off (usual time)</span></label><label><input type="radio" name="hf" value="PM" ${cur.half === 'PM' ? 'checked' : ''}><span>Afternoon off (may send after 1 pm)</span></label></div></div></div>
+    ${dn ? `<div class="sub ${dn.timing === 'Late' ? 'late' : ''}">✓ <b>Submitted</b> — ${esc(dn.first)} (${esc(dn.timing)}). ${LEAD ? 'Leadership mode: you can change it.' : 'This report is final and locked.'}</div>` : `<div class="hint" style="margin-top:8px">Not submitted yet for this day. Once sent, a report is final — please check it before sending.</div>`}
+    ${strip()}</div>`;
+  h += '<div class="cols"><div id="work">';
+  CATS.forEach(([cat, label]) => {
+    const list = DEF.tasks.filter(t => t.cat === cat || (cat === 'Quarterly' && t.cat === 'Every 4 Months')); if(!list.length) return;
+    const doneN = list.filter(t => (cur.items[t.id] || {}).s).length;
+    h += `<details open><summary><span>${label}</span><span class="n">${doneN}/${list.length}</span></summary><div class="colh"><span>Task</span><span>Status today</span><span style="text-align:center">Plan ${nxL}</span></div>` + list.map(t => {
+      const c = cur.items[t.id] || {s:'', r:''}, pm = String(c.r || '').match(/^\[(\d+)%\]\s*/), pc = pm ? pm[1] : '', rtxt = pm ? String(c.r).slice(pm[0].length) : (c.r || ''), showR = c.r || c.s === 'Deferred (Approved)';
+      return `<div class="task" data-id="${esc(t.id)}"><div class="nm">${esc(t.name)}${planned.has(t.id) ? '<span class="tag">planned</span>' : ''}${t.trial ? '<span class="tag">not scored yet</span>' : ''}<span class="nt">+ note</span></div>
+        <select class="st"><option value="">—</option>${DEF.statuses.map(s => `<option ${c.s === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
+        <label class="tm"><input type="checkbox" class="pl" value="${esc(t.id)}" ${cur.plan.indexOf(t.id) >= 0 ? 'checked' : ''}></label>
+        <div class="rmw ${showR || pc ? 'show' : ''}"><div style="display:flex;gap:6px"><select class="pg" style="width:92px;display:${c.s === 'In Progress' ? '' : 'none'}"><option value="">% done</option>${[10,25,50,75,90].map(n => `<option value="${n}" ${pc == n ? 'selected' : ''}>${n}%</option>`).join('')}</select><input type="text" class="rm" placeholder="Remark (required if deferred)" value="${esc(rtxt)}"></div></div></div>`;
+    }).join('') + '</details>';
+  });
+  h += `</div><div>
+    <div class="card"><label class="f" style="margin-top:0">Other work done (not in the list) — also counts</label><textarea id="other" style="min-height:52px" placeholder="One item per line">${esc(cur.other)}</textarea></div>
+    <div class="card"><b>Plan for ${nx ? dow(nx) + ' ' + nx.slice(8) + '/' + nx.slice(5,7) : 'your next working day'}</b> <span class="hint">(tick the “Plan” boxes on the left)</span><div class="seg" style="margin-top:6px"><label><input type="radio" name="pr" value="Yes" ${proceed === 'Yes' || !proceed ? 'checked' : ''}><span>Working</span></label><label><input type="radio" name="pr" value="No" ${proceed === 'No' ? 'checked' : ''}><span>On leave</span></label><label><input type="radio" name="pr" value="Rest & Recovery" ${proceed === 'Rest & Recovery' ? 'checked' : ''}><span>Rest &amp; Recovery</span></label></div>
+      <div id="planBox"><label class="f">Other things planned (not in the list)</label><textarea id="planOther" style="min-height:44px">${esc(cur.planOther)}</textarea></div></div>
+    <div class="card"><label class="f" style="margin-top:0">General remarks (optional)</label><textarea id="remarks" style="min-height:44px">${esc(cur.remarks)}</textarea></div>
+  </div></div>`;
+  if(locked) h += `<div class="card" id="chg"><b>Something important missing or wrong?</b><div class="hint">A sent report cannot be edited. You can ask leadership to review a change; it is only changed if they approve.</div><textarea id="chgT" style="min-height:48px;margin-top:6px" placeholder="What needs to change, and why?"></textarea><div style="margin-top:8px"><button class="sec" id="chgB">Request a change</button></div></div>`;
+  else h += `<div class="bar"><div style="max-width:1060px;margin:0 auto"><button class="pri" id="send">${dn ? 'Update report (leadership)' : 'Send my report — final'}</button></div></div>`;
+  $('app').innerHTML = h;
+  const toggle = () => { const dv = document.querySelector('input[name=day]:checked').value, lv = dv === 'Leave'; $('halfBox').style.display = dv === 'Half' ? '' : 'none'; $('work').style.opacity = lv ? .35 : 1; $('work').style.pointerEvents = lv ? 'none' : ''; $('other').disabled = lv;
+    const pr = document.querySelector('input[name=pr]:checked').value === 'Yes'; $('planBox').style.display = pr ? '' : 'none'; document.querySelectorAll('.pl').forEach(x => x.disabled = !pr); };
+  document.querySelectorAll('input[name=day],input[name=pr],input[name=hf]').forEach(i => i.onchange = toggle); toggle();
+  if(locked){ document.querySelectorAll('#app input:not(#dt),#app select,#app textarea').forEach(x => { if(!x.closest('#chg') && !x.closest('.strip')) x.disabled = true; }); document.querySelectorAll('.task .nt').forEach(x => x.style.display = 'none'); }
+  document.querySelectorAll('.task').forEach(el => {
+    const w = el.querySelector('.rmw'), st = el.querySelector('.st');
+    el.querySelector('.nt').onclick = () => { w.classList.toggle('show'); if(w.classList.contains('show')) w.querySelector('input').focus(); };
+    st.onchange = () => { const pg = el.querySelector('.pg'); pg.style.display = st.value === 'In Progress' ? '' : 'none'; if(st.value === 'In Progress') w.classList.add('show'); if(st.value === 'Deferred (Approved)'){ w.classList.add('show'); w.querySelector('input').focus(); } };
+  });
+  document.querySelectorAll('.mk').forEach(a => a.onclick = e => { e.preventDefault(); load(a.dataset.d); });
+  document.querySelectorAll('.strip button').forEach(b => b.onclick = () => load(b.dataset.d));
+  $('dt').onchange = e => { if(e.target.value) load(e.target.value); };
+  if($('send')) $('send').onclick = send;
+  if($('chgB')) $('chgB').onclick = async () => { const t = $('chgT').value.trim(); if(t.length < 5){ msg('err', 'Please say what needs to change.'); return; } $('chgB').disabled = true;
+    try{ const j = await call({action:'appRequestChange', date: DATE, text: t}); if(j.ok){ msg('ok', 'Your request was sent to leadership.'); $('chgT').value = ''; } else msg('err', esc(j.error || 'Not sent.')); }catch(e){ msg('err', 'Could not reach the service.'); } $('chgB').disabled = false; };
+}
+async function send(){
+  const dayR = document.querySelector('input[name=day]:checked').value, onLeave = dayR === 'Leave', dayV = onLeave ? 'Leave' : 'Working', hfEl = document.querySelector('input[name=hf]:checked'), half = (dayR === 'Half' && hfEl) ? hfEl.value : '';
+  if(dayR === 'Half' && !hfEl){ msg('err', 'Please choose morning or afternoon for your half-day leave.'); return; }
+  const items = [];
+  if(!onLeave) document.querySelectorAll('#work .task').forEach(el => { const s = el.querySelector('.st').value; if(s) items.push({id: el.dataset.id, s, r: el.querySelector('.rm').value.trim(), p: s === 'In Progress' ? el.querySelector('.pg').value : ''}); });
+  const bad = items.find(i => i.s === 'Deferred (Approved)' && i.r.length < 3);
+  if(bad){ const t = DEF.tasks.find(x => x.id === bad.id); msg('err', 'Please type the reason for deferring “' + esc(t ? t.name : '') + '”.'); return; }
+  const pr = document.querySelector('input[name=pr]:checked').value;
+  if(!DEF.done || !DEF.done[DATE]){ if(!confirm('Send this report? Once sent it is final and cannot be edited.')) return; }
+  const body = {action:'appSubmit', date: DATE, day: dayV, half, proceed: pr, items,
+    plan: pr === 'Yes' ? Array.from(document.querySelectorAll('.pl:checked')).map(x => x.value) : [],
+    other: onLeave ? '' : $('other').value, planOther: pr === 'Yes' ? $('planOther').value : '', remarks: $('remarks').value};
+  $('send').disabled = true; $('send').textContent = 'Sending…';
+  try{
+    const j = await call(body);
+    if(j.ok){ await load(DATE); msg('ok', '✓ Report received on ' + esc(j.received) + '. It is now final.'); }
+    else if(j.expired){ LS.del('tow_rep_s'); S = ''; signInView(1, 'Please sign in again — your answers were not sent.'); }
+    else { msg('err', esc(j.error || 'Not sent.')); $('send').textContent = 'Send my report'; $('send').disabled = false; }
+  }catch(e){ msg('err', 'Could not reach the service — nothing was sent. Please try again.'); $('send').textContent = 'Send my report'; $('send').disabled = false; }
+}
+$('bOut').onclick = () => { LS.del('tow_rep_s'); S = ''; DEF = null; signInView(1); };
+(async () => {
+  if(LEADQ.lk && LEADQ.as && API){
+    try{ const r = await fetch(API, {method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify({action:'appActAs', lk: LEADQ.lk, staff: LEADQ.as})}); const j = await r.json();
+      if(j.ok){ try{ sessionStorage.setItem('tow_lead_s', j.token); }catch(e){} location.reload(); return; }
+      $('app').innerHTML = '<div class="msg err">' + esc(j.error || 'Not allowed.') + '</div>'; return;
+    }catch(e){ $('app').innerHTML = '<div class="msg err">Could not reach the service.</div>'; return; }
+  }
+  load(todayStr());
+})();
+</script></body></html>
