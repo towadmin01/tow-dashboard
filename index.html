@@ -1360,7 +1360,7 @@ async function renderPilot(reload){
     const badge = g.timing === 'Late' ? 'late' : (g.timing === 'Early' ? 'early' : 'ontime');
     let det = '';
     if(open){
-      det = `<tr><td colspan="9" style="background:#FAF8F0;padding:10px 14px">
+      det = `<tr><td colspan="9" style="background:#FAF8F0;padding:10px 14px;text-align:left;line-height:1.7">
         ${g.dayType === 'Leave' ? '<div><b>On leave</b></div>' : ''}${g.half ? `<div><b>Half-day leave:</b> ${g.half === 'AM' ? 'morning' : 'afternoon'}</div>` : ''}
         ${g.tasks.map(t => `<div>• <b>${esc(t['Task'])}</b> <span class="badge ${t['Status / value'] === 'Completed' ? 'good' : (t['Status / value'] === 'In Progress' ? 'mid' : 'early')}">${esc(t['Status / value'])}</span>${t['Remark'] ? ' — ' + esc(t['Remark']) : ''}</div>`).join('') || '<div class="reason">No listed task reported.</div>'}
         ${g.other ? `<div style="margin-top:6px"><b>Other work:</b> ${esc(g.other).replace(/\n/g, '; ')}</div>` : ''}
