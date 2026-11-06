@@ -3,45 +3,44 @@
 <title>Daily Report — Tabernacle of Worship</title>
 <meta name="theme-color" content="#1F3864">
 <style>
-:root{--navy:#1F3864;--gold:#C9A227;--bg:#F8F6EF;--line:#E4DFCC;--green:#1E7B3A}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#2b2a22}
-header{background:var(--navy);color:#fff;padding:16px;display:flex;justify-content:space-between;align-items:center} header small{color:var(--gold);letter-spacing:.12em;font-weight:700;font-size:11px;text-transform:uppercase}
-header h1{margin:2px 0 0;font-size:19px} header button{background:none;border:1px solid #ffffff55;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer}
-main{max-width:1060px;margin:0 auto;padding:12px 14px 84px}
-.cols{display:grid;grid-template-columns:1fr;gap:12px}@media(min-width:900px){.cols{grid-template-columns:1.6fr 1fr;align-items:start}}
-.cols>div>.card,.cols>div>details{margin-bottom:10px}
-.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
-.msg{padding:12px;border-radius:10px;font-size:13.5px;margin-bottom:12px}.ok{background:#EAF5EC;color:#1a5c2c}.err{background:#FCE0E0;color:#7a0006}.info{background:#FFF7E0;color:#6b4a00}
-label.f{display:block;font-size:12.5px;font-weight:700;color:#4a4636;margin:10px 0 4px}
-input[type=text],input[type=email],input[type=date],input[type=number],select,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:14px;background:#fff}
-textarea{min-height:60px;resize:vertical}
-button.pri{background:var(--green);color:#fff;border:none;border-radius:10px;padding:13px 18px;font-size:15px;font-weight:700;cursor:pointer;width:100%}
-button.sec{background:#ECE7D6;color:#3a3626;border:none;border-radius:10px;padding:11px 14px;font-size:14px;font-weight:600;cursor:pointer}
+:root{--navy:#1F3864;--gold:#C9A227;--bg:#F3F1EA;--line:#E6E2D3;--green:#1E7B3A;--ink:#2b2a22;--mut:#756f5c}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink)}
+header{background:var(--navy);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--gold)} header small{color:var(--gold);letter-spacing:.14em;font-weight:700;font-size:10.5px;text-transform:uppercase}
+header h1{margin:1px 0 0;font-size:18px;font-weight:700} header button{background:none;border:1px solid #ffffff55;color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer}
+main{max-width:1080px;margin:0 auto;padding:14px 14px 90px}
+.cols{display:grid;grid-template-columns:1fr;gap:14px}@media(min-width:920px){.cols{grid-template-columns:1.7fr 1fr;align-items:start}}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 2px #0000000a}
+.msg{padding:11px 14px;border-radius:10px;font-size:13.5px;margin-bottom:12px}.ok{background:#E6F4EA;color:#1a5c2c}.err{background:#FCE4E4;color:#7a0006}.info{background:#FFF6D9;color:#6b4a00}
+label.f{display:block;font-size:12px;font-weight:700;color:var(--mut);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.04em}
+input[type=text],input[type=email],input[type=date],input[type=number],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:14px;background:#fff;color:var(--ink)}
+textarea{min-height:56px;resize:vertical}
+button.pri{background:var(--green);color:#fff;border:none;border-radius:11px;padding:13px 18px;font-size:15px;font-weight:700;cursor:pointer;width:100%}
+button.sec{background:#ECE7D6;color:#3a3626;border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;cursor:pointer}
 button:disabled{opacity:.5}
-.seg{display:flex;gap:6px;flex-wrap:wrap}.seg label{flex:1;min-width:110px}.seg input{display:none}
-.seg span{display:block;text-align:center;padding:10px 6px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;font-weight:600;cursor:pointer;background:#fff}
+.seg{display:flex;gap:6px;flex-wrap:wrap}.seg label{flex:1;min-width:96px}.seg input{display:none}
+.seg span{display:block;text-align:center;padding:9px 6px;border:1px solid var(--line);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--mut)}
 .seg input:checked + span{background:var(--navy);color:#fff;border-color:var(--navy)}
-details{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:10px}
-summary{padding:12px 14px;font-weight:700;color:var(--navy);cursor:pointer;display:flex;justify-content:space-between;list-style:none}
-summary::-webkit-details-marker{display:none} summary .n{font-weight:600;color:#6b6552;font-size:12.5px}
-.task{padding:7px 12px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 150px 74px;gap:4px 8px;align-items:center}
-.task .nm{font-size:13.5px;font-weight:600;line-height:1.3}.task .rmw{grid-column:1/-1;display:none}.task .rmw.show{display:block}
-.task select{padding:6px;font-size:13px}.task input[type=text]{padding:6px 8px;font-size:13px}
-.task .tm{display:flex;gap:4px;align-items:center;font-size:12px;color:#4a4636;cursor:pointer;justify-content:center}.task .tm input{width:17px;height:17px}
-.task .nt{font-size:11.5px;color:#1F3864;cursor:pointer;text-decoration:underline;margin-left:6px;font-weight:400}
-.colh{display:grid;grid-template-columns:1fr 150px 74px;gap:8px;padding:6px 12px;font-size:11px;color:#6b6552;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-@media(max-width:560px){.task,.colh{grid-template-columns:1fr 112px 56px}}
-.strip{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.strip button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 8px;font-size:12px;cursor:pointer;line-height:1.25}
-.strip button.sel{outline:2px solid var(--navy)}.strip button.y{background:#EAF5EC;border-color:#9ccaa6}.strip button.late{background:#FFF1B8;border-color:#e0c25a}.strip button.n{color:#8a8570}
-.sub{background:#EAF5EC;border:1px solid #9ccaa6;color:#1a5c2c;border-radius:10px;padding:8px 12px;font-size:13px;margin-top:8px}.sub.late{background:#FFF1B8;border-color:#e0c25a;color:#6b4a00}
-.hdr2{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.hdr2>div{flex:1;min-width:150px}
-
-.task .tag{font-size:11px;color:#8a6d00;background:#FFF1B8;border-radius:6px;padding:1px 6px;margin-left:6px;font-weight:600}
-.task select{margin-bottom:6px} .task input[type=text]{font-size:13px}
-.chk{display:flex;gap:10px;align-items:flex-start;padding:9px 14px;border-top:1px solid var(--line);font-size:14px}.chk input{margin-top:3px;width:18px;height:18px}
-.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:10px 14px}
-.hint{font-size:12px;color:#6b6552;margin:4px 0 0;line-height:1.45}
-.test{background:#FFF1B8;color:#6b4a00;padding:8px 14px;font-size:12.5px;text-align:center;font-weight:600}
+.cat{margin-bottom:16px}.cat h3{margin:0 0 6px 2px;font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--navy);display:flex;gap:8px;align-items:center}
+.cat h3 i{font-style:normal;background:#E4E9F4;color:var(--navy);border-radius:20px;padding:1px 8px;font-size:11px;letter-spacing:0}
+.list{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #0000000a}
+.task{padding:10px 14px 10px 12px;border-top:1px solid #EFEBDD;border-left:4px solid transparent;display:grid;grid-template-columns:1fr 158px auto;gap:6px 12px;align-items:center}
+.task:first-child{border-top:none}.task[data-s="Completed"]{border-left-color:#2e9d4f;background:#F6FBF7}.task[data-s="In Progress"]{border-left-color:#e0a21a;background:#FFFCF3}.task[data-s^="Deferred"]{border-left-color:#8a8a8a;background:#F7F7F6}
+.task .nm{font-size:14px;font-weight:600;line-height:1.3}.task .nm .ds{display:block;font-size:11.5px;font-weight:400;color:var(--mut);margin-top:2px;line-height:1.35}.task .rmw{grid-column:1/-1;display:none}.task .rmw.show{display:block}
+.task select{padding:7px 8px;font-size:13px;font-weight:600;border-radius:9px}
+.task .nt{font-size:12px;color:#4c63a3;cursor:pointer;margin-left:8px;font-weight:600}
+.task .tag{font-size:10.5px;color:#8a6d00;background:#FFF1B8;border-radius:6px;padding:1px 6px;margin-left:6px;font-weight:700}
+.pl-pill{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--mut);cursor:pointer;background:#fff;white-space:nowrap}
+.pl-pill input{width:15px;height:15px;margin:0}.pl-pill:has(input:checked){background:#E4E9F4;border-color:#9bb0e0;color:var(--navy)}
+@media(max-width:560px){.task{grid-template-columns:1fr 130px}.task .pl-pill{grid-column:1/-1;justify-self:start}}
+.strip{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center;font-size:12px;color:var(--mut)}
+.strip button{border:none;background:#F1EEE3;border-radius:20px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--mut)}
+.strip button.y{background:#E1F2E6;color:#1a5c2c}.strip button.late{background:#FFF1B8;color:#6b4a00}.strip button.sel{outline:2px solid var(--navy)}
+.sub{background:#E6F4EA;color:#1a5c2c;border-radius:10px;padding:9px 12px;font-size:13px;margin-top:10px}.sub.late{background:#FFF1B8;color:#6b4a00}
+.hdr2{display:flex;gap:14px;flex-wrap:wrap;align-items:end}.hdr2>div{flex:1;min-width:170px}
+details.chg{margin-top:4px;font-size:12px;color:var(--mut)}details.chg summary{cursor:pointer;padding:4px 2px;display:inline-block}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fffffff2;backdrop-filter:blur(4px);border-top:1px solid var(--line);padding:10px 14px}
+.hint{font-size:12px;color:var(--mut);margin:4px 0 0;line-height:1.45}
+.test{background:#FFF1B8;color:#6b4a00;padding:6px 14px;font-size:12px;text-align:center;font-weight:600}
 </style></head><body>
 <header><div><small>Tabernacle of Worship</small><h1>Daily Report</h1></div><button id="bOut" style="display:none">Sign out</button></header>
 <div class="test" id="testBar">TEST VERSION — please keep using the Google Form as usual. Entries here are only for checking.</div>
@@ -62,7 +61,8 @@ const LEADQ = { lk: q.get('lk') || '', as: q.get('as') || '' };
 if(LEADQ.lk){ history.replaceState(null, '', location.pathname); }
 async function call(body){
   const r = await fetch(API, {method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(Object.assign({s: S}, body))});
-  return r.json();
+  const t = await r.text();
+  try{ return JSON.parse(t); }catch(e){ const m = t.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160); const err = new Error('The service answered with something unexpected (HTTP ' + r.status + '): ' + m); err.detail = true; throw err; }
 }
 function msg(c, t){ const m = $('msg'); if(!m) return; m.className = 'msg ' + c; m.innerHTML = t; m.style.display = t ? 'block' : 'none'; window.scrollTo({top:0, behavior:'smooth'}); }
 function signInView(step, note){
@@ -85,7 +85,7 @@ function signInView(step, note){
         if(!j.ok){ msg('err', esc(j.error || 'Could not sign in.')); $('go').disabled = false; return; }
         S = j.token; LS.set('tow_rep_s', S); load(todayStr());
       }
-    }catch(e){ msg('err', 'Could not reach the service. Please check your internet.'); $('go').disabled = false; }
+    }catch(e){ msg('err', e && e.detail ? esc(e.message) : 'Could not reach the service (' + esc(String(e && e.message || e)) + ').'); $('go').disabled = false; }
   };
   if($('again')) $('again').onclick = () => signInView(1);
 }
@@ -97,13 +97,19 @@ async function load(date){
     const j = await call({action:'appForm', date: DATE});
     if(!j.ok){ if(j.expired){ LS.del('tow_rep_s'); S = ''; signInView(1, 'Please sign in again.'); return; } $('app').innerHTML = `<div class="msg err">${esc(j.error)}</div>`; return; }
     DEF = j; draw();
-  }catch(e){ $('app').innerHTML = '<div class="msg err">Could not reach the service. Please check your internet and reload.</div>'; }
+  }catch(e){ $('app').innerHTML = '<div class="msg err">' + (e && e.detail ? esc(e.message) : 'Could not reach the service (' + esc(String(e && e.message || e)) + ').') + '</div>'; }
+}
+function descOf(t){
+  const sh = String(t.short || '').trim();
+  let d = String(t.name || '').replace(/^(weekly|monthly|quarterly|semi-?annual|annual|ad-?hoc|every 4 months)\s*[-–—:]\s*/i, '').trim();
+  if(sh && d.toLowerCase().indexOf(sh.toLowerCase()) === 0) d = d.slice(sh.length).replace(/^\s*[-–—:]\s*/, '').trim();
+  return (!d || d.toLowerCase() === sh.toLowerCase()) ? '' : d;
 }
 function dow(k){ return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(k + 'T00:00:00').getDay()]; }
 function strip(){
-  const days = []; for(let i = 0; i < 8; i++) days.push(addDays(todayStr(), -i));
-  return '<div class="strip">' + days.map(k => { const d = (DEF.done || {})[k], cls = d ? (d.timing === 'Late' ? 'late' : 'y') : 'n';
-    return `<button data-d="${k}" class="${cls} ${k === DATE ? 'sel' : ''}">${dow(k)} ${k.slice(8)}<br>${d ? '✓ ' + (d.timing === 'Late' ? 'late' : 'sent') : '–'}</button>`; }).join('') + '</div>';
+  const days = []; for(let i = 0; i < 6; i++) days.push(addDays(todayStr(), -i));
+  return '<div class="strip"><span>Recent:</span>' + days.map(k => { const d = (DEF.done || {})[k], cls = d ? (d.timing === 'Late' ? 'late' : 'y') : '';
+    return `<button data-d="${k}" class="${cls} ${k === DATE ? 'sel' : ''}">${dow(k)} ${+k.slice(8)}${d ? ' ✓' : ''}</button>`; }).join('') + '</div>';
 }
 function draw(){
   const cur = DEF.current || {items:{}, plan:[], other:'', planOther:'', remarks:'', day:'', proceed:''};
@@ -128,31 +134,31 @@ function draw(){
   CATS.forEach(([cat, label]) => {
     const list = DEF.tasks.filter(t => t.cat === cat || (cat === 'Quarterly' && t.cat === 'Every 4 Months')); if(!list.length) return;
     const doneN = list.filter(t => (cur.items[t.id] || {}).s).length;
-    h += `<details open><summary><span>${label}</span><span class="n">${doneN}/${list.length}</span></summary><div class="colh"><span>Task</span><span>Status today</span><span style="text-align:center">Plan ${nxL}</span></div>` + list.map(t => {
+    h += `<div class="cat"><h3>${label}<i>${doneN}/${list.length}</i></h3><div class="list"><div class="colh" style="display:none"></div>` + list.map(t => {
       const c = cur.items[t.id] || {s:'', r:''}, pm = String(c.r || '').match(/^\[(\d+)%\]\s*/), pc = pm ? pm[1] : '', rtxt = pm ? String(c.r).slice(pm[0].length) : (c.r || ''), showR = c.r || c.s === 'Deferred (Approved)';
-      return `<div class="task" data-id="${esc(t.id)}"><div class="nm">${esc(t.name)}${planned.has(t.id) ? '<span class="tag">planned</span>' : ''}${t.trial ? '<span class="tag">not scored yet</span>' : ''}<span class="nt">+ note</span></div>
-        <select class="st"><option value="">—</option>${DEF.statuses.map(s => `<option ${c.s === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
-        <label class="tm"><input type="checkbox" class="pl" value="${esc(t.id)}" ${cur.plan.indexOf(t.id) >= 0 ? 'checked' : ''}></label>
+      return `<div class="task" data-id="${esc(t.id)}" data-s="${esc(c.s)}"><div class="nm">${esc(t.short || t.name)}${planned.has(t.id) ? '<span class="tag">planned</span>' : ''}${t.trial ? '<span class="tag">not scored yet</span>' : ''}<span class="nt">+ note</span>${descOf(t) ? `<span class="ds">${esc(descOf(t))}</span>` : ''}</div>
+        <select class="st"><option value="">Not worked on</option>${DEF.statuses.map(s => `<option ${c.s === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
+        <label class="pl-pill"><input type="checkbox" class="pl" value="${esc(t.id)}" ${cur.plan.indexOf(t.id) >= 0 ? 'checked' : ''}>Plan ${esc(nxL)}</label>
         <div class="rmw ${showR || pc ? 'show' : ''}"><div style="display:flex;gap:6px"><select class="pg" style="width:92px;display:${c.s === 'In Progress' ? '' : 'none'}"><option value="">% done</option>${[10,25,50,75,90].map(n => `<option value="${n}" ${pc == n ? 'selected' : ''}>${n}%</option>`).join('')}</select><input type="text" class="rm" placeholder="Remark (required if deferred)" value="${esc(rtxt)}"></div></div></div>`;
-    }).join('') + '</details>';
+    }).join('') + '</div></div>';
   });
   h += `</div><div>
     <div class="card"><label class="f" style="margin-top:0">Other work done (not in the list) — also counts</label><textarea id="other" style="min-height:52px" placeholder="One item per line">${esc(cur.other)}</textarea></div>
-    <div class="card"><b>Plan for ${nx ? dow(nx) + ' ' + nx.slice(8) + '/' + nx.slice(5,7) : 'your next working day'}</b> <span class="hint">(tick the “Plan” boxes on the left)</span><div class="seg" style="margin-top:6px"><label><input type="radio" name="pr" value="Yes" ${proceed === 'Yes' || !proceed ? 'checked' : ''}><span>Working</span></label><label><input type="radio" name="pr" value="No" ${proceed === 'No' ? 'checked' : ''}><span>On leave</span></label><label><input type="radio" name="pr" value="Rest & Recovery" ${proceed === 'Rest & Recovery' ? 'checked' : ''}><span>Rest &amp; Recovery</span></label></div>
-      <div id="planBox"><label class="f">Other things planned (not in the list)</label><textarea id="planOther" style="min-height:44px">${esc(cur.planOther)}</textarea></div></div>
+    <div class="card"><b>${nx ? dow(nx) + ' ' + nx.slice(8) + '/' + nx.slice(5,7) : 'Next working day'}: will you be working?</b><div class="seg" style="margin-top:8px"><label><input type="radio" name="pr" value="Yes" ${proceed === 'Yes' || !proceed ? 'checked' : ''}><span>Working</span></label><label><input type="radio" name="pr" value="No" ${proceed === 'No' ? 'checked' : ''}><span>On leave</span></label><label><input type="radio" name="pr" value="Rest & Recovery" ${proceed === 'Rest & Recovery' ? 'checked' : ''}><span>Rest &amp; Recovery</span></label></div>
+      <div class="hint" id="plHint">Your plan is for the next day you actually work. If you are off, tick what you plan for the day you are back.</div><div id="planBox"><label class="f">Other things planned (not in the list)</label><textarea id="planOther" style="min-height:44px">${esc(cur.planOther)}</textarea></div></div>
     <div class="card"><label class="f" style="margin-top:0">General remarks (optional)</label><textarea id="remarks" style="min-height:44px">${esc(cur.remarks)}</textarea></div>
   </div></div>`;
-  if(locked) h += `<div class="card" id="chg"><b>Something important missing or wrong?</b><div class="hint">A sent report cannot be edited. You can ask leadership to review a change; it is only changed if they approve.</div><textarea id="chgT" style="min-height:48px;margin-top:6px" placeholder="What needs to change, and why?"></textarea><div style="margin-top:8px"><button class="sec" id="chgB">Request a change</button></div></div>`;
+  if(locked) h += `<details class="chg" id="chg"><summary>Need to correct something?</summary><div class="card" style="margin-top:6px"><div class="hint">A sent report cannot be edited. You can ask leadership to review a change; it is only changed if they approve.</div><textarea id="chgT" style="min-height:48px;margin-top:6px" placeholder="What needs to change, and why?"></textarea><div style="margin-top:8px"><button class="sec" id="chgB">Request a change</button></div></div></details>`;
   else h += `<div class="bar"><div style="max-width:1060px;margin:0 auto"><button class="pri" id="send">${dn ? 'Update report (leadership)' : 'Send my report — final'}</button></div></div>`;
   $('app').innerHTML = h;
   const toggle = () => { const dv = document.querySelector('input[name=day]:checked').value, lv = dv === 'Leave'; $('halfBox').style.display = dv === 'Half' ? '' : 'none'; $('work').style.opacity = lv ? .35 : 1; $('work').style.pointerEvents = lv ? 'none' : ''; $('other').disabled = lv;
-    const pr = document.querySelector('input[name=pr]:checked').value === 'Yes'; $('planBox').style.display = pr ? '' : 'none'; document.querySelectorAll('.pl').forEach(x => x.disabled = !pr); };
+    };
   document.querySelectorAll('input[name=day],input[name=pr],input[name=hf]').forEach(i => i.onchange = toggle); toggle();
   if(locked){ document.querySelectorAll('#app input:not(#dt),#app select,#app textarea').forEach(x => { if(!x.closest('#chg') && !x.closest('.strip')) x.disabled = true; }); document.querySelectorAll('.task .nt').forEach(x => x.style.display = 'none'); }
   document.querySelectorAll('.task').forEach(el => {
     const w = el.querySelector('.rmw'), st = el.querySelector('.st');
     el.querySelector('.nt').onclick = () => { w.classList.toggle('show'); if(w.classList.contains('show')) w.querySelector('input').focus(); };
-    st.onchange = () => { const pg = el.querySelector('.pg'); pg.style.display = st.value === 'In Progress' ? '' : 'none'; if(st.value === 'In Progress') w.classList.add('show'); if(st.value === 'Deferred (Approved)'){ w.classList.add('show'); w.querySelector('input').focus(); } };
+    st.onchange = () => { el.dataset.s = st.value; const pg = el.querySelector('.pg'); pg.style.display = st.value === 'In Progress' ? '' : 'none'; if(st.value === 'In Progress') w.classList.add('show'); if(st.value === 'Deferred (Approved)'){ w.classList.add('show'); w.querySelector('input').focus(); } };
   });
   document.querySelectorAll('.mk').forEach(a => a.onclick = e => { e.preventDefault(); load(a.dataset.d); });
   document.querySelectorAll('.strip button').forEach(b => b.onclick = () => load(b.dataset.d));
@@ -171,8 +177,8 @@ async function send(){
   const pr = document.querySelector('input[name=pr]:checked').value;
   if(!DEF.done || !DEF.done[DATE]){ if(!confirm('Send this report? Once sent it is final and cannot be edited.')) return; }
   const body = {action:'appSubmit', date: DATE, day: dayV, half, proceed: pr, items,
-    plan: pr === 'Yes' ? Array.from(document.querySelectorAll('.pl:checked')).map(x => x.value) : [],
-    other: onLeave ? '' : $('other').value, planOther: pr === 'Yes' ? $('planOther').value : '', remarks: $('remarks').value};
+    plan: Array.from(document.querySelectorAll('.pl:checked')).map(x => x.value),
+    other: onLeave ? '' : $('other').value, planOther: $('planOther').value, remarks: $('remarks').value};
   $('send').disabled = true; $('send').textContent = 'Sending…';
   try{
     const j = await call(body);

@@ -1332,7 +1332,7 @@ function pilotGroups(){
   Object.values(g).forEach(o => {
     o.batch = o.rows.reduce((m, r) => r._b > m ? r._b : m, '');
     o.cur = o.rows.filter(r => r._b === o.batch);
-    o.lead = /\+L$/.test(o.batch);
+    o.lead = /\+L$/.test(o.batch); o.imp = /\+F$/.test(o.batch);
     const f = o.first, deadline = String((DATA.settings || {}).lateAfter || '19:30').split(':'), early = String((DATA.settings || {}).earlyBefore || '17:30').split(':');
     const mins = f.getHours() * 60 + f.getMinutes(), dayDiff = Math.round((new Date(f.getFullYear(), f.getMonth(), f.getDate()) - o.date) / 86400000);
     o.timing = dayDiff > 0 ? 'Late' : (mins > (+deadline[0]) * 60 + (+deadline[1]) ? 'Late' : (mins < (+early[0]) * 60 + (+early[1]) ? 'Early' : 'On time'));
@@ -1369,7 +1369,7 @@ async function renderPilot(reload){
         <div class="reason" style="margin-top:6px">First sent ${esc(fmtT(g.first))}${g.lead ? ' · last edit by leadership' : ''}</div></td></tr>`;
     }
     return `<tr data-k="${esc(k)}" style="cursor:pointer"><td>${esc(fmtT(g.date).split(',')[0])}</td><td><b>${esc(g.staff)}</b></td><td>${esc(g.first.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}))}</td><td><span class="badge ${badge}">${g.timing}</span></td>
-      <td style="text-align:center">${g.n.Completed}</td><td style="text-align:center">${g.n['In Progress']}</td><td style="text-align:center">${g.n['Deferred (Approved)']}</td><td>${g.other ? 'Yes' : '—'}</td><td>${g.plan.length}${g.planOther ? ' +' : ''}${g.lead ? ' <span class="badge onleave">by leadership</span>' : ''}</td></tr>${det}`;
+      <td style="text-align:center">${g.n.Completed}</td><td style="text-align:center">${g.n['In Progress']}</td><td style="text-align:center">${g.n['Deferred (Approved)']}</td><td>${g.other ? 'Yes' : '—'}</td><td>${g.plan.length}${g.planOther ? ' +' : ''}${g.lead ? ' <span class="badge onleave">by leadership</span>' : ''}${g.imp ? ' <span class="badge early">from Form</span>' : ''}</td></tr>${det}`;
   }).join('');
   box.innerHTML = `<div class="card"><div class="hc-title">Pilot — reports sent through the staff app</div>
     <div class="reason">Test ground only: nothing here changes any score. The Google Form is still the scoring source. Tap a row to see the details.</div>
