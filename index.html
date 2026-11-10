@@ -410,6 +410,7 @@
   .gl-colhead, .gl-row{display:grid; grid-template-columns:30px 1.1fr 1.6fr 34px; gap:8px; align-items:start;}
   .gl-colhead{font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:#9a927a; font-weight:800; padding:4px 0; border-bottom:1.5px solid var(--navy);}
   .gl-row{padding:7px 0; border-bottom:1px solid var(--line); font-size:12px; line-height:1.4; break-inside:avoid; page-break-inside:avoid;}
+  .gl-hist{margin-top:14px;border-top:1px dashed var(--line);padding-top:8px;font-size:12.5px;color:#6b6552} .gl-hist summary{cursor:pointer;font-weight:700} @media print{.gl-hist{display:none !important}}
   .gl-n{color:#9a927a; font-weight:700;} .gl-t b{display:block; color:var(--navy);} .gl-t i{display:block; font-size:10.5px; color:#8a8369;} .gl-d{color:#3a3626;} .gl-w{text-align:right; font-weight:700;}
   .gl-note{font-size:11px; color:#6b6552; margin:4px 0 6px;} .gl-foot{margin-top:12px; padding-top:8px; border-top:1px solid var(--line); font-style:italic;}
   @media print{ body.glossary-printing .modal-head{display:none !important;} body.glossary-printing .gl-head{margin-top:0;} .gl-info,.gl-sum span{-webkit-print-color-adjust:exact; print-color-adjust:exact;} }
@@ -1494,16 +1495,18 @@ function renderPortfolio(staff){
     html += `<div class="portfolio-group-label">${esc(c)} tasks <small>${cur[c].length}</small></div>${col}`;
     cur[c].slice().sort((a,b) => a.full.localeCompare(b.full)).forEach((t, i) => { html += taskRowHtml(t, i + 1); });
   });
-  if(previous.length){
-    const pv = groups(previous);
-    html += `<div class="portfolio-group-label gl-prev">Previous portfolio &mdash; history only</div><div class="gl-note">Scored up to the September form revision. Kept so past weeks and months still read correctly.</div>${col}`;
-    order.concat(Object.keys(pv).filter(k => !order.includes(k))).filter(k => pv[k] && pv[k].length).forEach(c => {
-      pv[c].slice().sort((a,b) => a.full.localeCompare(b.full)).forEach((t, i) => { html += taskRowHtml(t, c[0] + (i + 1)); });
-    });
-  }
   html += `<div class="gl-note gl-foot">Wt = the task's weight in the score. Weekly, monthly and quarterly tasks are all counted together in Portfolio (see How Calc.). Position and schedule are set in the Settings roster.</div>`;
+  if(previous.length){   // reference only: collapsed, never printed
+    const pv = groups(previous);
+    let h2 = `<details class="gl-hist"><summary>Task history \u2014 for reference only (${previous.length} older task${previous.length === 1 ? '' : 's'}, not printed)</summary><div class="gl-note">Tasks that were scored in earlier weeks and months. Kept so past results still read correctly.</div>${col}`;
+    order.concat(Object.keys(pv).filter(k => !order.includes(k))).filter(k => pv[k] && pv[k].length).forEach(c => {
+      pv[c].slice().sort((a,b) => a.full.localeCompare(b.full)).forEach((t, i) => { h2 += taskRowHtml(t, c[0] + (i + 1)); });
+    });
+    html += h2 + '</details>';
+  }
   el.innerHTML = html;
 }
+
 
 document.getElementById('glossaryBtn').addEventListener('click', () => {
   glossaryModal.classList.add('open');
@@ -2701,6 +2704,17 @@ async function renderReviewLinks(reload){
       <button class="rv-mini" id="rlAll">Email everyone who hasn't submitted (${pending})</button><button class="rv-mini" id="rlRef">Refresh</button></div>
     <div class="reason">${per === 'mid' ? 'The Mid-Year Checkpoint is a conversation record: its scores are for reference only and do <b>not</b> change the final score.' : 'The Year-End Evaluation is final: only these ratings feed the Final Recognition Score.'}</div>
     <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">${rows}</table></div><div class="reason" id="rlMsg"></div></div>`;
+  { // hide / show the whole panel (remembered on this device)
+    const card = box.firstElementChild, title = card && card.querySelector('.hc-title');
+    if(title){
+      const body = document.createElement('div'); while(title.nextSibling) body.appendChild(title.nextSibling); card.appendChild(body);
+      let hid = false; try{ hid = localStorage.getItem('tow_rl_hidden') === '1'; }catch(e){}
+      const b = document.createElement('button'); b.className = 'rv-mini'; b.style.cssText = 'float:right;margin-top:-2px';
+      const apply = () => { body.style.display = hid ? 'none' : ''; b.textContent = hid ? 'Show' : 'Hide'; };
+      b.onclick = () => { hid = !hid; try{ localStorage.setItem('tow_rl_hidden', hid ? '1' : '0'); }catch(e){} apply(); };
+      title.appendChild(b); apply();
+    }
+  }
   const msg = t => { const m = document.getElementById('rlMsg'); if(m) m.textContent = t; };
   document.getElementById('rlPer').onchange = e => { rlPeriod = e.target.value; renderReviewLinks(false); };
   document.getElementById('rlRef').onclick = () => { loadReviewCloud().then(() => renderReviewLinks(true)); };
