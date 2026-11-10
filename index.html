@@ -2622,8 +2622,9 @@ function reviewCycles(){
 function reviewCfg(){
   try{
     const u = new URLSearchParams(location.search);
-    if(u.get('api')){ localStorage.setItem('tow_review_api', u.get('api')); if(u.get('lk')) localStorage.setItem('tow_review_lk', u.get('lk')); history.replaceState(null, '', location.pathname); }
-    return {api: localStorage.getItem('tow_review_api') || '', lk: localStorage.getItem('tow_review_lk') || ''};
+    if(u.get('api') || u.get('lk')){ if(u.get('api')) localStorage.setItem('tow_review_api', u.get('api')); if(u.get('lk')) localStorage.setItem('tow_review_lk', u.get('lk')); history.replaceState(null, '', location.pathname); }
+    let a = localStorage.getItem('tow_review_api') || ''; if(!a || /\/dev$/.test(a)) a = 'https://script.google.com/macros/s/AKfycbxQkzHpqqTGVueGJwfbTPl1zLRDUiI9P1_Tz18bXJwXFAtPYFvqPQlf_tcMVXyJ4wnd1g/exec';
+    return {api: a, lk: localStorage.getItem('tow_review_lk') || ''};
   }catch(e){ return {api:'', lk:''}; }
 }
 let REVIEW_CLOUD = null, REVIEW_CLOUD_ERR = '';
@@ -2728,7 +2729,7 @@ async function renderReviewLinks(reload){
       msg(j.ok && j.sent.length ? 'Emailed ' + x.staff : (j.error || 'Not sent')); if(j.ok) renderReviewLinks(true);
     };
     tr.querySelector('.rl-rp').onclick = () => { const c = reviewCfg(); if(!c.api || !c.lk){ msg('Open the leadership link once on this device first.'); return; }
-      window.open('https://towadmin01.github.io/tow-dashboard/report.html?api=' + encodeURIComponent(c.api) + '&lk=' + encodeURIComponent(c.lk) + '&as=' + encodeURIComponent(x.staff), '_blank'); };
+      window.open('https://towadmin01.github.io/tow-dashboard/report.html?lk=' + encodeURIComponent(c.lk) + '&as=' + encodeURIComponent(x.staff), '_blank'); };
     tr.querySelector('.rl-cp').onclick = async () => { try{ await navigator.clipboard.writeText(x.link + '&p=' + per); msg('Link copied for ' + x.staff); }catch(e){ window.prompt('Copy this link:', x.link + '&p=' + per); } };
   });
   clearInterval(rlTimer);   // live: refresh the submitted status while this tab is open

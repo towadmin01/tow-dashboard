@@ -49,7 +49,8 @@ details.chg{margin-top:4px;font-size:12px;color:var(--mut)}details.chg summary{c
 const q = new URLSearchParams(location.search);
 const LS = { get(k){ try{ return localStorage.getItem(k) || ''; }catch(e){ return ''; } }, set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }, del(k){ try{ localStorage.removeItem(k); }catch(e){} } };
 if(q.get('api')){ LS.set('tow_rep_api', q.get('api')); history.replaceState(null, '', location.pathname); }
-const API = LS.get('tow_rep_api');
+const DEFAULT_API = 'https://script.google.com/macros/s/AKfycbxQkzHpqqTGVueGJwfbTPl1zLRDUiI9P1_Tz18bXJwXFAtPYFvqPQlf_tcMVXyJ4wnd1g/exec';
+let API = LS.get('tow_rep_api') || ''; if(!API || /\/dev$/.test(API)) API = DEFAULT_API;
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const todayStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
