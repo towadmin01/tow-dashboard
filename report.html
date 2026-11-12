@@ -25,10 +25,19 @@ button:disabled{opacity:.5}
 .list{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #0000000a}
 .task{padding:10px 14px 10px 12px;border-top:1px solid #EFEBDD;border-left:4px solid transparent;display:grid;grid-template-columns:1fr 158px auto;gap:6px 12px;align-items:center}
 .task:first-child{border-top:none}.task[data-s="Completed"]{border-left-color:#2e9d4f;background:#F6FBF7}.task[data-s="In Progress"]{border-left-color:#e0a21a;background:#FFFCF3}.task[data-s^="Deferred"]{border-left-color:#8a8a8a;background:#F7F7F6}
-.task .nm{font-size:14px;font-weight:600;line-height:1.3}.task .nm .ds{display:block;font-size:11.5px;font-weight:400;color:var(--mut);margin-top:2px;line-height:1.35}.task .rmw{grid-column:1/-1;display:none}.task .rmw.show{display:block}
+.task .nm{font-size:14px;font-weight:600;line-height:1.3;color:#1f1d14}.task .nm .ds{display:block;font-size:11.5px;font-weight:400;color:var(--mut);margin-top:2px;line-height:1.35}.task .rmw{grid-column:1/-1;display:none}.task .rmw.show{display:block}
 .task select{padding:7px 8px;font-size:13px;font-weight:600;border-radius:9px}
-.task .nt{font-size:12px;color:#4c63a3;cursor:pointer;margin-left:8px;font-weight:600}
-.task .ckrow{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin:2px 0 6px;font-size:12.5px}.task .ckrow>span{font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}.task .ck{display:inline-flex;align-items:center;gap:5px;font-weight:600;cursor:pointer;background:#fff;border:1px solid #E3DDC8;border-radius:14px;padding:3px 10px}.task .ck input{width:15px;height:15px;margin:0}.task .tag{font-size:10.5px;color:#8a6d00;background:#FFF1B8;border-radius:6px;padding:1px 6px;margin-left:6px;font-weight:700}
+.task .nt{display:block;width:max-content;font-size:11px;color:#6b7cae;cursor:pointer;margin-top:3px;font-weight:600}
+.task .pd{display:inline-block;vertical-align:-2px;margin-left:6px;width:14px;height:14px;color:#b88a00}.task .pd svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.task .rm{font-size:12.5px;padding:7px 10px;border-radius:8px}.task .rm::placeholder{font-size:12px;color:#aaa58f}
+.task .pg{font-size:12px;padding:6px 8px}
+.task .ckrow{display:flex;flex-wrap:wrap;gap:5px 6px;align-items:center;margin:0 0 6px}.task .ckrow>span{font-size:10px;font-weight:700;color:#9a947d;text-transform:uppercase;letter-spacing:.05em;margin-right:2px}
+.task .ck{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:#4a4636;cursor:pointer;background:#FBFAF5;border:1px solid #E7E2CE;border-radius:12px;padding:2px 9px}.task .ck input{width:13px;height:13px;margin:0}.task .ck:has(input:checked){background:#E8F3EA;border-color:#9fcfab;color:#1f6b36;font-weight:600}
+.task .ro{font-size:12.5px;color:#4a4636;line-height:1.45;margin-top:1px}.task .ro .rc{display:inline-block;font-size:11px;font-weight:600;color:#1f6b36;background:#E8F3EA;border-radius:10px;padding:0 8px;margin-right:6px}.task .ro .rp{color:#8a6d00;background:#FFF1B8}
+.task .tag{font-size:10.5px;color:#8a6d00;background:#FFF1B8;border-radius:6px;padding:1px 6px;margin-left:6px;font-weight:700}
+.list.lk .pl-pill:not(:has(input:checked)){display:none}.list.lk .task{grid-template-columns:1fr 158px auto}
+.strip button.lv{background:#EEE8F6;color:#5B3E9E}
+.ld{padding:40px 10px;text-align:center;color:var(--mut);font-size:13px}
 .pl-pill{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--mut);cursor:pointer;background:#fff;white-space:nowrap}
 .pl-pill input{width:15px;height:15px;margin:0}.pl-pill:has(input:checked){background:#E4E9F4;border-color:#9bb0e0;color:var(--navy)}
 @media(max-width:560px){.task{grid-template-columns:1fr 130px}.task .pl-pill{grid-column:1/-1;justify-self:start}}
@@ -90,30 +99,49 @@ function signInView(step, note){
   };
   if($('again')) $('again').onclick = () => signInView(1);
 }
+const DC = {}; let dirty = false, pf = 0;
 async function load(date){
   if(!API){ $('app').innerHTML = '<div class="msg err">This link is incomplete. Please use the exact link the office sent you.</div>'; return; }
   if(!S){ signInView(1); return; }
-  DATE = date || DATE;
+  DATE = date || DATE; const want = DATE, hit = DC[want];
+  if(hit){ DEF = hit; draw(); dirty = false; } else $('app').innerHTML = '<div class="ld">Loading ' + esc(want) + '…</div>';
   try{
-    const j = await call({action:'appForm', date: DATE});
-    if(!j.ok){ if(j.expired){ LS.del('tow_rep_s'); S = ''; signInView(1, 'Please sign in again.'); return; } $('app').innerHTML = `<div class="msg err">${esc(j.error)}</div>`; return; }
-    DEF = j; draw();
-  }catch(e){ $('app').innerHTML = '<div class="msg err">' + (e && e.detail ? esc(e.message) : 'Could not reach the service (' + esc(String(e && e.message || e)) + ').') + '</div>'; }
+    const j = await call({action:'appForm', date: want});
+    if(!j.ok){ if(j.expired){ LS.del('tow_rep_s'); S = ''; signInView(1, 'Please sign in again.'); return; } if(want === DATE) $('app').innerHTML = `<div class="msg err">${esc(j.error)}</div>`; return; }
+    const same = hit && JSON.stringify(hit) === JSON.stringify(j); DC[want] = j;
+    if(want !== DATE) return;
+    if(!hit || (!same && !dirty)){ DEF = j; draw(); dirty = false; }
+    prefetch();
+  }catch(e){ if(!hit) $('app').innerHTML = '<div class="msg err">' + (e && e.detail ? esc(e.message) : 'Could not reach the service (' + esc(String(e && e.message || e)) + ').') + '</div>'; }
 }
+function prefetch(){   // quietly load the other recent days so tapping them is instant
+  if(pf || !DEF) return; const ks = Array.from(document.querySelectorAll('.strip button')).map(b => b.dataset.d).filter(k => k && !DC[k]).slice(0, 3); if(!ks.length) return; pf = 1;
+  (async () => { for(const k of ks){ await new Promise(r => setTimeout(r, 500)); try{ const j = await call({action:'appForm', date: k}); if(j && j.ok) DC[k] = j; }catch(e){} } pf = 0; })();
+}
+document.addEventListener('input', e => { if(e.target.closest && e.target.closest('#work,#other,#planOther,#remarks')) dirty = true; });
+document.addEventListener('change', e => { if(e.target.closest && e.target.closest('#work,#other,#planOther,#remarks')) dirty = true; });
 function tparts(t){
   const f = String(t.name || '').replace(/^\s*(weekly|monthly|quarterly|semi-?annual|annual|ad-?hoc|every 4 months)\s*[-–—:]\s*/i, '').trim(), i = f.indexOf(' (');
   if(i > 0 && /\)\s*$/.test(f)) return {nm: f.slice(0, i).trim(), d: f.slice(i + 2).replace(/\)\s*$/, '').trim()};
   return {nm: f || String(t.short || ''), d: ''};
 }
+function ckHtml(m, ticked){
+  const groups = (m.groups && m.groups.length) ? m.groups : ((m.items && m.items.length) ? [{label: m.req === 'items' ? 'Tick what you did' : 'Covered', items: m.items}] : []);
+  return groups.map(g => `<div class="ckrow"><span>${esc(g.label)}</span>${g.items.map(x => `<label class="ck"><input type="checkbox" class="cx" value="${esc(x)}" ${ticked.indexOf(x) >= 0 ? 'checked' : ''}>${esc(x)}</label>`).join('')}</div>`).join('');
+}
 function ttl(t){ return tparts(t).nm || t.short || ''; }
 function descOf(t){ return tparts(t).d; }
 function dow(k){ return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(k + 'T00:00:00').getDay()]; }
 function strip(){
-  // only the working days Tue-Fri (last 6 of them, newest first); public holidays are greyed and named
+  // only the working days Tue-Fri (last 6, newest first); public holidays greyed, leave days named, submitted days ticked
   const days = []; for(let i = 0; i < 21 && days.length < 6; i++){ const k = addDays(todayStr(), -i), w = new Date(k + 'T00:00:00').getDay(); if(w >= 2 && w <= 5) days.push(k); }
-  const hol = DEF.hol || {};
-  return '<div class="strip"><span>Recent:</span>' + days.map(k => { const d = (DEF.done || {})[k], h = hol[k], cls = h ? 'ph' : (d ? (d.timing === 'Late' ? 'late' : 'y') : '');
-    return `<button data-d="${k}" class="${cls} ${k === DATE ? 'sel' : ''}"${h ? ` title="Public holiday: ${esc(h)}"` : ''}>${dow(k)} ${+k.slice(8)}${h ? ' · PH' : (d ? ' ✓' : '')}</button>`; }).join('') + '</div>';
+  const hol = DEF.hol || {}, lv = DEF.lv || {};
+  return '<div class="strip"><span>Recent:</span>' + days.map(k => { const d = (DEF.done || {})[k], h = hol[k], l = lv[k], appLv = d && d.day === 'Leave';
+    let cls = '', tag = '', tip = '';
+    if(h){ cls = 'ph'; tag = ' · PH'; tip = 'Public holiday: ' + h; }
+    else if(l || appLv){ const half = l && /half/i.test(l[1]); cls = 'lv'; tag = half ? ' · ½ Leave' : ' · Leave'; tip = l ? l[0] + ' (' + l[1] + ')' : 'On leave'; if(d && half) tag += ' ✓'; }
+    else if(d){ cls = d.timing === 'Late' ? 'late' : 'y'; tag = ' ✓'; }
+    return `<button data-d="${k}" class="${cls} ${k === DATE ? 'sel' : ''}"${tip ? ` title="${esc(tip)}"` : ''}>${dow(k)} ${+k.slice(8)}${tag}</button>`; }).join('') + '</div>';
 }
 function draw(){
   const cur = DEF.current || {items:{}, plan:[], other:'', planOther:'', remarks:'', day:'', proceed:''};
@@ -138,17 +166,19 @@ function draw(){
   CATS.forEach(([cat, label]) => {
     const list = DEF.tasks.filter(t => t.cat === cat || (cat === 'Quarterly' && t.cat === 'Every 4 Months')); if(!list.length) return;
     const doneN = list.filter(t => (cur.items[t.id] || {}).s).length;
-    h += `<div class="cat"><h3>${label}<i>${doneN}/${list.length}</i></h3><div class="list"><div class="colh" style="display:none"></div>` + list.map(t => {
+    h += `<div class="cat"><h3>${label}<i>${doneN}/${list.length}</i></h3><div class="list${locked ? ' lk' : ''}"><div class="colh" style="display:none"></div>` + list.map(t => {
       const c = cur.items[t.id] || {s:'', r:''}, m = t.m || {items:[], pcl:[[10,'Just started'],[25,'Started'],[50,'Halfway'],[75,'Nearly done'],[90,'Final checks']], req:''};
       let raw = String(c.r || ''); const pm = raw.match(/^\[(\d+)%\]\s*/), pc = pm ? pm[1] : ''; if(pm) raw = raw.slice(pm[0].length);
       const km = raw.match(/^\[✓ ([^\]]*)\]\s*/), ticked = km ? km[1].split(';').map(x => x.trim()) : []; if(km) raw = raw.slice(km[0].length);
       const needs = (m.items && m.items.length) || m.req === 'names', showR = raw || ticked.length || c.s === 'Deferred (Approved)' || (needs && c.s) || pc;
       const ph = m.req === 'names' ? 'Names of the members you visited / followed up (required)' : 'Remark (required if deferred)';
-      return `<div class="task" data-id="${esc(t.id)}" data-s="${esc(c.s)}" data-req="${esc(m.req || '')}"><div class="nm">${esc(ttl(t))}${planned.has(t.id) ? '<span class="tag">planned</span>' : ''}${t.trial ? '<span class="tag">not scored yet</span>' : ''}<span class="nt">+ note</span>${descOf(t) ? `<span class="ds">${esc(descOf(t))}</span>` : ''}</div>
+      const pdIcon = planned.has(t.id) ? '<span class="pd" title="Planned for this day"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M9 15l2 2 4-4"/></svg></span>' : '';
+      const ro = (locked && c.s && (pc || ticked.length || raw)) ? `<div class="ro">${pc ? `<span class="rc rp">${pc}%</span>` : ''}${ticked.length ? `<span class="rc">&#10003; ${esc(ticked.join(' · '))}</span>` : ''}${esc(raw)}</div>` : '';
+      return `<div class="task" data-id="${esc(t.id)}" data-s="${esc(c.s)}" data-req="${esc(m.req || '')}"><div class="nm">${esc(ttl(t))}${pdIcon}${t.trial ? '<span class="tag">not scored yet</span>' : ''}${descOf(t) ? `<span class="ds">${esc(descOf(t))}</span>` : ''}${locked ? '' : '<span class="nt">+ note</span>'}</div>
         <select class="st"><option value="">Not worked on</option>${DEF.statuses.map(s => `<option ${c.s === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
         <label class="pl-pill"><input type="checkbox" class="pl" value="${esc(t.id)}" ${cur.plan.indexOf(t.id) >= 0 ? 'checked' : ''}>Plan ${esc(nxL)}</label>
-        <div class="rmw ${showR ? 'show' : ''}">${(m.items && m.items.length) ? `<div class="ckrow"><span>${m.req === 'items' ? 'Tick what you did:' : 'Tick what you covered:'}</span>${m.items.map(x => `<label class="ck"><input type="checkbox" class="cx" value="${esc(x)}" ${ticked.indexOf(x) >= 0 ? 'checked' : ''}>${esc(x)}</label>`).join('')}</div>` : ''}
-          <div style="display:flex;gap:6px"><select class="pg" style="width:190px;display:${c.s === 'In Progress' ? '' : 'none'}"><option value="">% done</option>${m.pcl.map(([n, l]) => `<option value="${n}" ${pc == n ? 'selected' : ''}>${n}% – ${esc(l)}</option>`).join('')}</select><input type="text" class="rm" placeholder="${esc(ph)}" value="${esc(raw)}"></div></div></div>`;
+        ${locked ? (ro ? `<div class="rmw show">${ro}</div>` : '') : `<div class="rmw ${showR ? 'show' : ''}">${ckHtml(m, ticked)}
+          <div style="display:flex;gap:6px"><select class="pg" style="width:190px;display:${c.s === 'In Progress' ? '' : 'none'}"><option value="">% done</option>${m.pcl.map(([n, l]) => `<option value="${n}" ${pc == n ? 'selected' : ''}>${n}% – ${esc(l)}</option>`).join('')}</select><input type="text" class="rm" placeholder="${esc(ph)}" value="${esc(raw)}"></div></div>`}</div>`;
     }).join('') + '</div></div>';
   });
   h += `</div><div>
@@ -165,7 +195,7 @@ function draw(){
   document.querySelectorAll('input[name=day],input[name=pr],input[name=hf]').forEach(i => i.onchange = toggle); toggle();
   if(locked){ document.querySelectorAll('#app input:not(#dt),#app select,#app textarea').forEach(x => { if(!x.closest('#chg') && !x.closest('.strip')) x.disabled = true; }); document.querySelectorAll('.task .nt').forEach(x => x.style.display = 'none'); }
   document.querySelectorAll('.task').forEach(el => {
-    const w = el.querySelector('.rmw'), st = el.querySelector('.st');
+    const w = el.querySelector('.rmw'), st = el.querySelector('.st'); if(!el.querySelector('.nt')) return;
     el.querySelector('.nt').onclick = () => { w.classList.toggle('show'); if(w.classList.contains('show')) w.querySelector('input').focus(); };
     st.onchange = () => { el.dataset.s = st.value; const pg = el.querySelector('.pg'); pg.style.display = st.value === 'In Progress' ? '' : 'none'; if(st.value === 'In Progress' || (st.value && (el.querySelector('.cx') || el.dataset.req === 'names'))) w.classList.add('show'); if(st.value === 'Deferred (Approved)'){ w.classList.add('show'); w.querySelector('input').focus(); } };
   });
@@ -194,12 +224,12 @@ async function send(){
   $('send').disabled = true; $('send').textContent = 'Sending…';
   try{
     const j = await call(body);
-    if(j.ok){ await load(DATE); msg('ok', '✓ Report received on ' + esc(j.received) + '. It is now final.'); }
+    if(j.ok){ Object.keys(DC).forEach(k => delete DC[k]); await load(DATE); msg('ok', '✓ Report received on ' + esc(j.received) + '. It is now final.'); }
     else if(j.expired){ LS.del('tow_rep_s'); S = ''; signInView(1, 'Please sign in again — your answers were not sent.'); }
     else { msg('err', esc(j.error || 'Not sent.')); $('send').textContent = 'Send my report'; $('send').disabled = false; }
   }catch(e){ msg('err', 'Could not reach the service — nothing was sent. Please try again.'); $('send').textContent = 'Send my report'; $('send').disabled = false; }
 }
-$('bOut').onclick = () => { LS.del('tow_rep_s'); S = ''; DEF = null; signInView(1); };
+$('bOut').onclick = () => { LS.del('tow_rep_s'); S = ''; DEF = null; Object.keys(DC).forEach(k => delete DC[k]); signInView(1); };
 (async () => {
   if(LEADQ.lk && LEADQ.as && API){
     try{ const r = await fetch(API, {method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify({action:'appActAs', lk: LEADQ.lk, staff: LEADQ.as})}); const j = await r.json();
