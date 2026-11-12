@@ -28,7 +28,7 @@ button:disabled{opacity:.5}
 .task .nm{font-size:14px;font-weight:600;line-height:1.3}.task .nm .ds{display:block;font-size:11.5px;font-weight:400;color:var(--mut);margin-top:2px;line-height:1.35}.task .rmw{grid-column:1/-1;display:none}.task .rmw.show{display:block}
 .task select{padding:7px 8px;font-size:13px;font-weight:600;border-radius:9px}
 .task .nt{font-size:12px;color:#4c63a3;cursor:pointer;margin-left:8px;font-weight:600}
-.task .tag{font-size:10.5px;color:#8a6d00;background:#FFF1B8;border-radius:6px;padding:1px 6px;margin-left:6px;font-weight:700}
+.task .ckrow{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin:2px 0 6px;font-size:12.5px}.task .ckrow>span{font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}.task .ck{display:inline-flex;align-items:center;gap:5px;font-weight:600;cursor:pointer;background:#fff;border:1px solid #E3DDC8;border-radius:14px;padding:3px 10px}.task .ck input{width:15px;height:15px;margin:0}.task .tag{font-size:10.5px;color:#8a6d00;background:#FFF1B8;border-radius:6px;padding:1px 6px;margin-left:6px;font-weight:700}
 .pl-pill{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--mut);cursor:pointer;background:#fff;white-space:nowrap}
 .pl-pill input{width:15px;height:15px;margin:0}.pl-pill:has(input:checked){background:#E4E9F4;border-color:#9bb0e0;color:var(--navy)}
 @media(max-width:560px){.task{grid-template-columns:1fr 130px}.task .pl-pill{grid-column:1/-1;justify-self:start}}
@@ -100,12 +100,13 @@ async function load(date){
     DEF = j; draw();
   }catch(e){ $('app').innerHTML = '<div class="msg err">' + (e && e.detail ? esc(e.message) : 'Could not reach the service (' + esc(String(e && e.message || e)) + ').') + '</div>'; }
 }
-function descOf(t){
-  const sh = String(t.short || '').trim();
-  let d = String(t.name || '').replace(/^(weekly|monthly|quarterly|semi-?annual|annual|ad-?hoc|every 4 months)\s*[-–—:]\s*/i, '').trim();
-  if(sh && d.toLowerCase().indexOf(sh.toLowerCase()) === 0) d = d.slice(sh.length).replace(/^\s*[-–—:]\s*/, '').trim();
-  return (!d || d.toLowerCase() === sh.toLowerCase()) ? '' : d;
+function tparts(t){
+  const f = String(t.name || '').replace(/^\s*(weekly|monthly|quarterly|semi-?annual|annual|ad-?hoc|every 4 months)\s*[-–—:]\s*/i, '').trim(), i = f.indexOf(' (');
+  if(i > 0 && /\)\s*$/.test(f)) return {nm: f.slice(0, i).trim(), d: f.slice(i + 2).replace(/\)\s*$/, '').trim()};
+  return {nm: f || String(t.short || ''), d: ''};
 }
+function ttl(t){ return tparts(t).nm || t.short || ''; }
+function descOf(t){ return tparts(t).d; }
 function dow(k){ return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(k + 'T00:00:00').getDay()]; }
 function strip(){
   // only the working days Tue-Fri (last 6 of them, newest first); public holidays are greyed and named
@@ -123,7 +124,7 @@ function draw(){
   const nxL = nx ? dow(nx) + ' ' + nx.slice(8) : 'next day';
   let h = '<div id="msg" class="msg" style="display:none"></div>';
   if((DEF.missing || []).length && !LEAD) h += `<div class="msg err"><b>Reports still missing:</b> ${DEF.missing.map(k => `<a href="#" class="mk" data-d="${k}" style="color:inherit;font-weight:700">${dow(k)} ${k.slice(8)}/${k.slice(5,7)}</a>`).join(', ')}. Tap a date to report it now (late reports cost points; the earlier the better).</div>`;
-  const pn = (DEF.planned || []).map(id => (DEF.tasks.find(t => t.id === id) || {}).short).filter(Boolean);
+  const pn = (DEF.planned || []).map(id => { const t = DEF.tasks.find(x => x.id === id); return t ? ttl(t) : ''; }).filter(Boolean);
   if(pn.length && !dn && !LEAD) h += `<div class="msg info"><b>You planned for this day:</b> ${pn.map(esc).join(', ')}</div>`;
   if(LEAD) h += `<div class="msg info">Leadership mode — you are filling in for <b>${esc(DEF.staff)}</b>. This is recorded as sent by leadership.</div>`;
   h += `<div class="card"><div class="hdr2"><div><b style="font-size:16px">${esc(DEF.staff)}</b>
@@ -138,11 +139,16 @@ function draw(){
     const list = DEF.tasks.filter(t => t.cat === cat || (cat === 'Quarterly' && t.cat === 'Every 4 Months')); if(!list.length) return;
     const doneN = list.filter(t => (cur.items[t.id] || {}).s).length;
     h += `<div class="cat"><h3>${label}<i>${doneN}/${list.length}</i></h3><div class="list"><div class="colh" style="display:none"></div>` + list.map(t => {
-      const c = cur.items[t.id] || {s:'', r:''}, pm = String(c.r || '').match(/^\[(\d+)%\]\s*/), pc = pm ? pm[1] : '', rtxt = pm ? String(c.r).slice(pm[0].length) : (c.r || ''), showR = c.r || c.s === 'Deferred (Approved)';
-      return `<div class="task" data-id="${esc(t.id)}" data-s="${esc(c.s)}"><div class="nm">${esc(t.short || t.name)}${planned.has(t.id) ? '<span class="tag">planned</span>' : ''}${t.trial ? '<span class="tag">not scored yet</span>' : ''}<span class="nt">+ note</span>${descOf(t) ? `<span class="ds">${esc(descOf(t))}</span>` : ''}</div>
+      const c = cur.items[t.id] || {s:'', r:''}, m = t.m || {items:[], pcl:[[10,'Just started'],[25,'Started'],[50,'Halfway'],[75,'Nearly done'],[90,'Final checks']], req:''};
+      let raw = String(c.r || ''); const pm = raw.match(/^\[(\d+)%\]\s*/), pc = pm ? pm[1] : ''; if(pm) raw = raw.slice(pm[0].length);
+      const km = raw.match(/^\[✓ ([^\]]*)\]\s*/), ticked = km ? km[1].split(';').map(x => x.trim()) : []; if(km) raw = raw.slice(km[0].length);
+      const needs = (m.items && m.items.length) || m.req === 'names', showR = raw || ticked.length || c.s === 'Deferred (Approved)' || (needs && c.s) || pc;
+      const ph = m.req === 'names' ? 'Names of the members you visited / followed up (required)' : 'Remark (required if deferred)';
+      return `<div class="task" data-id="${esc(t.id)}" data-s="${esc(c.s)}" data-req="${esc(m.req || '')}"><div class="nm">${esc(ttl(t))}${planned.has(t.id) ? '<span class="tag">planned</span>' : ''}${t.trial ? '<span class="tag">not scored yet</span>' : ''}<span class="nt">+ note</span>${descOf(t) ? `<span class="ds">${esc(descOf(t))}</span>` : ''}</div>
         <select class="st"><option value="">Not worked on</option>${DEF.statuses.map(s => `<option ${c.s === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
         <label class="pl-pill"><input type="checkbox" class="pl" value="${esc(t.id)}" ${cur.plan.indexOf(t.id) >= 0 ? 'checked' : ''}>Plan ${esc(nxL)}</label>
-        <div class="rmw ${showR || pc ? 'show' : ''}"><div style="display:flex;gap:6px"><select class="pg" style="width:92px;display:${c.s === 'In Progress' ? '' : 'none'}"><option value="">% done</option>${[10,25,50,75,90].map(n => `<option value="${n}" ${pc == n ? 'selected' : ''}>${n}%</option>`).join('')}</select><input type="text" class="rm" placeholder="Remark (required if deferred)" value="${esc(rtxt)}"></div></div></div>`;
+        <div class="rmw ${showR ? 'show' : ''}">${(m.items && m.items.length) ? `<div class="ckrow"><span>${m.req === 'items' ? 'Tick what you did:' : 'Tick what you covered:'}</span>${m.items.map(x => `<label class="ck"><input type="checkbox" class="cx" value="${esc(x)}" ${ticked.indexOf(x) >= 0 ? 'checked' : ''}>${esc(x)}</label>`).join('')}</div>` : ''}
+          <div style="display:flex;gap:6px"><select class="pg" style="width:190px;display:${c.s === 'In Progress' ? '' : 'none'}"><option value="">% done</option>${m.pcl.map(([n, l]) => `<option value="${n}" ${pc == n ? 'selected' : ''}>${n}% – ${esc(l)}</option>`).join('')}</select><input type="text" class="rm" placeholder="${esc(ph)}" value="${esc(raw)}"></div></div></div>`;
     }).join('') + '</div></div>';
   });
   h += `</div><div>
@@ -161,7 +167,7 @@ function draw(){
   document.querySelectorAll('.task').forEach(el => {
     const w = el.querySelector('.rmw'), st = el.querySelector('.st');
     el.querySelector('.nt').onclick = () => { w.classList.toggle('show'); if(w.classList.contains('show')) w.querySelector('input').focus(); };
-    st.onchange = () => { el.dataset.s = st.value; const pg = el.querySelector('.pg'); pg.style.display = st.value === 'In Progress' ? '' : 'none'; if(st.value === 'In Progress') w.classList.add('show'); if(st.value === 'Deferred (Approved)'){ w.classList.add('show'); w.querySelector('input').focus(); } };
+    st.onchange = () => { el.dataset.s = st.value; const pg = el.querySelector('.pg'); pg.style.display = st.value === 'In Progress' ? '' : 'none'; if(st.value === 'In Progress' || (st.value && (el.querySelector('.cx') || el.dataset.req === 'names'))) w.classList.add('show'); if(st.value === 'Deferred (Approved)'){ w.classList.add('show'); w.querySelector('input').focus(); } };
   });
   document.querySelectorAll('.mk').forEach(a => a.onclick = e => { e.preventDefault(); load(a.dataset.d); });
   document.querySelectorAll('.strip button').forEach(b => b.onclick = () => load(b.dataset.d));
@@ -174,9 +180,12 @@ async function send(){
   const dayR = document.querySelector('input[name=day]:checked').value, onLeave = dayR === 'Leave', dayV = onLeave ? 'Leave' : 'Working', hfEl = document.querySelector('input[name=hf]:checked'), half = (dayR === 'Half' && hfEl) ? hfEl.value : '';
   if(dayR === 'Half' && !hfEl){ msg('err', 'Please choose morning or afternoon for your half-day leave.'); return; }
   const items = [];
-  if(!onLeave) document.querySelectorAll('#work .task').forEach(el => { const s = el.querySelector('.st').value; if(s) items.push({id: el.dataset.id, s, r: el.querySelector('.rm').value.trim(), p: s === 'In Progress' ? el.querySelector('.pg').value : ''}); });
+  if(!onLeave) document.querySelectorAll('#work .task').forEach(el => { const s = el.querySelector('.st').value; if(s) items.push({id: el.dataset.id, s, r: el.querySelector('.rm').value.trim(), p: s === 'In Progress' ? el.querySelector('.pg').value : '', c: Array.from(el.querySelectorAll('.cx:checked')).map(x => x.value)}); });
   const bad = items.find(i => i.s === 'Deferred (Approved)' && i.r.length < 3);
-  if(bad){ const t = DEF.tasks.find(x => x.id === bad.id); msg('err', 'Please type the reason for deferring “' + esc(t ? t.name : '') + '”.'); return; }
+  if(bad){ const t = DEF.tasks.find(x => x.id === bad.id); msg('err', 'Please type the reason for deferring “' + esc(t ? ttl(t) : '') + '”.'); return; }
+  for(const i of items){ const t = DEF.tasks.find(x => x.id === i.id) || {}, m = t.m || {}, live = i.s === 'Completed' || i.s === 'In Progress';
+    if(live && m.req === 'items' && !i.c.length){ msg('err', 'Please tick what you did for “' + esc(ttl(t)) + '” (' + esc((m.items || []).join(' / ')) + ').'); return; }
+    if(live && m.req === 'names' && i.r.length < 3){ msg('err', 'Please name the members you visited or followed up for “' + esc(ttl(t)) + '”.'); return; } }
   const pr = document.querySelector('input[name=pr]:checked').value;
   if(!DEF.done || !DEF.done[DATE]){ if(!confirm('Send this report? Once sent it is final and cannot be edited.')) return; }
   const body = {action:'appSubmit', date: DATE, day: dayV, half, proceed: pr, items,

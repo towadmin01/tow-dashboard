@@ -398,6 +398,7 @@
   .fr2-r .st{font-size:10px; font-weight:700; border-radius:20px; padding:1px 8px; white-space:nowrap;}
   .fr2-pc{font-size:10.5px; font-weight:700; color:#8a6d00;}
   .fr2-rm{font-size:11.5px; color:#6a6450; font-style:italic; padding:1px 0 3px;}
+  .fr2-ck{font-size:11.5px; color:#2e6b3f; font-weight:600; padding:1px 0;}
   .fr2-note{font-size:12.5px; color:#4b4636;}
   .fr2-foot{margin-top:10px; font-size:12px; color:#3d3a2c; display:grid; gap:5px;} .fr2-foot > div{display:grid; grid-template-columns:92px 1fr; gap:8px; align-items:baseline;} .fr2-foot b{font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:#9a927a;} .fr2-foot span{overflow-wrap:anywhere;}
   @media print{ .card.dl{break-inside:avoid; page-break-inside:avoid; padding:8px 10px !important; margin-bottom:8px !important;} .fr2-grid{gap:8px;} .fr2-col{-webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid;} }
@@ -2107,6 +2108,12 @@ const ACCOUNTED = {'Completed':1, 'In Progress':1, 'Deferred (Approved)':1};
 const NOISE = /^(no|none|nil|n\/a|na|-|--|\.|nothing)$/i;
 const CATS = [['w','Weekly'],['m','Monthly'],['q','Quarterly'],['a','Adhoc']];
 
+function dispName(staff, short){   // the full task name from the list (not the abbreviated short name)
+  const t = ((DATA.portfolio && DATA.portfolio[staff]) || []).find(x => x.short === short);
+  if(!t || !t.full) return short;
+  let f = String(t.full).replace(/^\s*(weekly|monthly|quarterly|semi-?annual|annual|ad-?hoc|every 4 months)\s*[-\u2013\u2014:]\s*/i, '').trim(); const i = f.indexOf(' (');
+  return (i > 0 ? f.slice(0, i).trim() : f) || short;
+}
 function posOf(staff){ const x = ((DATA.settings && DATA.settings.schedules) || []).find(y => y.staff === staff); return x && x.position ? x.position : ''; }
 function deptPos(staff, dept){ const p = posOf(staff), d = dept || ''; return esc(d) + (p && p !== d ? (d ? ' &middot; ' : '') + '<b class="pos">' + esc(p) + '</b>' : ''); }
 function dayRow(staff, date){ const rows = DATA.daily[date]; return rows ? rows.find(r => r.staff === staff) : null; }
@@ -2143,18 +2150,18 @@ function dailyCardHtml(r, date){
 function fullReportHtml(r, date, noMeta){
   const d = r.detail;
   const nd = nextWorkdayKey(date);
-  const prog = t => { const m = /^\[(\d+)%\]\s*/.exec(t || ''); return m ? [m[1], (t || '').slice(m[0].length)] : [null, t || '']; };
+  const prog = t => { let x = t || '', pc = null, ck = ''; let m = /^\[(\d+)%\]\s*/.exec(x); if(m){ pc = m[1]; x = x.slice(m[0].length); } m = /^\[\u2713 ([^\]]*)\]\s*/.exec(x); if(m){ ck = m[1]; x = x.slice(m[0].length); } return [pc, x, ck]; };
   let meta = `<div class="fr2-meta"><b>${esc(r.staff)}</b><span>${deptPos(r.staff, r.dept)}</span><span>${esc(fmtDayLong(date))}</span><span class="badge ${statusBadgeClass(r.status)}">${esc(r.status)}${r.time ? ' &middot; ' + esc(r.time) : ''}</span>${r.leaveInfo ? `<span class="fr2-lv">${leaveText(r.leaveInfo)}</span>` : ''}</div>`;
   const planHead = `Planned &middot; ${nd ? esc(fmtDay(nd)) : 'next working day'}`;
   if(!d){
     return (noMeta ? '' : meta) + `<div class="fr2-grid"><section class="fr2-col today"><h3>Today</h3><div class="dl-none">${r.status === 'NOT SUBMITTED' ? 'No report submitted.' : (r.today && r.today !== '—' ? esc(r.today) : 'No detail on file.')}</div></section>
       <section class="fr2-col next"><h3>${planHead}</h3><div class="dl-none">${r.plan && r.plan !== '—' ? esc(r.plan) : 'No detail on file.'}</div></section></div>`;
   }
-  const doneCat = (label, items) => (items && items.length) ? `<div class="fr2-cat">${label}</div>` + items.map(it => { const pr = prog(it.r); return `<div class="fr2-r"><span class="n">${esc(it.n)}</span>${pr[0] && it.s === 'In Progress' ? `<span class="fr2-pc">${pr[0]}%</span>` : ''}${stChip(it.s)}</div>${meaningful(pr[1]) ? `<div class="fr2-rm">${esc(pr[1])}</div>` : ''}`; }).join('') : '';
+  const doneCat = (label, items) => (items && items.length) ? `<div class="fr2-cat">${label}</div>` + items.map(it => { const pr = prog(it.r); return `<div class="fr2-r"><span class="n">${esc(dispName(r.staff, it.n))}</span>${pr[0] && it.s === 'In Progress' ? `<span class="fr2-pc">${pr[0]}%</span>` : ''}${stChip(it.s)}</div>${pr[2] ? `<div class="fr2-ck">&#10003; ${esc(pr[2])}</div>` : ''}${meaningful(pr[1]) ? `<div class="fr2-rm">${esc(pr[1])}</div>` : ''}`; }).join('') : '';
   let today = doneCat('Weekly', d.w) + doneCat('Monthly', d.m) + doneCat('Quarterly', d.q) + doneCat('Adhoc', d.a);
   if(!today) today = '<div class="dl-none">' + (r.status === 'On Leave' ? 'On leave.' : r.status === 'Rest & Recovery' ? 'Rest &amp; recovery day.' : 'No tasks reported.') + '</div>';
   const p = d.p || {};
-  const planCat = (label, arr) => (arr && arr.length) ? `<div class="fr2-cat">${label}</div>` + arr.map(n => `<div class="fr2-r"><span class="n">${esc(n)}</span></div>`).join('') : '';
+  const planCat = (label, arr) => (arr && arr.length) ? `<div class="fr2-cat">${label}</div>` + arr.map(n => `<div class="fr2-r"><span class="n">${esc(dispName(r.staff, n))}</span></div>`).join('') : '';
   let plan = '';
   if(r.nextLeave) plan = `<div class="fr2-note">On planned leave &mdash; ${leaveText(r.nextLeave)}</div>`;
   else if(p.ps === 'Rest & Recovery') plan = '<div class="fr2-note">Rest &amp; recovery day.</div>';
