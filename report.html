@@ -34,7 +34,7 @@ button:disabled{opacity:.5}
 @media(max-width:560px){.task{grid-template-columns:1fr 130px}.task .pl-pill{grid-column:1/-1;justify-self:start}}
 .strip{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center;font-size:12px;color:var(--mut)}
 .strip button{border:none;background:#F1EEE3;border-radius:20px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--mut)}
-.strip button.y{background:#E1F2E6;color:#1a5c2c}.strip button.late{background:#FFF1B8;color:#6b4a00}.strip button.sel{outline:2px solid var(--navy)}
+.strip button.y{background:#E1F2E6;color:#1a5c2c}.strip button.late{background:#FFF1B8;color:#6b4a00}.strip button.ph{background:#E4E4E4;color:#8a8a8a;text-decoration:line-through}.strip button.sel{outline:2px solid var(--navy)}
 .sub{background:#E6F4EA;color:#1a5c2c;border-radius:10px;padding:9px 12px;font-size:13px;margin-top:10px}.sub.late{background:#FFF1B8;color:#6b4a00}
 .hdr2{display:flex;gap:14px;flex-wrap:wrap;align-items:end}.hdr2>div{flex:1;min-width:170px}
 details.chg{margin-top:4px;font-size:12px;color:var(--mut)}details.chg summary{cursor:pointer;padding:4px 2px;display:inline-block}
@@ -108,9 +108,11 @@ function descOf(t){
 }
 function dow(k){ return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(k + 'T00:00:00').getDay()]; }
 function strip(){
-  const days = []; for(let i = 0; i < 6; i++) days.push(addDays(todayStr(), -i));
-  return '<div class="strip"><span>Recent:</span>' + days.map(k => { const d = (DEF.done || {})[k], cls = d ? (d.timing === 'Late' ? 'late' : 'y') : '';
-    return `<button data-d="${k}" class="${cls} ${k === DATE ? 'sel' : ''}">${dow(k)} ${+k.slice(8)}${d ? ' ✓' : ''}</button>`; }).join('') + '</div>';
+  // only the working days Tue-Fri (last 6 of them, newest first); public holidays are greyed and named
+  const days = []; for(let i = 0; i < 21 && days.length < 6; i++){ const k = addDays(todayStr(), -i), w = new Date(k + 'T00:00:00').getDay(); if(w >= 2 && w <= 5) days.push(k); }
+  const hol = DEF.hol || {};
+  return '<div class="strip"><span>Recent:</span>' + days.map(k => { const d = (DEF.done || {})[k], h = hol[k], cls = h ? 'ph' : (d ? (d.timing === 'Late' ? 'late' : 'y') : '');
+    return `<button data-d="${k}" class="${cls} ${k === DATE ? 'sel' : ''}"${h ? ` title="Public holiday: ${esc(h)}"` : ''}>${dow(k)} ${+k.slice(8)}${h ? ' · PH' : (d ? ' ✓' : '')}</button>`; }).join('') + '</div>';
 }
 function draw(){
   const cur = DEF.current || {items:{}, plan:[], other:'', planOther:'', remarks:'', day:'', proceed:''};

@@ -384,6 +384,31 @@
     .dl-col, .dl-remarks{break-inside:avoid;}
   }
 
+
+  /* compact full report (v4) */
+  .fr2-meta{display:flex; flex-wrap:wrap; gap:4px 12px; align-items:center; font-size:12px; color:#5b5748; margin-bottom:10px;} .fr2-meta b{font-size:15px; color:var(--navy);} .fr2-lv{color:#5B3E9E; font-weight:600;}
+  .dl-name2{font-weight:800; font-size:15px; color:var(--navy);} .dl .fr2-grid{margin-top:8px;}
+  .fr2-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .fr2-col{border-radius:9px; padding:8px 10px 10px; min-width:0;} .fr2-col h3{margin:0 0 4px; font-size:11px; letter-spacing:.07em; text-transform:uppercase; font-weight:800;}
+  .fr2-col.today{background:#EEF3FA; border-top:3px solid var(--navy);} .fr2-col.today h3{color:var(--navy);}
+  .fr2-col.next{background:#FBF5E2; border-top:3px solid var(--gold);} .fr2-col.next h3{color:#8a6d00;}
+  .fr2-cat{font-size:9.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#8d8670; margin:8px 0 2px;}
+  .fr2-r{display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:#1f1d14; padding:3px 0; border-bottom:1px solid rgba(0,0,0,.06);} .fr2-r .n{flex:1; min-width:0; overflow-wrap:anywhere;}
+  .fr2-r .st{font-size:10px; font-weight:700; border-radius:20px; padding:1px 8px; white-space:nowrap;}
+  .fr2-pc{font-size:10.5px; font-weight:700; color:#8a6d00;}
+  .fr2-rm{font-size:11.5px; color:#6a6450; font-style:italic; padding:1px 0 3px;}
+  .fr2-note{font-size:12.5px; color:#4b4636;}
+  .fr2-foot{margin-top:10px; font-size:12px; color:#3d3a2c; display:grid; gap:4px;} .fr2-foot b{display:inline-block; min-width:92px; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:#9a927a;}
+  @media print{ .card.dl{break-inside:avoid; page-break-inside:avoid; padding:8px 10px !important; margin-bottom:8px !important;} .fr2-grid{gap:8px;} .fr2-col{-webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid;} }
+
+
+  /* v4: weekly/monthly legend + inline details, maintenance cards */
+  .lg2 .lg2-t{font-weight:800; font-size:13px; color:var(--navy); margin-bottom:4px;} .lg2 ul{margin:0; padding-left:18px; font-size:12.5px; line-height:1.6; color:#3d3a2c;}
+  .lg2-a{margin-top:6px; font-size:12.5px; line-height:1.5; background:#FBF5E2; border-left:4px solid var(--gold); border-radius:6px; padding:6px 10px; color:#3d3a2c;}
+  .clickscore{cursor:pointer;} .row1 .chev{opacity:.5;font-size:13px;}
+  .mt-btn{margin:8px 0 6px; padding:5px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; font-size:12px; cursor:pointer; color:var(--navy); font-weight:600;}
+  .mt-det{margin-top:8px; border-top:1px solid var(--line); padding-top:6px;}
+
   /* v3.2 — maintenance, how-calc, review helpers */
   .mt-ctl{display:flex; gap:8px;} .mt-ctl select{flex:1; margin:0;}
   .mt-title{font-size:16px; font-weight:800; color:var(--navy);} .mt-meta{font-size:11.5px; color:#6b6552; margin:3px 0 8px;}
@@ -1148,20 +1173,35 @@ function renderDaily(key){
   el.innerHTML = rows.map(r => dailyCardHtml(r, key)).join('');
 }
 
+function periodLegendHtml(inModal){
+  const S = DATA.settings, q = x => (Math.round(x * 100) / 100);
+  return `<div class="${inModal ? 'bx-legend lg2' : 'card lg2'}"><div class="lg2-t">How to read</div>
+    <ul>
+      <li>Every score is out of <b>100 points</b>, shared between the parts that apply to each person.</li>
+      <li><b>Portfolio</b> &mdash; tasks done. Each part earns points in proportion to the result.</li>
+      <li><b>Planning</b> &mdash; plan the next working day, then report on that plan.</li>
+      <li><b>Submission</b> &mdash; daily report in by 19:30. Late: &minus;${q(S.lateSame)} / &minus;${q(S.late1)} / &minus;${q(S.late2)} pt. No report: &minus;${q(S.missDay)} pt.</li>
+      <li><b>Adhoc</b> only covers missed <i>weekly</i> tasks, at a lower value. Max score 100%.</li>
+      <li>Monthly tasks count after the month ends; quarterly after the quarter ends.</li>
+    </ul>
+    <div class="lg2-a">&#10148; Report every planned task the next working day: <b>Completed</b> / <b>In Progress</b> / <b>Deferred (Approved)</b> + reason. Leave it out of the plan if you won&rsquo;t do it. Always list your plan for the next working day.</div>
+    <div class="lg2-a">&#10148; Submit your daily report every working day by <b>19:30</b> (leave days excluded).</div>
+  </div>`;
+}
 function renderPeriod(view, key){
   const el = document.getElementById('view-'+view);
   const rows = ROWS[view][key] || [];
   if(!rows.length){ el.innerHTML = '<div class="empty">No data on file for this period.</div>'; return; }
   const line = (label, v) => (v && v !== '—') ? `<div class="sec"><b>${label}</b><span class="taskline">${esc(v)}</span></div>` : '';
-  el.innerHTML = rows.map(r => `
+  el.innerHTML = rows.map(r => { const bd = r.score !== null && r.calc ? ` data-bd="${view}|${key}|${esc(r.staff)}"` : '', ck = bd ? ' clickscore' : ''; return `
     <div class="card">
       <div class="row1">
-        <div>
-          <div class="staff">${esc(r.staff)}</div>
+        <div${bd} class="${ck.trim()}">
+          <div class="staff">${esc(r.staff)}${bd ? ' <span class="chev">&rsaquo;</span>' : ''}</div>
           <div class="dept">${esc(r.dept)}</div>
         </div>
         <div style="text-align:right">
-          <div class="score ${r.score !== null && r.calc ? 'clickscore' : ''}" ${r.score !== null && r.calc ? `data-bd="${view}|${key}|${esc(r.staff)}" title="Tap to see how this score was built"` : ''}>${pct(r.score)}${r.score !== null && r.calc ? ' <span class="chev">&#9662;</span>' : ''}</div>
+          <div class="score${ck}"${bd}>${pct(r.score)}</div>
           <span class="badge ${ratingClass(r.rating)}">${esc((r.rating||'').replace(/^\d - /,''))}</span>
         </div>
       </div>
@@ -1172,8 +1212,7 @@ function renderPeriod(view, key){
       ${line('Not touched', r.deferred)}
       ${line('Adhoc', r.adhocItems)}
       ${(!r.completed || r.completed==='—') && (!r.inprogress || r.inprogress==='—') && (!r.deferred || r.deferred==='—') && (!r.adhocItems || r.adhocItems==='—') ? '<div class="sec"><span class="taskline dash">&mdash;</span></div>' : ''}
-    </div>
-  `).join('');
+    </div>`; }).join('');
 }
 
 function ratingFromScore(score){
@@ -2064,82 +2103,40 @@ const meaningful = t => !!t && !NOISE.test(String(t).trim());
 
 /** One staff member's Daily card: identical layout for everyone — name + status, then TODAY and PLANNED TOMORROW side by side. */
 function dailyCardHtml(r, date){
-  const d = r.detail;
   const badge = `<span class="badge ${statusBadgeClass(r.status)}">${esc(r.status)}${r.time ? ' &middot; ' + esc(r.time) : ''}</span>`;
-  const half = r.leaveInfo && /half/i.test(r.leaveInfo.duration || '');
-  const pill = r.leaveInfo ? `<div class="dl-pill">${leaveText(r.leaveInfo)}</div>` : '';
-
-  // ---- TODAY ----
-  let today = '';
-  const hasTasks = d && ((d.w&&d.w.length)||(d.m&&d.m.length)||(d.q&&d.q.length)||(d.a&&d.a.length)||meaningful(d.o));
-  if(d && hasTasks){
-    today = itemsLine('Weekly', d.w) + itemsLine('Monthly', d.m) + itemsLine('Quarterly', d.q) + itemsLine('Adhoc', d.a) + (meaningful(d.o) ? dlLine('Other', esc(d.o)) : '');
-  } else if(!d && r.status !== 'NOT SUBMITTED' && r.status !== 'Rest & Recovery' && r.status !== 'On Leave' && r.today && r.today !== '—'){
-    today = dlLine('Done', esc(r.today));
-  }
-  if(!today){
-    today = r.status === 'NOT SUBMITTED' ? '<div class="dl-none">No report submitted.</div>'
-      : r.status === 'On Leave' ? '<div class="dl-none">On leave &mdash; no tasks expected.</div>'
-      : r.status === 'Rest & Recovery' ? `<div class="dl-none">${r.restPlanned ? 'Planned rest &amp; recovery day.' : 'Flexible schedule &mdash; no daily report required.'}</div>`
-      : '<div class="dl-none">No tasks reported.</div>';
-  }
-  const rm = d && meaningful(d.rm) ? `<div class="dl-remarks"><b>Remarks</b>${esc(d.rm)}</div>` : '';
-
-  // ---- PLANNED TOMORROW ----
-  const p = d && d.p;
-  let plan = '';
-  if(r.nextLeave) plan = `<div class="dl-note">On planned leave &mdash; ${leaveText(r.nextLeave)}</div>`;
-  else if(p && p.ps === 'Rest & Recovery') plan = '<div class="dl-note">Planned rest &amp; recovery day.</div>';
-  else if(p && p.ps === 'Leave') plan = '<div class="dl-note">On planned leave.</div>';
-  else if(p) plan = namesLine('Weekly', p.w) + namesLine('Monthly', p.m) + namesLine('Quarterly', p.q) + namesLine('Adhoc', p.a) + (meaningful(p.o) ? dlLine('Other', esc(p.o)) : '');
-  else if(!d && r.plan && r.plan !== '—') plan = dlLine('Plan', esc(r.plan));
-  if(!plan) plan = '<div class="dl-none">' + (r.status === 'NOT SUBMITTED' ? 'No plan submitted.' : 'Nothing planned.') + '</div>';
-
   return `<div class="card dl">
-    <div class="dl-head">
-      <div><button class="dl-name" data-report="${esc(date)}|${esc(r.staff)}" title="Open the full report">${esc(r.staff)} <span class="chev">&rsaquo;</span></button><div class="dept">${esc(r.dept)}</div></div>
-      ${badge}
-    </div>
-    ${pill}
-    <div class="dl-cols">
-      <section class="dl-col dl-today"><h4>Today</h4>${today}</section>
-      <section class="dl-col dl-next"><h4>Planned tomorrow</h4>${plan}</section>
-    </div>
-    ${rm}
+    <div class="dl-head"><div><span class="dl-name2">${esc(r.staff)}</span><div class="dept">${esc(r.dept)}${r.leaveInfo ? ' &middot; <span class="fr2-lv">' + leaveText(r.leaveInfo) + '</span>' : ''}</div></div>${badge}</div>
+    ${fullReportHtml(r, date, true)}
   </div>`;
 }
 
-/** The full, un-abbreviated report for one person on one day (opens when their name is tapped). */
-function fullReportHtml(r, date){
+/** The full report for one person on one day (opens when their name is tapped) — compact: short task names, two columns, fits one A4 page. */
+function fullReportHtml(r, date, noMeta){
   const d = r.detail;
   const nd = nextWorkdayKey(date);
-  let h = `<div class="fr-meta"><b>${esc(r.staff)}</b> &middot; ${esc(r.dept)}<br>${esc(fmtDayLong(date))}<br>Status: <span class="badge ${statusBadgeClass(r.status)}">${esc(r.status)}${r.time ? ' &middot; ' + esc(r.time) : ''}</span>`;
-  if(r.leaveInfo) h += `<br>Leave: ${leaveText(r.leaveInfo)}`;
-  h += `</div>`;
+  const prog = t => { const m = /^\[(\d+)%\]\s*/.exec(t || ''); return m ? [m[1], (t || '').slice(m[0].length)] : [null, t || '']; };
+  let meta = `<div class="fr2-meta"><b>${esc(r.staff)}</b><span>${esc(r.dept)}</span><span>${esc(fmtDayLong(date))}</span><span class="badge ${statusBadgeClass(r.status)}">${esc(r.status)}${r.time ? ' &middot; ' + esc(r.time) : ''}</span>${r.leaveInfo ? `<span class="fr2-lv">${leaveText(r.leaveInfo)}</span>` : ''}</div>`;
+  const planHead = `Planned &middot; ${nd ? esc(fmtDay(nd)) : 'next working day'}`;
   if(!d){
-    return h + `<div class="fr-sec today"><h3>Today</h3><div class="dl-none">${r.status === 'NOT SUBMITTED' ? 'No report was submitted.' : (r.today && r.today !== '—' ? esc(r.today) : 'No detail on file.')}</div></div>
-      <div class="fr-sec next"><h3>Planned for ${nd ? esc(fmtDay(nd)) : 'the next working day'}</h3><div class="dl-none">${r.plan && r.plan !== '—' ? esc(r.plan) : 'No detail on file.'}</div></div>`;
+    return (noMeta ? '' : meta) + `<div class="fr2-grid"><section class="fr2-col today"><h3>Today</h3><div class="dl-none">${r.status === 'NOT SUBMITTED' ? 'No report submitted.' : (r.today && r.today !== '—' ? esc(r.today) : 'No detail on file.')}</div></section>
+      <section class="fr2-col next"><h3>${planHead}</h3><div class="dl-none">${r.plan && r.plan !== '—' ? esc(r.plan) : 'No detail on file.'}</div></section></div>`;
   }
-  const doneCat = (label, items) => (items && items.length) ? `<div class="fr-cat"><b>${label}</b>${items.map(it => `<div class="fr-item">${esc((DATA.taskFull && DATA.taskFull[it.id] || it.n).replace(/^(weekly|monthly|quarterly|ad-?hoc|every 4 months)\s*[-–—]\s*/i,''))} ${stChip(it.s)}${meaningful(it.r) ? `<div class="fr-remark">&ldquo;${esc(it.r)}&rdquo;</div>` : ''}</div>`).join('')}</div>` : '';
-  let today = doneCat('Weekly tasks', d.w) + doneCat('Monthly tasks', d.m) + doneCat('Quarterly / every-4-months tasks', d.q) + doneCat('Adhoc tasks', d.a);
-  if(meaningful(d.o)) today += `<div class="fr-cat"><b>Other adhoc work</b><div class="fr-item">${esc(d.o)}</div></div>`;
-  if(meaningful(d.rm)) today += `<div class="fr-cat"><b>Remarks on tasks today</b><div class="fr-item">${esc(d.rm)}</div></div>`;
-  if(!today) today = '<div class="dl-none">No tasks reported.</div>';
-  h += `<div class="fr-sec today"><h3>Today</h3>${today}</div>`;
-
+  const doneCat = (label, items) => (items && items.length) ? `<div class="fr2-cat">${label}</div>` + items.map(it => { const pr = prog(it.r); return `<div class="fr2-r"><span class="n">${esc(it.n)}</span>${pr[0] && it.s === 'In Progress' ? `<span class="fr2-pc">${pr[0]}%</span>` : ''}${stChip(it.s)}</div>${meaningful(pr[1]) ? `<div class="fr2-rm">${esc(pr[1])}</div>` : ''}`; }).join('') : '';
+  let today = doneCat('Weekly', d.w) + doneCat('Monthly', d.m) + doneCat('Quarterly', d.q) + doneCat('Adhoc', d.a);
+  if(!today) today = '<div class="dl-none">' + (r.status === 'On Leave' ? 'On leave.' : r.status === 'Rest & Recovery' ? 'Rest &amp; recovery day.' : 'No tasks reported.') + '</div>';
   const p = d.p || {};
-  const planCat = (label, arr) => (arr && arr.length) ? `<div class="fr-cat"><b>${label}</b>${arr.map(n => `<div class="fr-item">${esc(fullOf(r.staff, n))}</div>`).join('')}</div>` : '';
+  const planCat = (label, arr) => (arr && arr.length) ? `<div class="fr2-cat">${label}</div>` + arr.map(n => `<div class="fr2-r"><span class="n">${esc(n)}</span></div>`).join('') : '';
   let plan = '';
-  if(r.nextLeave) plan = `<div class="fr-item">On planned leave &mdash; ${leaveText(r.nextLeave)}</div>`;
-  else if(p.ps === 'Rest & Recovery') plan = '<div class="fr-item">Planned rest &amp; recovery day.</div>';
-  else if(p.ps === 'Leave') plan = '<div class="fr-item">On planned leave.</div>';
-  else {
-    plan = planCat('Weekly tasks', p.w) + planCat('Monthly tasks', p.m) + planCat('Quarterly / every-4-months tasks', p.q) + planCat('Adhoc tasks', p.a);
-    if(meaningful(p.o)) plan += `<div class="fr-cat"><b>Other planned work</b><div class="fr-item">${esc(p.o)}</div></div>`;
-  }
+  if(r.nextLeave) plan = `<div class="fr2-note">On planned leave &mdash; ${leaveText(r.nextLeave)}</div>`;
+  else if(p.ps === 'Rest & Recovery') plan = '<div class="fr2-note">Rest &amp; recovery day.</div>';
+  else if(p.ps === 'Leave') plan = '<div class="fr2-note">On planned leave.</div>';
+  else plan = planCat('Weekly', p.w) + planCat('Monthly', p.m) + planCat('Quarterly', p.q) + planCat('Adhoc', p.a);
   if(!plan) plan = '<div class="dl-none">Nothing planned.</div>';
-  h += `<div class="fr-sec next"><h3>Planned for ${nd ? esc(fmtDayLong(nd)) : 'the next working day'}</h3>${plan}</div>`;
-  return h;
+  const foot = [];
+  if(meaningful(d.o)) foot.push(`<div><b>Other work</b>${esc(d.o)}</div>`);
+  if(meaningful(d.rm)) foot.push(`<div><b>Remarks</b>${esc(d.rm)}</div>`);
+  if(!r.nextLeave && p.ps !== 'Rest & Recovery' && p.ps !== 'Leave' && meaningful(p.o)) foot.push(`<div><b>Also planned</b>${esc(p.o)}</div>`);
+  return (noMeta ? '' : meta) + `<div class="fr2-grid"><section class="fr2-col today"><h3>Today</h3>${today}</section><section class="fr2-col next"><h3>${planHead}</h3>${plan}</section></div>${foot.length ? `<div class="fr2-foot">${foot.join('')}</div>` : ''}`;
 }
 function openReport(date, staff){
   const r = dayRow(staff, date); if(!r) return;
@@ -2338,7 +2335,7 @@ function prevRowFor(kind, key, staff){
   return null;
 }
 const barCls = v => v >= DATA.settings.good ? '' : v >= DATA.settings.ok ? 'mid' : 'low';
-function breakdownHtml(kind, key, staff){
+function breakdownHtml(kind, key, staff, compact){
   const row = findRow(kind, key, staff);
   if(!row || !row.calc) return '<div class="empty">A detailed breakdown is not available for this period.</div>';
   const flex = DATA.flexSet.has(staff);
@@ -2372,9 +2369,9 @@ function breakdownHtml(kind, key, staff){
     : '<div class="bx-ok">Nothing was lost &mdash; every part that applies is at 100%.</div>';
   const lists = (lab, v) => v && v !== '—' ? `<div class="sec"><b>${lab}</b><span class="taskline">${esc(v)}</span></div>` : '';
   const wtxt = Object.assign({}, ...b.comps.filter(x => x.applies).map(x => ({[x.key]: Math.round(x.share * 100)})));
-  return `<div class="bx-top"><span class="val">${pct(row.score)}</span><span class="badge ${ratingClass(row.rating)}">${esc((row.rating || '').replace(/^\d - /, ''))}</span></div>
+  return (compact ? `${sheetNote}` : `<div class="bx-top"><span class="val">${pct(row.score)}</span><span class="badge ${ratingClass(row.rating)}">${esc((row.rating || '').replace(/^\d - /, ''))}</span></div>
     <div class="bx-sub">${esc(staff)} &middot; ${esc(label)}${delta}</div>${sheetNote}
-    <div class="bx-legend"><b>How to read this:</b> every score is out of 100 points. The points are shared between the parts that apply to ${flex ? 'this person (flexible schedule)' : 'this person'}: <b>Portfolio ${wtxt.port || 0}</b>${wtxt.plan !== undefined ? ` &middot; <b>Planning ${wtxt.plan}</b>` : ''}${wtxt.sub !== undefined ? ` &middot; <b>Submission ${wtxt.sub}</b>` : ''}${wtxt.adhoc !== undefined ? ` &middot; <b>Adhoc ${wtxt.adhoc}</b>` : ''}. Each part earns its share in proportion to the result (e.g. 80% of 15 pts = 12 pts). ${b.late > 0 ? 'Late reports then cost 0.5 pt each. ' : ''}<b>Adhoc covers only missed WEEKLY tasks</b>, at a lower value (never planning, submission, late penalties, monthly or quarterly tasks), and a score never goes above 100%. Monthly tasks count after the month ends and quarterly tasks after the quarter ends.<br>${b.recov > 0.0005 ? '' : ''}</div>
+    ${periodLegendHtml(true)}`) + `
     <div class="bx-h">How the score was built</div>${parts}
     ${row.trialItems && row.trialItems !== '—' ? `<div class="bx-h">Plus point &mdash; reported early (not scored yet)</div><div class="bx-ok">${esc(row.trialItems)}. These new-type pastoral tasks start counting from ${esc(fmtShortDate(DATA.settings.trial))}; reporting them early is noted here as a bonus and does not change the score.</div>` : ''}
     <div class="bx-h">Where points were lost &mdash; and how to win them back</div>${lostHtml}
@@ -2543,8 +2540,9 @@ function initHcSim(){
 
 // ---------- Maintenance history reports (Vehicle — Ps. Kevin, Music Instruments — Ps. Kenrick) ----------
 const MAINT_REPORTS = {
-  'Vehicle Maintenance': {title: 'Vehicle Maintenance History'},
-  'Music Instruments Maintenance': {title: 'Music Instruments Maintenance History'}
+  'Vehicle Maintenance': {title: 'Vehicle Maintenance History', staff: 'Ps. Kevin Ong'},
+  'AC Maintenance': {title: 'AC Maintenance History', staff: 'Ps. Kevin Ong'},
+  'Music Instruments Maintenance': {title: 'Music Instruments Maintenance History', staff: 'Ps. Kenrick Kong'}
 };
 let maintReport = 'Vehicle Maintenance', maintYear = 'all';
 function maintEntries(){
@@ -2591,29 +2589,31 @@ function renderEmails(){
   on('emailMore', () => { emailShown += 10; renderEmails(); });
   on('emailLess', () => { emailShown = 10; renderEmails(); });
 }
+const maintOpen = {}, maintPrev = {};
 function renderMaint(){
   const el = document.getElementById('view-maint');
-  const all = (DATA.maintenance || []).filter(r => r.report === maintReport);
-  const years = Array.from(new Set(all.map(r => r.date.slice(0,4)))).sort().reverse();
-  if(maintYear !== 'all' && !years.includes(maintYear)) maintYear = 'all';
-  const list = maintEntries();
-  const staffName = (all[0] && all[0].staff) || (maintReport === 'Vehicle Maintenance' ? 'Ps. Kevin Ong' : 'Ps. Kenrick Kong');
-  const last = list[0];
-  const byMonth = {};
-  list.forEach(r => { (byMonth[r.date.slice(0,7)] = byMonth[r.date.slice(0,7)] || []).push(r); });
-  const sel = `<div class="card mt-ctl">
-      <select id="maintSel" class="orientation-select">${Object.keys(MAINT_REPORTS).map(k => `<option ${k === maintReport ? 'selected' : ''}>${k}</option>`).join('')}</select>
-      <select id="maintYear" class="orientation-select"><option value="all">All years</option>${years.map(y => `<option ${y === maintYear ? 'selected' : ''}>${y}</option>`).join('')}</select>
-    </div>`;
-  const chips = `<div class="card mt-sum"><div class="mt-title">${esc(MAINT_REPORTS[maintReport].title)}</div>
-      <div class="mt-meta">Responsible: ${esc(staffName)} &middot; recorded automatically each time the task is ticked <b>Completed</b> in the daily report</div>
-      <div class="mt-chips"><span><b>${list.length}</b> record(s)</span><span>Last done: <b>${last ? fmtDay(last.date) + ' ' + last.date.slice(0,4) : '—'}</b></span></div></div>`;
-  const body = list.length ? Object.keys(byMonth).sort().reverse().map(m => `<div class="card mt-month"><div class="mt-mh">${fmtMonth(m + '-01')} <span>${byMonth[m].length}</span></div>
-      ${byMonth[m].map(r => `<div class="mt-row"><div class="mt-date">${fmtDay(r.date)}</div><div class="mt-what"><div class="mt-task">${esc(r.task)}</div>${meaningful(r.remark) ? `<div class="mt-rem">${esc(r.remark)}</div>` : '<div class="mt-rem none">No remarks</div>'}${meaningful(r.dayRemark) && r.dayRemark !== r.remark ? `<div class="mt-rem">Day note: ${esc(r.dayRemark)}</div>` : ''}</div></div>`).join('')}</div>`).join('')
-    : '<div class="empty">Nothing recorded yet. Entries appear after the next sheet refresh once this task is ticked Completed.</div>';
-  el.innerHTML = sel + chips + body;
-  document.getElementById('maintSel').addEventListener('change', e => { maintReport = e.target.value; renderMaint(); });
-  document.getElementById('maintYear').addEventListener('change', e => { maintYear = e.target.value; renderMaint(); });
+  const curMonth = TODAY_KEY.slice(0,7);
+  const cards = Object.keys(MAINT_REPORTS).map((rep, idx) => {
+    const list = (DATA.maintenance || []).filter(r => r.report === rep).sort((a, b) => b.date.localeCompare(a.date));
+    const last = list[0], open = !!maintOpen[rep], showPrev = !!maintPrev[rep];
+    const thisM = list.filter(r => r.date.slice(0,7) === curMonth).length;
+    const row = r => `<div class="mt-row"><div class="mt-date">${fmtDay(r.date)}</div><div class="mt-what">${meaningful(r.remark) ? `<div class="mt-task">${esc(r.remark)}</div>` : '<div class="mt-rem none">No remarks</div>'}${meaningful(r.dayRemark) && r.dayRemark !== r.remark ? `<div class="mt-rem">Day note: ${esc(r.dayRemark)}</div>` : ''}</div></div>`;
+    const byMonth = {}; list.forEach(r => { (byMonth[r.date.slice(0,7)] = byMonth[r.date.slice(0,7)] || []).push(r); });
+    const months = Object.keys(byMonth).sort().reverse(), curList = byMonth[curMonth] || [], older = months.filter(m => m !== curMonth);
+    const month = m => `<div class="mt-mh">${fmtMonth(m + '-01')} <span>${byMonth[m].length}</span></div>${byMonth[m].map(row).join('')}`;
+    const details = open ? `<div class="mt-det">
+        ${curList.length ? month(curMonth) : `<div class="mt-rem none" style="padding:6px 0">Nothing recorded yet this month.</div>`}
+        ${older.length ? `<button class="mt-btn" data-mprev="${esc(rep)}">${showPrev ? 'Hide' : 'Show'} previous months (${older.length})</button>` : ''}
+        ${showPrev ? older.map(month).join('') : ''}
+      </div>` : '';
+    return `<div class="card mt-card"><div class="mt-title">${esc(MAINT_REPORTS[rep].title.replace(' History',''))}</div>
+      <div class="mt-meta">${esc(MAINT_REPORTS[rep].staff || '')}</div>
+      <div class="mt-chips"><span><b>${list.length}</b> record${list.length === 1 ? '' : 's'}</span><span>This month: <b>${thisM}</b></span><span>Last done: <b>${last ? fmtDay(last.date) + ' ' + last.date.slice(0,4) : '—'}</b></span></div>
+      <button class="mt-btn" data-mopen="${esc(rep)}">${open ? 'Hide details' : 'Show details'}</button>${details}</div>`;
+  }).join('');
+  el.innerHTML = `<div class="card mt-sum"><div class="mt-meta" style="margin:0">Recorded automatically each time the task is ticked <b>Completed</b> in the daily report.</div></div>` + cards;
+  el.querySelectorAll('[data-mopen]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.mopen; maintOpen[k] = !maintOpen[k]; if(maintOpen[k]) maintReport = k; renderMaint(); }));
+  el.querySelectorAll('[data-mprev]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.mprev; maintPrev[k] = !maintPrev[k]; renderMaint(); }));
 }
 
 // ---------- Review: due reminder + shared staff self-review (cloud) ----------
