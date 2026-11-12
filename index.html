@@ -72,7 +72,7 @@
   }
   .card .row1{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
   .staff{font-weight:700; font-size:14.5px;}
-  .dept{font-size:11px; color:#847e6a; margin-top:1px;}
+  .dept{font-size:11px; color:#847e6a; margin-top:1px;} .dept .pos{color:#5b5748; font-weight:600;}
   .badge{
     font-size:11px; font-weight:700; padding:4px 9px; border-radius:20px; white-space:nowrap;
   }
@@ -275,6 +275,7 @@
   .fullbox{margin-top:10px; padding-top:8px; border-top:1px dashed var(--line); font-size:12.5px;}
   .fullcat b{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:#9a927a; margin:8px 0 2px;}
   .fullitem{margin:2px 0 4px;} .fullremark{color:#6a6450; font-style:italic; margin:1px 0 0 10px;}
+  .lg2 summary{cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center;} .lg2 summary::-webkit-details-marker{display:none;} .lg2 summary::after{content:'Hide'; font-size:11px; font-weight:700; border:1px solid var(--line); border-radius:12px; padding:1px 10px; color:var(--navy); background:#fff;} .lg2:not([open]) summary::after{content:'Show'} .lg2[open] summary{margin-bottom:4px;}
   .clickscore{cursor:pointer;}
   .bd{font-size:12px;} .bd th{text-align:left; padding:5px 4px; font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:#9a927a; border-bottom:1px solid var(--line);}
   .bd td.up{color:var(--green); font-weight:700;} .bd td.dn{color:var(--red); font-weight:700;}
@@ -349,7 +350,7 @@
 
   /* YTD summary */
   .ys{font-size:12.5px; line-height:1.5; color:#3a3626; margin-top:8px;}
-  .ys b{color:var(--navy);}
+  .ys b{color:var(--navy);} .ys-l{padding:2px 0;} .ys-l + .ys-l{border-top:1px solid var(--line);} .ys-u{color:#8a826b; font-size:11px;}
   .ys ul{margin:4px 0 0; padding-left:18px;}
 
   /* Maintenance reports */
@@ -398,16 +399,41 @@
   .fr2-pc{font-size:10.5px; font-weight:700; color:#8a6d00;}
   .fr2-rm{font-size:11.5px; color:#6a6450; font-style:italic; padding:1px 0 3px;}
   .fr2-note{font-size:12.5px; color:#4b4636;}
-  .fr2-foot{margin-top:10px; font-size:12px; color:#3d3a2c; display:grid; gap:4px;} .fr2-foot b{display:inline-block; min-width:92px; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:#9a927a;}
+  .fr2-foot{margin-top:10px; font-size:12px; color:#3d3a2c; display:grid; gap:5px;} .fr2-foot > div{display:grid; grid-template-columns:92px 1fr; gap:8px; align-items:baseline;} .fr2-foot b{font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:#9a927a;} .fr2-foot span{overflow-wrap:anywhere;}
   @media print{ .card.dl{break-inside:avoid; page-break-inside:avoid; padding:8px 10px !important; margin-bottom:8px !important;} .fr2-grid{gap:8px;} .fr2-col{-webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid;} }
 
 
   /* v4: weekly/monthly legend + inline details, maintenance cards */
-  .lg2 .lg2-t{font-weight:800; font-size:13px; color:var(--navy); margin-bottom:4px;} .lg2 ul{margin:0; padding-left:18px; font-size:12.5px; line-height:1.6; color:#3d3a2c;}
+  .lg2 .lg2-t{font-weight:800; font-size:13px; color:var(--navy);} .lg2 ul{margin:0; padding-left:18px; font-size:12.5px; line-height:1.6; color:#3d3a2c;}
   .lg2-a{margin-top:6px; font-size:12.5px; line-height:1.5; background:#FBF5E2; border-left:4px solid var(--gold); border-radius:6px; padding:6px 10px; color:#3d3a2c;}
   .clickscore{cursor:pointer;} .row1 .chev{opacity:.5;font-size:13px;}
   .mt-btn{margin:8px 0 6px; padding:5px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; font-size:12px; cursor:pointer; color:var(--navy); font-weight:600;}
   .mt-det{margin-top:8px; border-top:1px solid var(--line); padding-top:6px;}
+
+
+  /* maintenance v5 */
+  .mt-card{border-left:6px solid var(--mc); padding:0 !important; overflow:hidden;}
+  .mt-top{display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--mb);}
+  .mt-badge{flex:0 0 42px; height:42px; border-radius:12px; background:var(--mc); display:flex; align-items:center; justify-content:center;}
+  .mt-badge svg{width:24px; height:24px; fill:none; stroke:#fff; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;}
+  .mt-tt{flex:1; min-width:0;} .mt-card .mt-title{font-size:16px; font-weight:800; color:var(--mc);} .mt-card .mt-meta{margin:1px 0 0;}
+  .mt-ic{width:34px; height:34px; border-radius:50%; border:1px solid var(--line); background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;}
+  .mt-ic svg{width:18px; height:18px; fill:none; stroke:var(--mc); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; transition:transform .15s;}
+  .mt-chev.on svg{transform:rotate(180deg);} .mt-ic.on{background:var(--mb);}
+  .mt-stats{display:grid; grid-template-columns:1fr 1fr 1.6fr; gap:1px; background:var(--line); border-top:1px solid var(--line);}
+  .mt-stats > div{background:#fff; padding:9px 12px; display:flex; flex-direction:column;} .mt-stats b{font-size:18px; color:var(--mc); line-height:1.2;} .mt-stats .wide b{font-size:15px; padding-top:2px;} .mt-stats span{font-size:10.5px; color:#8a826b; text-transform:uppercase; letter-spacing:.05em;}
+  .mt-det{padding:6px 14px 12px; border-top:1px solid var(--line);}
+  .mt-prevbar{display:flex; align-items:center; gap:8px; margin:10px 0 4px; font-size:12px; color:#6b6552;}
+  .mt-note{font-size:12px; color:#6b6552; padding:0 4px 8px;}
+
+
+  /* how-calc / settings v5 */
+  .hc-nav{display:flex; gap:6px; flex-wrap:wrap; margin:0 0 10px; position:sticky; top:var(--hdr-h,118px); z-index:3; background:var(--cream); padding:6px 0;} .hc-nav a{font-size:12px; font-weight:700; color:var(--navy); background:#fff; border:1px solid var(--line); border-radius:16px; padding:4px 11px; text-decoration:none;}
+  .hc-tiles{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;} @media (max-width:520px){ .hc-tiles{grid-template-columns:1fr;} }
+  .hc-tile{background:#fff; border:1px solid var(--line); border-top:4px solid var(--tc); border-radius:10px; padding:10px 12px;} .hc-tile h4{margin:0 0 4px; font-size:13px; color:var(--tc);} .hc-tile p{margin:0; font-size:12.5px; line-height:1.5; color:#3a3626;}
+  .hc-more{margin-top:8px; font-size:12.5px;} .hc-more summary, .hc-fold summary{cursor:pointer; font-weight:700; color:var(--navy);} .hc-fold{padding:12px 14px;} .hc-fold[open] summary{margin-bottom:8px;}
+  .hc-table td:first-child{width:46%;}
+  html{scroll-behavior:smooth;} #hc-score,#hc-parts,#hcSim,#hc-know,#hc-rating,#hc-review,#st-edit,#st-weights,#st-roster,#st-rules,#st-how{scroll-margin-top:170px;}
 
   /* v3.2 — maintenance, how-calc, review helpers */
   .mt-ctl{display:flex; gap:8px;} .mt-ctl select{flex:1; margin:0;}
@@ -1175,7 +1201,8 @@ function renderDaily(key){
 
 function periodLegendHtml(inModal){
   const S = DATA.settings, q = x => (Math.round(x * 100) / 100);
-  return `<div class="${inModal ? 'bx-legend lg2' : 'card lg2'}"><div class="lg2-t">How to read</div>
+  let op = true; try{ op = localStorage.getItem('tow_lg') !== '0'; }catch(e){}
+  return `<details class="${inModal ? 'bx-legend lg2' : 'card lg2'}"${op ? ' open' : ''} ontoggle="try{localStorage.setItem('tow_lg', this.open ? '1' : '0')}catch(e){}"><summary class="lg2-t">How to read</summary>
     <ul>
       <li>Every score is out of <b>100 points</b>, shared between the parts that apply to each person.</li>
       <li><b>Portfolio</b> &mdash; tasks done. Each part earns points in proportion to the result.</li>
@@ -1186,7 +1213,7 @@ function periodLegendHtml(inModal){
     </ul>
     <div class="lg2-a">&#10148; Report every planned task the next working day: <b>Completed</b> / <b>In Progress</b> / <b>Deferred (Approved)</b> + reason. Leave it out of the plan if you won&rsquo;t do it. Always list your plan for the next working day.</div>
     <div class="lg2-a">&#10148; Submit your daily report every working day by <b>19:30</b> (leave days excluded).</div>
-  </div>`;
+  </details>`;
 }
 function renderPeriod(view, key){
   const el = document.getElementById('view-'+view);
@@ -1198,7 +1225,7 @@ function renderPeriod(view, key){
       <div class="row1">
         <div${bd} class="${ck.trim()}">
           <div class="staff">${esc(r.staff)}${bd ? ' <span class="chev">&rsaquo;</span>' : ''}</div>
-          <div class="dept">${esc(r.dept)}</div>
+          <div class="dept">${deptPos(r.staff, r.dept)}</div>
         </div>
         <div style="text-align:right">
           <div class="score${ck}"${bd}>${pct(r.score)}</div>
@@ -1269,7 +1296,7 @@ function renderYTD(){
       <div class="row1">
         <div>
           <div class="staff">${staff}</div>
-          <div class="dept">${base.dept}</div>
+          <div class="dept">${deptPos(staff, base.dept)}</div>
         </div>
       </div>
       <div class="split">
@@ -2080,6 +2107,8 @@ const ACCOUNTED = {'Completed':1, 'In Progress':1, 'Deferred (Approved)':1};
 const NOISE = /^(no|none|nil|n\/a|na|-|--|\.|nothing)$/i;
 const CATS = [['w','Weekly'],['m','Monthly'],['q','Quarterly'],['a','Adhoc']];
 
+function posOf(staff){ const x = ((DATA.settings && DATA.settings.schedules) || []).find(y => y.staff === staff); return x && x.position ? x.position : ''; }
+function deptPos(staff, dept){ const p = posOf(staff), d = dept || ''; return esc(d) + (p && p !== d ? (d ? ' &middot; ' : '') + '<b class="pos">' + esc(p) + '</b>' : ''); }
 function dayRow(staff, date){ const rows = DATA.daily[date]; return rows ? rows.find(r => r.staff === staff) : null; }
 function nextWorkdayKey(k){ return DATA.workdays.find(x => x > k) || null; }
 /** full, un-abbreviated task name for a short name (plan lists only carry short names) */
@@ -2105,7 +2134,7 @@ const meaningful = t => !!t && !NOISE.test(String(t).trim());
 function dailyCardHtml(r, date){
   const badge = `<span class="badge ${statusBadgeClass(r.status)}">${esc(r.status)}${r.time ? ' &middot; ' + esc(r.time) : ''}</span>`;
   return `<div class="card dl">
-    <div class="dl-head"><div><span class="dl-name2">${esc(r.staff)}</span><div class="dept">${esc(r.dept)}${r.leaveInfo ? ' &middot; <span class="fr2-lv">' + leaveText(r.leaveInfo) + '</span>' : ''}</div></div>${badge}</div>
+    <div class="dl-head"><div><span class="dl-name2">${esc(r.staff)}</span><div class="dept">${deptPos(r.staff, r.dept)}${r.leaveInfo ? ' &middot; <span class="fr2-lv">' + leaveText(r.leaveInfo) + '</span>' : ''}</div></div>${badge}</div>
     ${fullReportHtml(r, date, true)}
   </div>`;
 }
@@ -2115,7 +2144,7 @@ function fullReportHtml(r, date, noMeta){
   const d = r.detail;
   const nd = nextWorkdayKey(date);
   const prog = t => { const m = /^\[(\d+)%\]\s*/.exec(t || ''); return m ? [m[1], (t || '').slice(m[0].length)] : [null, t || '']; };
-  let meta = `<div class="fr2-meta"><b>${esc(r.staff)}</b><span>${esc(r.dept)}</span><span>${esc(fmtDayLong(date))}</span><span class="badge ${statusBadgeClass(r.status)}">${esc(r.status)}${r.time ? ' &middot; ' + esc(r.time) : ''}</span>${r.leaveInfo ? `<span class="fr2-lv">${leaveText(r.leaveInfo)}</span>` : ''}</div>`;
+  let meta = `<div class="fr2-meta"><b>${esc(r.staff)}</b><span>${deptPos(r.staff, r.dept)}</span><span>${esc(fmtDayLong(date))}</span><span class="badge ${statusBadgeClass(r.status)}">${esc(r.status)}${r.time ? ' &middot; ' + esc(r.time) : ''}</span>${r.leaveInfo ? `<span class="fr2-lv">${leaveText(r.leaveInfo)}</span>` : ''}</div>`;
   const planHead = `Planned &middot; ${nd ? esc(fmtDay(nd)) : 'next working day'}`;
   if(!d){
     return (noMeta ? '' : meta) + `<div class="fr2-grid"><section class="fr2-col today"><h3>Today</h3><div class="dl-none">${r.status === 'NOT SUBMITTED' ? 'No report submitted.' : (r.today && r.today !== '—' ? esc(r.today) : 'No detail on file.')}</div></section>
@@ -2132,10 +2161,15 @@ function fullReportHtml(r, date, noMeta){
   else if(p.ps === 'Leave') plan = '<div class="fr2-note">On planned leave.</div>';
   else plan = planCat('Weekly', p.w) + planCat('Monthly', p.m) + planCat('Quarterly', p.q) + planCat('Adhoc', p.a);
   if(!plan) plan = '<div class="dl-none">Nothing planned.</div>';
+  const words = t => String(t || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
+  const covered = (a, b) => { const A = words(a), B = new Set(words(b)); return A.length && A.filter(w => B.has(w)).length / A.length >= 0.8; };
+  let o = meaningful(d.o) ? String(d.o) : '', rmk = meaningful(d.rm) ? String(d.rm) : '', ap = (!r.nextLeave && p.ps !== 'Rest & Recovery' && p.ps !== 'Leave' && meaningful(p.o)) ? String(p.o) : '';
+  if(o && rmk && (covered(o, rmk) || covered(rmk, o))){ if(words(o).length > words(rmk).length) rmk = o; o = ''; }   // same text twice -> keep it under Remarks only
+  if(ap && ((rmk && covered(ap, rmk)) || (o && covered(ap, o)))) ap = '';
   const foot = [];
-  if(meaningful(d.o)) foot.push(`<div><b>Other work</b>${esc(d.o)}</div>`);
-  if(meaningful(d.rm)) foot.push(`<div><b>Remarks</b>${esc(d.rm)}</div>`);
-  if(!r.nextLeave && p.ps !== 'Rest & Recovery' && p.ps !== 'Leave' && meaningful(p.o)) foot.push(`<div><b>Also planned</b>${esc(p.o)}</div>`);
+  if(o) foot.push(`<div><b>Other work</b><span>${esc(o)}</span></div>`);
+  if(rmk) foot.push(`<div><b>Remarks</b><span>${esc(rmk)}</span></div>`);
+  if(ap) foot.push(`<div><b>Also planned</b><span>${esc(ap)}</span></div>`);
   return (noMeta ? '' : meta) + `<div class="fr2-grid"><section class="fr2-col today"><h3>Today</h3>${today}</section><section class="fr2-col next"><h3>${planHead}</h3>${plan}</section></div>${foot.length ? `<div class="fr2-foot">${foot.join('')}</div>` : ''}`;
 }
 function openReport(date, staff){
@@ -2414,19 +2448,15 @@ function summarizePeriods(staff, kind, fromKey, toKey){
   const loss = Object.keys(lostSum).map(k => ({k, v: lostSum[k] / n})).filter(x => x.v >= 0.5).sort((a, b) => b.v - a.v).slice(0, 3);
   const best = rows.reduce((a, x) => x.row.score > a.row.score ? x : a), worst = rows.reduce((a, x) => x.row.score < a.row.score ? x : a);
   const lbl = k => kind === 'weekly' ? 'week of ' + fmtDay(addDaysKey(k, 1)) : fmtMonth(k);
-  const lossTxt = {
-    port: () => 'task completion (some listed tasks were not done)',
-    plan: () => 'planned tasks not reported the next day',
-    sub: () => 'missed or late daily reports',
-    adhoc: () => `few adhoc items logged (${(adhocTot / n).toFixed(1)} per ${unit} on average)`
-  };
-  let s = `Average ${pct(avg)} over ${n} ${unit}${n > 1 ? 's' : ''}.`;
-  if(loss.length) s += ` Points were mainly lost on ${loss.map(x => `<b>${esc(({port:'Portfolio',plan:'Planning',sub:'Submission',adhoc:'Adhoc'})[x.k])}</b> (&minus;${x.v.toFixed(1)} pts per ${unit} &ndash; ${lossTxt[x.k]()})`).join('; ')}.`;
-  else s += ' Nearly all points were earned.';
+  const nm = ({port:'Portfolio',plan:'Planning',sub:'Submission',adhoc:'Adhoc'});
+  const L = [];
+  L.push(`<b>Average ${pct(avg)}</b> &middot; ${n} ${unit}${n > 1 ? 's' : ''}`);
+  L.push(loss.length ? `Lost on: ${loss.map(x => `${nm[x.k]} <b>&minus;${x.v.toFixed(1)}</b>`).join(' &middot; ')} <span class="ys-u">pts per ${unit}</span>` : 'Nearly all points earned');
   const top = Object.keys(missed).sort((a, b) => missed[b] - missed[a]).slice(0, 3).filter(k => missed[k] >= 2);
-  if(top.length) s += ` Tasks most often left undone: ${top.map(k => `${esc(k)} (${missed[k]}&times;)`).join(', ')}.`;
-  if(late) s += ` ${late} late report(s).`;
-  if(n > 1) s += ` Best: ${lbl(best.key)} (${pct(best.row.score)}); lowest: ${lbl(worst.key)} (${pct(worst.row.score)}).`;
+  if(top.length) L.push(`Often undone: ${top.map(k => `${esc(k)} (${missed[k]}&times;)`).join(', ')}`);
+  if(late) L.push(`Late reports: <b>${late}</b>`);
+  if(n > 1) L.push(`Best ${lbl(best.key).replace(/^week of /,'')} <b>${pct(best.row.score)}</b> &middot; Lowest ${lbl(worst.key).replace(/^week of /,'')} <b>${pct(worst.row.score)}</b>`);
+  const s = L.map(x => `<div class="ys-l">${x}</div>`).join('');
   return s;
 }
 
@@ -2437,18 +2467,23 @@ function renderHowCalc(){
   const wr = p => { const x = W[p]; return `<tr><td>${p}</td><td>${Math.round(x.port*100)}</td><td>${Math.round(x.plan*100)}</td><td>${Math.round(x.sub*100)}</td><td>${Math.round(x.adhoc*100)}</td></tr>`; };
   const flexNames = Array.from(DATA.flexSet).join(', ') || '&mdash;';
   document.getElementById('howcalcBody').innerHTML = `
-    <div class="card"><div class="hc-title">The score in one line</div>
-      <div class="reason">Every week and every month is scored out of 100 points, shared between four parts. Each part earns its share in proportion to its result (80% of a 15-point part = 12 points).</div>
+    <div class="hc-nav"><a href="#hc-score">Score</a><a href="#hc-parts">Four parts</a><a href="#hcSim">Try it</a><a href="#hc-know">Good to know</a><a href="#hc-rating">Rating</a><a href="#hc-review">Annual review</a></div>
+    <div class="card" id="hc-score"><div class="hc-title">The score in one line</div>
+      <div class="reason">Every week and month is <b>100 points</b>, shared between four parts. Each part earns its share in proportion to its result (80% of a 15-point part = 12 points).</div>
       <table class="hc-table"><tr><th>Points</th><th>Portfolio</th><th>Planning</th><th>Submission</th><th>Adhoc</th></tr>${wr('Administration')}${wr('Pastoral')}</table>
-      <div class="reason">Planning (15) and Submission (15) are fixed. The Adhoc points (20) are held in Portfolio, so Portfolio is worth 70; for flexible-schedule staff the Planning / Submission points sit in Portfolio instead (no daily report needed). A full-time staff member who does not plan or does not report loses those points. <b>Adhoc then covers missed weekly tasks only</b>, at a lower value (see the Adhoc part below); a score never goes above 100%. Staff with everything perfect simply score 100%.<br>A report sent after ${DATA.settings.lateAfter} loses points: ${lateTierText()}. A missed day can still be reported until day ${DATA.settings.catchup} of the next month (it then counts as 2+ days late); from the next day the month is closed and it stays at 0.<br><b>When tasks fall due:</b> weekly tasks count every week. <b>Monthly tasks count only after the month's last working day</b> and <b>quarterly tasks only after the quarter's last working day</b>, so nobody is marked down part-way through; until then an untouched task is only listed as a heads-up. A plan made for the next working day is judged only once that day's report is due.<br>Example: Submission is worth 15 points; in a 4-day week with one report late the same day, 3 on time: (100+100+100+95) &divide; 4 = 98.75% &times; 15 = 14.8 points.</div></div>
+      <ul class="hc-list" style="margin-top:8px">
+        <li>Adhoc points sit inside Portfolio (Portfolio = 70). Flexible staff: Planning and Submission sit in Portfolio too.</li>
+        <li>A full-time person who does not plan or report loses those points. A score never goes above 100%.</li>
+        <li><b>Due dates:</b> weekly tasks every week; <b>monthly</b> after the month&rsquo;s last working day; <b>quarterly</b> after the quarter&rsquo;s. Until then an untouched task is only a heads-up.</li>
+      </ul>
+      <details class="hc-more"><summary>Worked example</summary><div class="reason">Submission = 15 points. A 4-day week, one report late the same day, 3 on time: (100+100+100+95) &divide; 4 = 98.75% &times; 15 = <b>14.8 points</b>.</div></details></div>
 
-    <div class="card"><div class="hc-title">The four parts</div>
-      <div class="hc-grid">
-        <div><b>Portfolio</b><span>Your listed tasks. Points of tasks Completed or In Progress &divide; points that were due. Weekly tasks are due every week (scaled down for leave days). Monthly tasks fall due after the month's last working day and quarterly tasks after the quarter's last working day &mdash; until then an untouched one is only a heads-up, with no deduction. In a month's score: your weekly-task results are averaged, and the monthly (and, at quarter end, quarterly) tasks are blended in once due.</span></div>
-        <div><b>Planning</b><span>Each working day you report, list what you plan for the next working day. Next working day, report each planned task (Completed / In Progress, or Deferred (Approved) with the reason). A day is worth up to ${f2g(S0.planDay)} points (15 &divide; 4, the same in a leave week): no plan = the whole day is lost; a plan only partly followed = that part is lost. Flexible-schedule staff are exempt.</span></div>
-        <div><b>Submission</b><span>Report on every working day (Tue&ndash;Fri, leave excluded). Each day is worth up to ${f2g(S0.missDay)} points (15 &divide; 4, the same in a leave week). A day never reported loses all ${f2g(S0.missDay)}; a late report loses a few points depending on how late: ${lateTierText()}. You can still report a missed day until day ${S0.catchup} of the next month (at the late rate).</span></div>
-        <div><b>Adhoc</b><span>Extra work outside your listed tasks. Items logged (Completed or In Progress) &divide; ${DATA.settings.adhocWeek} per week (${DATA.settings.adhocMonth} per month, scaled down for leave days), capped at 100%. Adhoc covers only <b>missed weekly tasks</b>, at a lower value: each adhoc item counts as ${DATA.settings.adhocItem == null ? 3 : DATA.settings.adhocItem} task points, and one missed task can get back at most ${Math.round((DATA.settings.adhocCap == null ? .6 : DATA.settings.adhocCap) * 100)}% of its points, so a missed task always still costs points. It never covers Planning, Submission, late penalties, or monthly / quarterly tasks, and never takes a score above 100%.</span></div>
-      </div></div>
+    <div id="hc-parts" class="hc-tiles">
+      <div class="hc-tile" style="--tc:#1F3864"><h4>Portfolio</h4><p>Your listed tasks <b>Completed or In Progress</b> &divide; tasks due. Leave days scale the weekly tasks down.</p></div>
+      <div class="hc-tile" style="--tc:#C9A227"><h4>Planning</h4><p>List the next working day&rsquo;s plan, then report each planned task the next day. Up to <b>${f2g(S0.planDay)} pts</b>/day. No plan = day lost. Flexible staff exempt.</p></div>
+      <div class="hc-tile" style="--tc:#12807F"><h4>Submission</h4><p>Report every working day (Tue&ndash;Fri, leave excluded). Up to <b>${f2g(S0.missDay)} pts</b>/day. Late: ${lateTierText()}. Missed day can be sent until day ${S0.catchup} of next month.</p></div>
+      <div class="hc-tile" style="--tc:#7A4FA3"><h4>Adhoc</h4><p>Covers <b>missed weekly tasks only</b>: each item = ${DATA.settings.adhocItem == null ? 3 : DATA.settings.adhocItem} pts, max ${Math.round((DATA.settings.adhocCap == null ? .6 : DATA.settings.adhocCap) * 100)}% of a missed task. Never planning, submission, late, monthly or quarterly.</p></div>
+    </div>
 
     <div class="card" id="hcSim"><div class="hc-title">Try a calculation (weekly)</div>
       <div class="reason">Change the yellow boxes, or tap a scenario, and the score is worked out step by step with the same rules the dashboard uses. Nothing here is saved.</div>
@@ -2457,24 +2492,23 @@ function renderHowCalc(){
       <table class="hc-table" id="hcSimOut" style="margin-top:10px"></table>
       <div class="reason" id="hcSimNote"></div></div>
 
-    <div class="card"><div class="hc-title">Good to know</div>
+    <div class="card" id="hc-know"><div class="hc-title">Good to know</div>
       <ul class="hc-list">
-        <li><b>Deferred (Approved)</b> protects your Planning score, but the task still counts as <b>not done</b> in Portfolio.</li>
-        <li><b>Leave</b> is never penalised. A full leave week is skipped, not scored as zero. In a part-leave week, Submission, Planning <b>and</b> the weekly tasks expected are all scaled to the working days you were available.</li>
-        <li><b>Flexible schedule</b> (${flexNames}): no daily report needed; scored on Portfolio and Adhoc only.</li>
-        <li><b>New-type pastoral tasks</b> (Ministerial Reading, Ministry Training, Levites Training, Every&nbsp;4&nbsp;Months tasks) are reported but do not affect the score until 1 Jan 2027.</li>
-        <li><b>Portfolio change:</b> scores to 18 Sep 2026 use the old task list; from 21 Sep 2026 the new one. Quarterly tasks count from 1 Oct 2026.</li>
-        <li><b>Monthly score</b> = the weeks' Portfolio, Planning, Submission and Adhoc results for the month, with monthly and quarterly tasks blended into Portfolio.</li>
-        <li>Tap any score on the Weekly or Monthly tab to see exactly where its points came from.</li>
+        <li><b>Deferred (Approved)</b> protects Planning, but the task still counts as <b>not done</b> in Portfolio.</li>
+        <li><b>Leave</b> is never penalised. A full leave week is skipped; a part-leave week is scaled to the days available.</li>
+        <li><b>Flexible schedule</b> (${flexNames}): no daily report; scored on Portfolio and Adhoc.</li>
+        <li><b>New-type pastoral tasks</b> (Ministerial Reading, Ministry Training, Levites Training, Every&nbsp;4&nbsp;Months) are reported but not scored until 1 Jan 2027.</li>
+        <li><b>Portfolio change:</b> to 18 Sep 2026 old task list; from 21 Sep 2026 the new one. Quarterly tasks count from 1 Oct 2026.</li>
+        <li>Tap a score or name on Weekly / Monthly to see where its points came from.</li>
       </ul></div>
 
-    <div class="card"><div class="hc-title">Rating</div>
+    <div class="card" id="hc-rating"><div class="hc-title">Rating</div>
       <table class="hc-table"><tr><td>${Math.round(DATA.settings.good*100)}% and above</td><td><span class="badge good">Good</span></td></tr>
         <tr><td>${Math.round(DATA.settings.ok*100)}&ndash;${Math.round(DATA.settings.good*100)-1}%</td><td><span class="badge mid">Needs Improvement</span></td></tr>
         <tr><td>Below ${Math.round(DATA.settings.ok*100)}%</td><td><span class="badge low">Immediate Attention</span></td></tr></table>
       <div class="reason">YTD = the average of the completed, scored weeks (and months) from the month you choose on the YTD tab (it starts from the Sep revamp and remembers your choice on this device).</div></div>
 
-    <div class="card"><div class="hc-title">Annual review</div>
+    <div class="card" id="hc-review"><div class="hc-title">Annual review</div>
       <div class="reason">Final score = Daily Reporting KPI &times; 60% + Staff Observation (Mid-Year / Year-End review) &times; 40%, shown out of 5.</div>
       <table class="hc-table"><tr><th>Score</th><th>Level</th><th>Increment</th><th>Bonus</th></tr>${DATA.settings.revBands.map((b, k, a) => `<tr><td>${k === 0 ? b.from.toFixed(2) + '&ndash;5.00' : (k === a.length - 1 ? '&lt; ' + a[k - 1].from.toFixed(2) : b.from.toFixed(2) + '&ndash;' + (a[k - 1].from - 0.01).toFixed(2))}</td><td>${b.level}</td><td>${b.inc}</td><td>${b.bonus}</td></tr>`).join('')}</table>
       <div class="reason"><b>Please note:</b> ${DATA.settings.revNote} (The increment and bonus columns are set in the Settings tab.)</div></div>`;
@@ -2590,10 +2624,17 @@ function renderEmails(){
   on('emailLess', () => { emailShown = 10; renderEmails(); });
 }
 const maintOpen = {}, maintPrev = {};
+const MAINT_LOOK = {
+  'Vehicle Maintenance': {c:'#2F5D8C', bg:'#EAF1F8', icon:'<svg viewBox="0 0 24 24"><path d="M5 11l1.5-4.5A2 2 0 018.4 5h7.2a2 2 0 011.9 1.5L19 11m-14 0h14a1 1 0 011 1v4a1 1 0 01-1 1h-1m-12 0H5a1 1 0 01-1-1v-4a1 1 0 011-1zm2 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm10 0a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"/></svg>'},
+  'AC Maintenance': {c:'#12807F', bg:'#E5F4F3', icon:'<svg viewBox="0 0 24 24"><path d="M12 2v20M4.9 7l14.2 10M4.9 17L19.1 7M9 3.5l3 2.5 3-2.5M9 20.5l3-2.5 3 2.5"/></svg>'},
+  'Music Instruments Maintenance': {c:'#7A4FA3', bg:'#F1EBF7', icon:'<svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12M9 18a3 3 0 11-6 0 3 3 0 016 0zm10-2a3 3 0 11-6 0 3 3 0 016 0z"/></svg>'}
+};
+const IC_CHEV = '<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>', IC_HIST = '<svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9 9 0 00-7 3.4M3 4v4h4M12 7v5l3 2"/></svg>';
 function renderMaint(){
   const el = document.getElementById('view-maint');
   const curMonth = TODAY_KEY.slice(0,7);
-  const cards = Object.keys(MAINT_REPORTS).map((rep, idx) => {
+  const cards = Object.keys(MAINT_REPORTS).map(rep => {
+    const look = MAINT_LOOK[rep] || {c:'#1F3864', bg:'#EEF3FA', icon:''};
     const list = (DATA.maintenance || []).filter(r => r.report === rep).sort((a, b) => b.date.localeCompare(a.date));
     const last = list[0], open = !!maintOpen[rep], showPrev = !!maintPrev[rep];
     const thisM = list.filter(r => r.date.slice(0,7) === curMonth).length;
@@ -2603,15 +2644,17 @@ function renderMaint(){
     const month = m => `<div class="mt-mh">${fmtMonth(m + '-01')} <span>${byMonth[m].length}</span></div>${byMonth[m].map(row).join('')}`;
     const details = open ? `<div class="mt-det">
         ${curList.length ? month(curMonth) : `<div class="mt-rem none" style="padding:6px 0">Nothing recorded yet this month.</div>`}
-        ${older.length ? `<button class="mt-btn" data-mprev="${esc(rep)}">${showPrev ? 'Hide' : 'Show'} previous months (${older.length})</button>` : ''}
+        ${older.length ? `<div class="mt-prevbar"><button class="mt-ic ${showPrev ? 'on' : ''}" data-mprev="${esc(rep)}" title="${showPrev ? 'Hide' : 'Show'} previous months" aria-label="${showPrev ? 'Hide' : 'Show'} previous months">${IC_HIST}</button><span>Previous months (${older.length})</span></div>` : ''}
         ${showPrev ? older.map(month).join('') : ''}
       </div>` : '';
-    return `<div class="card mt-card"><div class="mt-title">${esc(MAINT_REPORTS[rep].title.replace(' History',''))}</div>
-      <div class="mt-meta">${esc(MAINT_REPORTS[rep].staff || '')}</div>
-      <div class="mt-chips"><span><b>${list.length}</b> record${list.length === 1 ? '' : 's'}</span><span>This month: <b>${thisM}</b></span><span>Last done: <b>${last ? fmtDay(last.date) + ' ' + last.date.slice(0,4) : '—'}</b></span></div>
-      <button class="mt-btn" data-mopen="${esc(rep)}">${open ? 'Hide details' : 'Show details'}</button>${details}</div>`;
+    return `<div class="card mt-card" style="--mc:${look.c};--mb:${look.bg}">
+      <div class="mt-top"><span class="mt-badge">${look.icon}</span>
+        <div class="mt-tt"><div class="mt-title">${esc(MAINT_REPORTS[rep].title.replace(' History','').replace(' Maintenance',''))}</div><div class="mt-meta">${esc(MAINT_REPORTS[rep].staff || '')}</div></div>
+        <button class="mt-ic mt-chev ${open ? 'on' : ''}" data-mopen="${esc(rep)}" title="${open ? 'Hide' : 'Show'} details" aria-label="${open ? 'Hide' : 'Show'} details">${IC_CHEV}</button></div>
+      <div class="mt-stats"><div><b>${list.length}</b><span>Total</span></div><div><b>${thisM}</b><span>This month</span></div><div class="wide"><b>${last ? fmtDay(last.date) : '—'}</b><span>Last done${last ? ' ' + last.date.slice(0,4) : ''}</span></div></div>
+      ${details}</div>`;
   }).join('');
-  el.innerHTML = `<div class="card mt-sum"><div class="mt-meta" style="margin:0">Recorded automatically each time the task is ticked <b>Completed</b> in the daily report.</div></div>` + cards;
+  el.innerHTML = `<div class="mt-note">Recorded automatically each time the task is ticked <b>Completed</b> in the daily report.</div>` + cards;
   el.querySelectorAll('[data-mopen]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.mopen; maintOpen[k] = !maintOpen[k]; if(maintOpen[k]) maintReport = k; renderMaint(); }));
   el.querySelectorAll('[data-mprev]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.mprev; maintPrev[k] = !maintPrev[k]; renderMaint(); }));
 }
@@ -2838,17 +2881,20 @@ function renderSettings(){
   const sched = S.schedules.length ? S.schedules : Object.keys(DATA.portfolio).sort().map(n => ({staff:n, profile:'', schedule: DATA.flexSet.has(n) ? 'Flexible' : 'Full-time'}));
   const kv = (k, v) => `<tr><td>${k}</td><td>${v}</td></tr>`;
   el.innerHTML = `
+    <div class="hc-nav"><a href="#st-edit">Edit numbers</a><a href="#st-weights">Weights</a><a href="#st-roster">Roster</a><a href="#st-rules">Rules in force</a><a href="#st-how">How to&hellip;</a></div>
     <div class="card"><div class="hc-title">Settings</div>
-      <div class="reason">${S.fromSheet ? 'This is what is applied right now.' : '<b>The Settings tab has not been created yet.</b> Paste the latest Apps Script and run <b>manualRefresh</b> once &mdash; defaults shown below are the current rules.'}
-      The main numbers can be changed in the card below (leadership link). Anything else (roster, dates) is changed in the yellow cells of the <b>Settings</b> tab of the Google Sheet, then run <b>manualRefresh</b> (or wait for the nightly refresh). This page then updates by itself.</div>
+      <div class="reason">${S.fromSheet ? 'Showing what is applied right now.' : '<b>The Settings tab is not created yet.</b> Paste the latest Apps Script and run <b>manualRefresh</b> once.'}
+      Change the main numbers in the first card. Roster and dates are changed in the yellow cells of the <b>Settings</b> tab, then run <b>manualRefresh</b> (or wait for the nightly refresh).</div>
       <a class="adhoc-link" style="display:block;text-align:center;text-decoration:none;margin-top:8px" href="${sheetUrl}" target="_blank" rel="noopener">Open the Google Sheet &rsaquo;</a></div>
+    <div id="st-edit"></div>
     ${settingsEditCardHtml()}
-    <div class="card"><div class="hc-title">Scoring weights</div>
+    <div class="card" id="st-weights"><div class="hc-title">Scoring weights</div>
       <table class="hc-table"><tr><th></th><th>Portfolio</th><th>Planning</th><th>Submission</th><th>Adhoc</th><th>Total</th></tr>${wrow('Administration')}${wrow('Pastoral')}</table></div>
-    <div class="card"><div class="hc-title">Staff roster</div>
-      <table class="hc-table"><tr><th>Staff</th><th>Profile</th><th>Schedule</th><th>Start</th><th>Last day</th></tr>${sched.map(x => `<tr><td>${esc(x.staff)}</td><td>${esc(x.profile || '')}</td><td>${/^flex/i.test(x.schedule) ? '<span class="badge mid">Flexible</span>' : 'Full-time'}</td><td>${x.start ? fmtShortDate(x.start) : '&mdash;'}</td><td>${x.last ? '<span class="badge low">' + fmtShortDate(x.last) + '</span>' : '&mdash;'}</td></tr>`).join('')}</table>
+    <div class="card" id="st-roster"><div class="hc-title">Staff roster</div>
+      <table class="hc-table"><tr><th>Staff</th><th>Position</th><th>Profile</th><th>Schedule</th><th>Start</th><th>Last day</th></tr>${sched.map(x => `<tr><td>${esc(x.staff)}</td><td>${esc(x.position || '')}</td><td>${esc(x.profile || '')}</td><td>${/^flex/i.test(x.schedule) ? '<span class="badge mid">Flexible</span>' : 'Full-time'}</td><td>${x.start ? fmtShortDate(x.start) : '&mdash;'}</td><td>${x.last ? '<span class="badge low">' + fmtShortDate(x.last) + '</span>' : '&mdash;'}</td></tr>`).join('')}</table>
       <div class="reason">Flexible = no daily report needed; scored on task completion only. A person with a Last day stops being scored, reminded and listed after that day; their history stays.</div></div>
-    <div class="card"><div class="hc-title">Onboarding &amp; resignation</div>
+    <div id="st-how"></div>
+    <details class="card hc-fold"><summary>Onboarding &amp; resignation</summary>
       <ol class="hc-list">
         <li><b>New staff:</b> add them to the Google Form (name exactly as in the roster), then add a row at the bottom of the roster in the Settings tab: name, department, profile, schedule, <b>Start date</b>.</li>
         <li>Add their tasks in <b>Task Reference</b>. Add their email in the private review sheet&rsquo;s <i>Staff Emails</i> tab (daily reminders), and run <b>setupReviewLinks</b> again for their review link.</li>
@@ -2856,7 +2902,7 @@ function renderSettings(){
         <li><b>Resignation:</b> fill in their <b>Last day</b> in the roster (never delete the row) and put the same date as End Date on their tasks. Run <b>manualRefresh</b>.</li>
         <li><b>Profile or schedule change:</b> change it in the roster. A profile change applies from the current month onward.</li>
       </ol></div>
-    <div class="card"><div class="hc-title">Rules in force</div>
+    <div class="card" id="st-rules"><div class="hc-title">Rules in force</div>
       <table class="hc-table">
         ${kv('Late report: same day / 1 day later / 2+ days later', (Math.round(S.lateSame*100)/100) + ' / ' + (Math.round(S.late1*100)/100) + ' / ' + (Math.round(S.late2*100)/100) + ' points lost per late report; a day never reported costs ' + (Math.round((S.missDay == null ? 3.75 : S.missDay)*100)/100) + ' points')}
         ${kv('New late rule applies from week of', esc(fmtShortDate(S.lateFrom)))}
@@ -2872,7 +2918,7 @@ function renderSettings(){
         ${kv('New-type pastoral tasks count from', fmtShortDate(S.trial))}
         ${kv('Mid-Year / Year-End review due', esc(S.mid) + ' &middot; ' + esc(S.final) + ' (MM-DD)')}
       </table></div>
-    <div class="card"><div class="hc-title">When the portfolio changes</div>
+    <details class="card hc-fold"><summary>When the portfolio changes</summary>
       <ol class="hc-list">
         <li>Update the <b>Google Form</b> first (add, remove or rename the question under Weekly / Monthly / Quarterly / Adhoc).</li>
         <li>Run <b>manualRefresh</b>. New form questions that are not in Task Reference show up in the <i>Unmatched Form Tasks</i> tab; <b>addUnmatchedTasksToReference</b> adds them for you.</li>
@@ -2882,7 +2928,7 @@ function renderSettings(){
         <li>To report a task without scoring it yet, put a date in <b>Scores From</b>.</li>
         <li>Run <b>manualRefresh</b> again and check the first affected week on the Weekly tab.</li>
       </ol>
-      <div class="reason">Rule of thumb: history is never edited &mdash; end-date the old line and start a new one. </div></div>`;
+      <div class="reason">Rule of thumb: history is never edited &mdash; end-date the old line and start a new one.</div></details>`;
 }
 // ===================== end v3.1 additions =====================
 
