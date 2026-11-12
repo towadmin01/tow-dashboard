@@ -23,24 +23,26 @@ button:disabled{opacity:.5}
 .cat{margin-bottom:16px}.cat h3{margin:0 0 6px 2px;font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--navy);display:flex;gap:8px;align-items:center}
 .cat h3 i{font-style:normal;background:#E4E9F4;color:var(--navy);border-radius:20px;padding:1px 8px;font-size:11px;letter-spacing:0}
 .list{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #0000000a}
-.task{padding:10px 14px 10px 12px;border-top:1px solid #EFEBDD;border-left:4px solid transparent;display:grid;grid-template-columns:1fr 158px auto;gap:6px 12px;align-items:center}
-.task:first-child{border-top:none}.task[data-s="Completed"]{border-left-color:#2e9d4f;background:#F6FBF7}.task[data-s="In Progress"]{border-left-color:#e0a21a;background:#FFFCF3}.task[data-s^="Deferred"]{border-left-color:#8a8a8a;background:#F7F7F6}
+.task{padding:10px 14px 10px 12px;border-top:1px solid #EFEBDD;border-left:4px solid transparent;display:grid;grid-template-columns:1fr 132px auto;gap:6px 10px;align-items:center}
+.task:first-child{border-top:none}.task[data-s="Completed"]{border-left-color:#2e9d4f;background:#F6FBF7}.task[data-s="In Progress"]{border-left-color:#3b6fc4;background:#F5F8FD}.task[data-s^="Deferred"]{border-left-color:#d9a400;background:#FFFBEA}
+.task .st{font-size:12px;font-weight:600;padding:5px 8px;border-radius:8px;background:#F1F0EA;color:#8a8672;border:1px solid #E3DFCF}
+.task[data-s="Completed"] .st{background:#DFF3E5;color:#1f6b36;border-color:#a7d7b4}.task[data-s="In Progress"] .st{background:#DEE9FA;color:#24509c;border-color:#a9c3ee}.task[data-s^="Deferred"] .st{background:#FFF1BD;color:#7a5d00;border-color:#ecd27a}
 .task .nm{font-size:14px;font-weight:600;line-height:1.3;color:#1f1d14}.task .nm .ds{display:block;font-size:11.5px;font-weight:400;color:var(--mut);margin-top:2px;line-height:1.35}.task .rmw{grid-column:1/-1;display:none}.task .rmw.show{display:block}
-.task select{padding:7px 8px;font-size:13px;font-weight:600;border-radius:9px}
+.task select{font-size:12px}
 .task .nt{display:block;width:max-content;font-size:11px;color:#6b7cae;cursor:pointer;margin-top:3px;font-weight:600}
 .task .pd{display:inline-block;vertical-align:-2px;margin-left:6px;width:14px;height:14px;color:#b88a00}.task .pd svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .task .rm{font-size:12.5px;padding:7px 10px;border-radius:8px}.task .rm::placeholder{font-size:12px;color:#aaa58f}
 .task .pg{font-size:12px;padding:6px 8px}
 .task .ckrow{display:flex;flex-wrap:wrap;gap:5px 6px;align-items:center;margin:0 0 6px}.task .ckrow>span{font-size:10px;font-weight:700;color:#9a947d;text-transform:uppercase;letter-spacing:.05em;margin-right:2px}
 .task .ck{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:#4a4636;cursor:pointer;background:#FBFAF5;border:1px solid #E7E2CE;border-radius:12px;padding:2px 9px}.task .ck input{width:13px;height:13px;margin:0}.task .ck:has(input:checked){background:#E8F3EA;border-color:#9fcfab;color:#1f6b36;font-weight:600}
-.task .ro{font-size:12.5px;color:#4a4636;line-height:1.45;margin-top:1px}.task .ro .rc{display:inline-block;font-size:11px;font-weight:600;color:#1f6b36;background:#E8F3EA;border-radius:10px;padding:0 8px;margin-right:6px}.task .ro .rp{color:#8a6d00;background:#FFF1B8}
-.task .tag{font-size:10.5px;color:#8a6d00;background:#FFF1B8;border-radius:6px;padding:1px 6px;margin-left:6px;font-weight:700}
-.list.lk .pl-pill:not(:has(input:checked)){display:none}.list.lk .task{grid-template-columns:1fr 158px auto}
+.task .ro{font-size:12.5px;color:#4a4636;line-height:1.45;margin-top:1px}.task .ro .rc{display:inline-block;font-size:11px;font-weight:600;color:#1f6b36;background:#E8F3EA;border-radius:10px;padding:0 8px;margin-right:6px}.task .ro .rp{color:#24509c;background:#DEE9FA}
+.task .tag{font-size:10.5px;color:#b3261e;background:#FDE3E1;border-radius:6px;padding:1px 6px;margin-left:6px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+.list.lk .pl-pill:not(:has(input:checked)){display:none}.list.lk .task{grid-template-columns:1fr 132px auto}
 .strip button.lv{background:#EEE8F6;color:#5B3E9E}
 .ld{padding:40px 10px;text-align:center;color:var(--mut);font-size:13px}
-.pl-pill{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--mut);cursor:pointer;background:#fff;white-space:nowrap}
-.pl-pill input{width:15px;height:15px;margin:0}.pl-pill:has(input:checked){background:#E4E9F4;border-color:#9bb0e0;color:var(--navy)}
-@media(max-width:560px){.task{grid-template-columns:1fr 130px}.task .pl-pill{grid-column:1/-1;justify-self:start}}
+.pl-pill{display:flex;align-items:center;gap:4px;border:1px solid #E7E2CE;border-radius:12px;padding:2px 8px;font-size:11px;font-weight:500;color:#9a947d;cursor:pointer;background:transparent;white-space:nowrap}
+.pl-pill input{width:13px;height:13px;margin:0}.pl-pill:has(input:checked){background:#E4E9F4;border-color:#9bb0e0;color:var(--navy);font-weight:600}
+@media(max-width:560px){.task{grid-template-columns:1fr 120px}.task .pl-pill{grid-column:1/-1;justify-self:start}}
 .strip{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center;font-size:12px;color:var(--mut)}
 .strip button{border:none;background:#F1EEE3;border-radius:20px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--mut)}
 .strip button.y{background:#E1F2E6;color:#1a5c2c}.strip button.late{background:#FFF1B8;color:#6b4a00}.strip button.ph{background:#E4E4E4;color:#8a8a8a;text-decoration:line-through}.strip button.sel{outline:2px solid var(--navy)}
@@ -170,15 +172,15 @@ function draw(){
       const c = cur.items[t.id] || {s:'', r:''}, m = t.m || {items:[], pcl:[[10,'Just started'],[25,'Started'],[50,'Halfway'],[75,'Nearly done'],[90,'Final checks']], req:''};
       let raw = String(c.r || ''); const pm = raw.match(/^\[(\d+)%\]\s*/), pc = pm ? pm[1] : ''; if(pm) raw = raw.slice(pm[0].length);
       const km = raw.match(/^\[✓ ([^\]]*)\]\s*/), ticked = km ? km[1].split(';').map(x => x.trim()) : []; if(km) raw = raw.slice(km[0].length);
-      const needs = (m.items && m.items.length) || m.req === 'names', showR = raw || ticked.length || c.s === 'Deferred (Approved)' || (needs && c.s) || pc;
+      const needs = (m.items && m.items.length) || m.req === 'names' || m.pct, showR = raw || ticked.length || c.s === 'Deferred (Approved)' || (needs && c.s) || pc;
       const ph = m.req === 'names' ? 'Names of the members you visited / followed up (required)' : 'Remark (required if deferred)';
       const pdIcon = planned.has(t.id) ? '<span class="pd" title="Planned for this day"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M9 15l2 2 4-4"/></svg></span>' : '';
       const ro = (locked && c.s && (pc || ticked.length || raw)) ? `<div class="ro">${pc ? `<span class="rc rp">${pc}%</span>` : ''}${ticked.length ? `<span class="rc">&#10003; ${esc(ticked.join(' · '))}</span>` : ''}${esc(raw)}</div>` : '';
-      return `<div class="task" data-id="${esc(t.id)}" data-s="${esc(c.s)}" data-req="${esc(m.req || '')}"><div class="nm">${esc(ttl(t))}${pdIcon}${t.trial ? '<span class="tag">not scored yet</span>' : ''}${descOf(t) ? `<span class="ds">${esc(descOf(t))}</span>` : ''}${locked ? '' : '<span class="nt">+ note</span>'}</div>
+      return `<div class="task" data-id="${esc(t.id)}" data-s="${esc(c.s)}" data-req="${esc(m.req || '')}"><div class="nm">${esc(ttl(t))}${pdIcon}${t.trial ? '<span class="tag">NOT SCORED YET</span>' : ''}${descOf(t) ? `<span class="ds">${esc(descOf(t))}</span>` : ''}${locked ? '' : '<span class="nt">+ note</span>'}</div>
         <select class="st"><option value="">Not worked on</option>${DEF.statuses.map(s => `<option ${c.s === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
         <label class="pl-pill"><input type="checkbox" class="pl" value="${esc(t.id)}" ${cur.plan.indexOf(t.id) >= 0 ? 'checked' : ''}>Plan ${esc(nxL)}</label>
         ${locked ? (ro ? `<div class="rmw show">${ro}</div>` : '') : `<div class="rmw ${showR ? 'show' : ''}">${ckHtml(m, ticked)}
-          <div style="display:flex;gap:6px"><select class="pg" style="width:190px;display:${c.s === 'In Progress' ? '' : 'none'}"><option value="">% done</option>${m.pcl.map(([n, l]) => `<option value="${n}" ${pc == n ? 'selected' : ''}>${n}% – ${esc(l)}</option>`).join('')}</select><input type="text" class="rm" placeholder="${esc(ph)}" value="${esc(raw)}"></div></div>`}</div>`;
+          <div style="display:flex;gap:6px"><select class="pg" style="width:190px;display:${c.s === 'In Progress' ? '' : 'none'}"><option value="">${m.pct ? '% done (required)' : '% done'}</option>${m.pcl.map(([n, l]) => `<option value="${n}" ${pc == n ? 'selected' : ''}>${n}% – ${esc(l)}</option>`).join('')}</select><input type="text" class="rm" placeholder="${esc(ph)}" value="${esc(raw)}"></div></div>`}</div>`;
     }).join('') + '</div></div>';
   });
   h += `</div><div>
@@ -197,7 +199,7 @@ function draw(){
   document.querySelectorAll('.task').forEach(el => {
     const w = el.querySelector('.rmw'), st = el.querySelector('.st'); if(!el.querySelector('.nt')) return;
     el.querySelector('.nt').onclick = () => { w.classList.toggle('show'); if(w.classList.contains('show')) w.querySelector('input').focus(); };
-    st.onchange = () => { el.dataset.s = st.value; const pg = el.querySelector('.pg'); pg.style.display = st.value === 'In Progress' ? '' : 'none'; if(st.value === 'In Progress' || (st.value && (el.querySelector('.cx') || el.dataset.req === 'names'))) w.classList.add('show'); if(st.value === 'Deferred (Approved)'){ w.classList.add('show'); w.querySelector('input').focus(); } };
+    st.onchange = () => { el.dataset.s = st.value; const pg = el.querySelector('.pg'); pg.style.display = st.value === 'In Progress' ? '' : 'none'; if(st.value === 'In Progress' || (st.value && (el.querySelector('.cx') || el.dataset.req === 'names'))) w.classList.add('show'); el.querySelector('.pg').style.borderColor = ''; if(st.value === 'Deferred (Approved)'){ w.classList.add('show'); w.querySelector('input').focus(); } };
   });
   document.querySelectorAll('.mk').forEach(a => a.onclick = e => { e.preventDefault(); load(a.dataset.d); });
   document.querySelectorAll('.strip button').forEach(b => b.onclick = () => load(b.dataset.d));
@@ -215,6 +217,7 @@ async function send(){
   if(bad){ const t = DEF.tasks.find(x => x.id === bad.id); msg('err', 'Please type the reason for deferring “' + esc(t ? ttl(t) : '') + '”.'); return; }
   for(const i of items){ const t = DEF.tasks.find(x => x.id === i.id) || {}, m = t.m || {}, live = i.s === 'Completed' || i.s === 'In Progress';
     if(live && m.req === 'items' && !i.c.length){ msg('err', 'Please tick what you did for “' + esc(ttl(t)) + '” (' + esc((m.items || []).join(' / ')) + ').'); return; }
+    if(i.s === 'In Progress' && m.pct && !i.p){ msg('err', 'Please choose how far along “' + esc(ttl(t)) + '” is (% done).'); return; }
     if(live && m.req === 'names' && i.r.length < 3){ msg('err', 'Please name the members you visited or followed up for “' + esc(ttl(t)) + '”.'); return; } }
   const pr = document.querySelector('input[name=pr]:checked').value;
   if(!DEF.done || !DEF.done[DATE]){ if(!confirm('Send this report? Once sent it is final and cannot be edited.')) return; }
