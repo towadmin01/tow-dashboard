@@ -23,7 +23,7 @@ button:disabled{opacity:.5}
 .cat{margin-bottom:16px}.cat h3{margin:0 0 6px 2px;font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--navy);display:flex;gap:8px;align-items:center}
 .cat h3 i{font-style:normal;background:#E4E9F4;color:var(--navy);border-radius:20px;padding:1px 8px;font-size:11px;letter-spacing:0}
 .list{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #0000000a}
-.task{padding:10px 14px 10px 12px;border-top:1px solid #EFEBDD;border-left:4px solid transparent;display:grid;grid-template-columns:1fr 132px auto;gap:6px 10px;align-items:center}
+.task{padding:10px 14px 10px 12px;border-top:1px solid #EFEBDD;border-left:4px solid transparent;display:grid;grid-template-columns:1fr 132px 96px;gap:6px 10px;align-items:center}
 .task:first-child{border-top:none}.task[data-s="Completed"]{border-left-color:#2e9d4f;background:#F6FBF7}.task[data-s="In Progress"]{border-left-color:#3b6fc4;background:#F5F8FD}.task[data-s^="Deferred"]{border-left-color:#d9a400;background:#FFFBEA}
 .task .st{font-size:12px;font-weight:600;padding:5px 8px;border-radius:8px;background:#F1F0EA;color:#8a8672;border:1px solid #E3DFCF}
 .task[data-s="Completed"] .st{background:#DFF3E5;color:#1f6b36;border-color:#a7d7b4}.task[data-s="In Progress"] .st{background:#DEE9FA;color:#24509c;border-color:#a9c3ee}.task[data-s^="Deferred"] .st{background:#FFF1BD;color:#7a5d00;border-color:#ecd27a}
@@ -32,22 +32,22 @@ button:disabled{opacity:.5}
 .task .nt{display:block;width:max-content;font-size:11px;color:#6b7cae;cursor:pointer;margin-top:3px;font-weight:600}
 .task .pd{display:inline-block;vertical-align:-2px;margin-left:6px;width:14px;height:14px;color:#b88a00}.task .pd svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .task .rm{font-size:12.5px;padding:7px 10px;border-radius:8px}.task .rm::placeholder{font-size:12px;color:#aaa58f}
-.task .pg{font-size:12px;padding:6px 8px}
+.task .pg{font-size:12px;padding:6px 8px}.task .rmw{display:none}.task .rmw.show{display:block}.task .rr{display:flex;gap:8px;align-items:stretch}.task .rr .pg{flex:0 0 190px}.task .rr .rm{flex:1 1 auto;min-width:0;width:auto}@media(max-width:560px){.task .rr{flex-direction:column}.task .rr .pg{flex:none;width:100%!important}.task .rr .rm{width:100%}.top2 .seg label{min-width:80px}.cols{gap:6px}}
 .task .ckrow{display:flex;flex-wrap:wrap;gap:5px 6px;align-items:center;margin:0 0 6px}.task .ckrow>span{font-size:10px;font-weight:700;color:#9a947d;text-transform:uppercase;letter-spacing:.05em;margin-right:2px}
 .task .ck{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:#4a4636;cursor:pointer;background:#FBFAF5;border:1px solid #E7E2CE;border-radius:12px;padding:2px 9px}.task .ck input{width:13px;height:13px;margin:0}.task .ck:has(input:checked){background:#E8F3EA;border-color:#9fcfab;color:#1f6b36;font-weight:600}
 .task .ro{font-size:12.5px;color:#4a4636;line-height:1.45;margin-top:1px}.task .ro .rc{display:inline-block;font-size:11px;font-weight:600;color:#1f6b36;background:#E8F3EA;border-radius:10px;padding:0 8px;margin-right:6px}.task .ro .rp{color:#24509c;background:#DEE9FA}
 .task .tag{font-size:10.5px;color:#b3261e;background:#FDE3E1;border-radius:6px;padding:1px 6px;margin-left:6px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
-.list.lk .pl-pill:not(:has(input:checked)){display:none}.list.lk .task{grid-template-columns:1fr 132px auto}
+.list.lk .pl-pill:not(:has(input:checked)){display:none}.list.lk .task{grid-template-columns:1fr 132px 96px}
 .strip button.lv{background:#EEE8F6;color:#5B3E9E}
 .ld{padding:40px 10px;text-align:center;color:var(--mut);font-size:13px}
-.pl-pill{display:flex;align-items:center;gap:4px;border:1px solid #E7E2CE;border-radius:12px;padding:2px 8px;font-size:11px;font-weight:500;color:#9a947d;cursor:pointer;background:transparent;white-space:nowrap}
+.pl-pill{display:flex;align-items:center;justify-content:center;gap:4px;border:1px solid #E7E2CE;border-radius:12px;padding:2px 8px;font-size:11px;font-weight:500;color:#9a947d;cursor:pointer;background:transparent;white-space:nowrap}
 .pl-pill input{width:13px;height:13px;margin:0}.pl-pill:has(input:checked){background:#E4E9F4;border-color:#9bb0e0;color:var(--navy);font-weight:600}
-@media(max-width:560px){.task{grid-template-columns:1fr 120px}.task .pl-pill{grid-column:1/-1;justify-self:start}}
+@media(max-width:560px){.task{grid-template-columns:1fr 112px}.task .pl-pill{grid-column:2;grid-row:2;justify-self:stretch}.task .rmw{grid-column:1/-1}}
 .strip{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;align-items:center;font-size:12px;color:var(--mut)}
 .strip button{border:none;background:#F1EEE3;border-radius:20px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--mut)}
 .strip button.y{background:#E1F2E6;color:#1a5c2c}.strip button.late{background:#FFF1B8;color:#6b4a00}.strip button.ph{background:#E4E4E4;color:#8a8a8a;text-decoration:line-through}.strip button.sel{outline:2px solid var(--navy)}
 .sub{background:#E6F4EA;color:#1a5c2c;border-radius:10px;padding:9px 12px;font-size:13px;margin-top:10px}.sub.late{background:#FFF1B8;color:#6b4a00}
-.top2{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:2px}@media(min-width:760px){.top2{grid-template-columns:1.3fr 1fr}}
+.top2{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:2px;align-items:start}@media(min-width:760px){.top2{grid-template-columns:1fr 1fr}}
 .top2 .card{margin-bottom:12px;margin-top:0}.ct{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);margin-bottom:8px}
 .who{font-size:17px;font-weight:700;margin-bottom:6px}.rq{background:#FDE8E8;color:#B42318;border-radius:20px;padding:1px 8px;font-size:10px;letter-spacing:.06em;margin-left:6px;font-weight:700}
 .card.need{border-color:#E11D48;box-shadow:0 0 0 3px #E11D4822}
@@ -191,7 +191,7 @@ function draw(){
         <select class="st"><option value="">Not worked on</option>${DEF.statuses.map(s => `<option ${c.s === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
         <label class="pl-pill"><input type="checkbox" class="pl" value="${esc(t.id)}" ${cur.plan.indexOf(t.id) >= 0 ? 'checked' : ''}>Plan ${esc(nxL)}</label>
         ${locked ? (ro ? `<div class="rmw show">${ro}</div>` : '') : `<div class="rmw ${showR ? 'show' : ''}">${ckHtml(m, ticked)}
-          <div style="display:flex;gap:6px"><select class="pg" style="width:190px;display:${(m.pct || c.s === 'In Progress') ? '' : 'none'}"><option value="">${m.pct ? '% progress' : '% done'}</option>${m.pcl.map(([n, l]) => `<option value="${n}" ${pc == n ? 'selected' : ''}>${n}% – ${esc(l)}</option>`).join('')}${m.pct ? `<option value="100" ${pc == 100 ? 'selected' : ''}>100% – Done</option>` : ''}</select><input type="text" class="rm" placeholder="${esc(ph)}" value="${esc(raw)}"></div></div>`}</div>`;
+          <div class="rr"><select class="pg" style="width:190px;display:${(m.pct || c.s === 'In Progress') ? '' : 'none'}"><option value="">${m.pct ? '% progress' : '% done'}</option>${m.pcl.map(([n, l]) => `<option value="${n}" ${pc == n ? 'selected' : ''}>${n}% – ${esc(l)}</option>`).join('')}${m.pct ? `<option value="100" ${pc == 100 ? 'selected' : ''}>100% – Done</option>` : ''}</select><input type="text" class="rm" placeholder="${esc(ph)}" value="${esc(raw)}"></div></div>`}</div>`;
     }).join('') + '</div></div>';
   });
   h += `</div>
