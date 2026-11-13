@@ -959,6 +959,7 @@ async function loadLiveData(){
     if(hr >= 0) for(let r = hr + 1; r < Math.min(settingsGrid.length, hr + 60); r++){ const n = cell(r, 8); if(n) sched.push({staff:n, dept:cell(r,9), profile:cell(r,10), schedule:cell(r,11) || 'Full-time', start:toISODate(cell(r,12)) || '', last:toISODate(cell(r,13)) || '', position:(rosterPos && rosterPos[n]) || cell(r, pcol) || cell(r, 14) || cell(r, 15)}); }
     if(sched.length){ SET.schedules = sched; flexSet = new Set(sched.filter(x => /^flex/i.test(x.schedule)).map(x => x.staff)); }
   }
+  SET.positions = rosterPos || {};
   const rosterOf = {}; SET.schedules.forEach(x => { rosterOf[x.staff] = x; });
   // is this person on the team on this date? (Start date / Last day come from the Settings roster)
   const activeOn = (staff, key) => { const x = rosterOf[staff]; return !x || ((!x.start || key >= x.start) && (!x.last || key <= x.last)); };
@@ -1563,7 +1564,7 @@ function renderPortfolio(staff){
       <div><div class="gl-brand">Tabernacle of Worship</div><div class="gl-title">Task Glossary &amp; Portfolio</div><div class="gl-sub">Performance Management System</div></div></div>
     <div class="gl-info">
       <div><span>Name</span><b>${esc(staff)}</b></div>
-      <div><span>Position</span><b>${esc(ro.position || posOf(staff) || '—')}</b></div>
+      <div><span>Position</span><b>${esc(posOf(staff) || ro.position || '—')}</b></div>
       <div><span>Department</span><b>${esc(dept || '—')}</b></div>
       <div><span>Schedule</span><b>${flex ? 'Flexible' : 'Full-time'}</b></div>
       <div><span>As at</span><b>${esc(fmtShortDate(TODAY_KEY))}</b></div>
@@ -1826,7 +1827,7 @@ function renderReviewHeader(staff){
   const rows = [`<tr><td>Staff Name</td><td>${staff}</td></tr>`,
                 `<tr><td>Department</td><td>${accum.dept || ''}</td></tr>`];
   REVIEW_HEADER_FIELDS.forEach(f => {
-    const dv = header[f.key] || (f.key === 'positionHeld' ? (((DATA.settings.schedules || []).find(x => x.staff === staff) || {}).position || '') : '');
+    const dv = header[f.key] || (f.key === 'positionHeld' ? (posOf(staff) || ((DATA.settings.schedules || []).find(x => x.staff === staff) || {}).position || '') : '');
     rows.push(`<tr><td>${f.label}</td><td><input type="${f.type||'text'}" class="rev-header-input" data-field="${f.key}" value="${String(dv).replace(/"/g,'&quot;')}"></td></tr>`);
   });
   document.getElementById('reviewHeaderTable').innerHTML = rows.join('');
@@ -2124,7 +2125,7 @@ function dispName(staff, short){   // the full task name from the list (not the 
   let f = String(t.full).replace(/^\s*(weekly|monthly|quarterly|semi-?annual|annual|ad-?hoc|every 4 months)\s*[-\u2013\u2014:]\s*/i, '').trim(); const i = f.indexOf(' (');
   return (i > 0 ? f.slice(0, i).trim() : f) || short;
 }
-function posOf(staff){ const x = ((DATA.settings && DATA.settings.schedules) || []).find(y => y.staff === staff); return x && x.position ? x.position : ''; }
+function posOf(staff){ const pm = (DATA.settings && DATA.settings.positions) || {}; if(pm[staff]) return pm[staff]; const k = Object.keys(pm).find(n => n.toLowerCase() === String(staff).toLowerCase()); if(k) return pm[k]; const x = ((DATA.settings && DATA.settings.schedules) || []).find(y => y.staff === staff); return x && x.position ? x.position : ''; }
 function deptPos(staff, dept){ const p = posOf(staff), d = dept || ''; return esc(d) + (p && p !== d ? (d ? ' &middot; ' : '') + '<b class="pos">' + esc(p) + '</b>' : ''); }
 function dayRow(staff, date){ const rows = DATA.daily[date]; return rows ? rows.find(r => r.staff === staff) : null; }
 function nextWorkdayKey(k){ return DATA.workdays.find(x => x > k) || null; }
