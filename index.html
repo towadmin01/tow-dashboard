@@ -774,6 +774,13 @@ async function fetchSheetGrid(sheetName){
   if(!res.ok) throw new Error('Failed to fetch sheet: ' + sheetName);
   return parseCsvLine(await res.text());
 }
+async function fetchRoster(){   // roster block only (I4:O70) so Google's column-type guessing cannot blank the Position column
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Settings&range=I4:O70&headers=1&cb=${Date.now()}`;
+  const res = await fetch(url); if(!res.ok) throw new Error('roster');
+  const rows = parseCsvLine(await res.text()), m = {};
+  rows.forEach(r => { const n = String(r[0] || '').trim(); if(n && !/^staff/i.test(n) && !/^STAFF ROSTER/i.test(n)) m[n] = String(r[6] || '').trim(); });
+  return m;
+}
 async function fetchSheetRows(sheetName, bust){
   const encodedSheet = encodeURIComponent(sheetName).replace(/\(/g,'%28').replace(/\)/g,'%29');
   const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodedSheet}${bust ? '&cb=' + Date.now() : ''}`;
@@ -847,7 +854,7 @@ function buildRemark(rows, periodLabel){
 
 const TODAY_KEY_EARLY = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })();
 async function loadLiveData(){
-  const [rawDaily, weeklyCalc, monthlyCalc, weeklyTaskSummary, monthlyTaskSummary, taskReference, accumWeekly, accumMonthly, leaveLog, workdayCalendar, kpiWeightsRows, flexRows, maintRows, settingsGrid, emailRows, queueRows] = await Promise.all([
+  const [rawDaily, weeklyCalc, monthlyCalc, weeklyTaskSummary, monthlyTaskSummary, taskReference, accumWeekly, accumMonthly, leaveLog, workdayCalendar, kpiWeightsRows, flexRows, maintRows, settingsGrid, rosterPos, emailRows, queueRows] = await Promise.all([
     fetchSheetRows('Raw Daily Log'),
     fetchSheetRows('Weekly Calc'),
     fetchSheetRows('Monthly Calc'),
@@ -862,6 +869,7 @@ async function loadLiveData(){
     fetchSheetRows('Flexible Arrangement Staff').catch(() => []),
     fetchSheetRows('Maintenance Log').catch(() => []),
     fetchSheetGrid('Settings').catch(() => null),
+    fetchRoster().catch(() => ({})),
     fetchSheetRows('Email Log', true).catch(() => []),
     fetchSheetRows('Email Queue', true).catch(() => []),
   ]);
@@ -949,7 +957,8 @@ async function loadLiveData(){
     });
     const sched = [];
     const hr = find(/^staff( \(|$)/i, 8);
-    if(hr >= 0) for(let r = hr + 1; r < Math.min(settingsGrid.length, hr + 60); r++){ const n = cell(r, 8); if(n) sched.push({staff:n, dept:cell(r,9), profile:cell(r,10), schedule:cell(r,11) || 'Full-time', start:toISODate(cell(r,12)) || '', last:toISODate(cell(r,13)) || '', position:cell(r,14)}); }
+    let pcol = 14; if(hr >= 0){ const hrow = settingsGrid[hr] || []; const k = hrow.findIndex((x, i) => i >= 8 && /^position/i.test(String(x || '').trim())); if(k >= 0) pcol = k; }
+    if(hr >= 0) for(let r = hr + 1; r < Math.min(settingsGrid.length, hr + 60); r++){ const n = cell(r, 8); if(n) sched.push({staff:n, dept:cell(r,9), profile:cell(r,10), schedule:cell(r,11) || 'Full-time', start:toISODate(cell(r,12)) || '', last:toISODate(cell(r,13)) || '', position:(rosterPos && rosterPos[n]) || cell(r, pcol) || cell(r, 14) || cell(r, 15)}); }
     if(sched.length){ SET.schedules = sched; flexSet = new Set(sched.filter(x => /^flex/i.test(x.schedule)).map(x => x.staff)); }
   }
   const rosterOf = {}; SET.schedules.forEach(x => { rosterOf[x.staff] = x; });
@@ -1556,7 +1565,7 @@ function renderPortfolio(staff){
       <div><div class="gl-brand">Tabernacle of Worship</div><div class="gl-title">Task Glossary &amp; Portfolio</div><div class="gl-sub">Performance Management System</div></div></div>
     <div class="gl-info">
       <div><span>Name</span><b>${esc(staff)}</b></div>
-      <div><span>Position</span><b>${esc(ro.position || '—')}</b></div>
+      <div><span>Position</span><b>${esc(ro.position || posOf(staff) || '—')}</b></div>
       <div><span>Department</span><b>${esc(dept || '—')}</b></div>
       <div><span>Schedule</span><b>${flex ? 'Flexible' : 'Full-time'}</b></div>
       <div><span>As at</span><b>${esc(fmtShortDate(TODAY_KEY))}</b></div>
