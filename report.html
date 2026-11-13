@@ -47,6 +47,15 @@ button:disabled{opacity:.5}
 .strip button{border:none;background:#F1EEE3;border-radius:20px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--mut)}
 .strip button.y{background:#E1F2E6;color:#1a5c2c}.strip button.late{background:#FFF1B8;color:#6b4a00}.strip button.ph{background:#E4E4E4;color:#8a8a8a;text-decoration:line-through}.strip button.sel{outline:2px solid var(--navy)}
 .sub{background:#E6F4EA;color:#1a5c2c;border-radius:10px;padding:9px 12px;font-size:13px;margin-top:10px}.sub.late{background:#FFF1B8;color:#6b4a00}
+.top2{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:2px}@media(min-width:760px){.top2{grid-template-columns:1.3fr 1fr}}
+.top2 .card{margin-bottom:12px;margin-top:0}.ct{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);margin-bottom:8px}
+.who{font-size:17px;font-weight:700;margin-bottom:6px}.rq{background:#FDE8E8;color:#B42318;border-radius:20px;padding:1px 8px;font-size:10px;letter-spacing:.06em;margin-left:6px;font-weight:700}
+.card.need{border-color:#E11D48;box-shadow:0 0 0 3px #E11D4822}
+.c2{border-left:4px solid var(--navy)}#cNext{border-left:4px solid var(--navy)}
+.card.other{border:2px solid #F59E0B;background:#FFFBEB;margin-top:4px}.card.other .ct{color:#92400E}.card.other textarea{background:#fff;min-height:70px}
+.cath{cursor:pointer;user-select:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px!important;margin-bottom:8px!important}.cath:hover{background:#F4F6FB}
+.cath span{flex:1}.cath em{font-style:normal;background:#DBEAFE;color:#1D4ED8;border-radius:20px;padding:1px 8px;font-size:11px;letter-spacing:0;text-transform:none}
+.cv{width:18px;height:18px;fill:none;stroke:var(--navy);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;transform:rotate(-90deg)}.cv.on{transform:none}
 .hdr2{display:flex;gap:14px;flex-wrap:wrap;align-items:end}.hdr2>div{flex:1;min-width:170px}
 details.chg{margin-top:4px;font-size:12px;color:var(--mut)}details.chg summary{cursor:pointer;padding:4px 2px;display:inline-block}
 .bar{position:fixed;left:0;right:0;bottom:0;background:#fffffff2;backdrop-filter:blur(4px);border-top:1px solid var(--line);padding:10px 14px}
@@ -101,7 +110,7 @@ function signInView(step, note){
   };
   if($('again')) $('again').onclick = () => signInView(1);
 }
-const DC = {}; let dirty = false, pf = 0;
+const DC = {}, catOpen = {}; let dirty = false, pf = 0;
 async function load(date){
   if(!API){ $('app').innerHTML = '<div class="msg err">This link is incomplete. Please use the exact link the office sent you.</div>'; return; }
   if(!S){ signInView(1); return; }
@@ -157,22 +166,24 @@ function draw(){
   const pn = (DEF.planned || []).map(id => { const t = DEF.tasks.find(x => x.id === id); return t ? ttl(t) : ''; }).filter(Boolean);
   if(pn.length && !dn && !LEAD) h += `<div class="msg info"><b>You planned for this day:</b> ${pn.map(esc).join(', ')}</div>`;
   if(LEAD) h += `<div class="msg info">Leadership mode — you are filling in for <b>${esc(DEF.staff)}</b>. This is recorded as sent by leadership.</div>`;
-  h += `<div class="card"><div class="hdr2"><div><b style="font-size:16px">${esc(DEF.staff)}</b>
-    <label class="f" style="margin-top:6px">Report for</label><input type="date" id="dt" value="${DATE}" max="${todayStr()}" min="${addDays(todayStr(), -40)}"></div>
-    <div><label class="f" style="margin-top:0">Were you working this day?</label>
-    <div class="seg"><label><input type="radio" name="day" value="Working" ${day !== 'Leave' && !cur.half ? 'checked' : ''}><span>Full day</span></label><label><input type="radio" name="day" value="Half" ${day !== 'Leave' && cur.half ? 'checked' : ''}><span>Half-day leave</span></label><label><input type="radio" name="day" value="Leave" ${day === 'Leave' ? 'checked' : ''}><span>Full-day leave</span></label></div>
-    <div id="halfBox" class="seg" style="margin-top:6px"><label><input type="radio" name="hf" value="AM" ${cur.half === 'AM' ? 'checked' : ''}><span>Morning off (usual time)</span></label><label><input type="radio" name="hf" value="PM" ${cur.half === 'PM' ? 'checked' : ''}><span>Afternoon off (may send after 1 pm)</span></label></div></div></div>
-    ${dn ? `<div class="sub ${dn.timing === 'Late' ? 'late' : ''}">✓ <b>Submitted</b> — ${esc(dn.first)} (${esc(dn.timing)}). ${LEAD ? 'Leadership mode: you can change it.' : 'This report is final and locked.'}</div>` : `<div class="hint" style="margin-top:8px">Not submitted yet for this day. Once sent, a report is final — please check it before sending.</div>`}
-    ${strip()}</div>`;
-  h += '<div class="cols"><div id="work">';
+  const reqTag = '<span class="rq">required</span>';
+  h += `<div class="top2"><div class="card c1"><div class="ct">Report for</div><div class="who">${esc(DEF.staff)}</div>
+      <input type="date" id="dt" value="${DATE}" max="${todayStr()}" min="${addDays(todayStr(), -40)}">
+      ${dn ? `<div class="sub ${dn.timing === 'Late' ? 'late' : ''}">✓ <b>Submitted</b> — ${esc(dn.first)} (${esc(dn.timing)}). ${LEAD ? 'Leadership mode: you can change it.' : 'Final and locked.'}</div>` : `<div class="hint" style="margin-top:8px">Not submitted yet. Once sent, a report is final — please check it first.</div>`}
+      ${strip()}</div>
+    <div class="card c2" id="cDay"><div class="ct">Were you working this day? ${reqTag}</div>
+      <div class="seg"><label><input type="radio" name="day" value="Working" ${cur.day && cur.day !== 'Leave' && !cur.half ? 'checked' : ''}><span>Full day</span></label><label><input type="radio" name="day" value="Half" ${cur.day && cur.day !== 'Leave' && cur.half ? 'checked' : ''}><span>Half-day leave</span></label><label><input type="radio" name="day" value="Leave" ${cur.day === 'Leave' ? 'checked' : ''}><span>Full-day leave</span></label></div>
+      <div id="halfBox" class="seg" style="margin-top:6px"><label><input type="radio" name="hf" value="AM" ${cur.half === 'AM' ? 'checked' : ''}><span>Morning off (usual time)</span></label><label><input type="radio" name="hf" value="PM" ${cur.half === 'PM' ? 'checked' : ''}><span>Afternoon off (may send after 1 pm)</span></label></div></div></div>`;
+  h += '<div class="cols"><div><div id="work">';
   CATS.forEach(([cat, label]) => {
     const list = DEF.tasks.filter(t => t.cat === cat || (cat === 'Quarterly' && t.cat === 'Every 4 Months')); if(!list.length) return;
-    const doneN = list.filter(t => (cur.items[t.id] || {}).s).length;
-    h += `<div class="cat"><h3>${label}<i>${doneN}/${list.length}</i></h3><div class="list${locked ? ' lk' : ''}"><div class="colh" style="display:none"></div>` + list.map(t => {
+    const doneN = list.filter(t => (cur.items[t.id] || {}).s).length, plN = list.filter(t => planned.has(t.id) && !(cur.items[t.id] || {}).s).length;
+    const isOpen = catOpen[cat] !== undefined ? catOpen[cat] : (cat === 'Weekly' || (!!dn && doneN > 0));
+    h += `<div class="cat"><h3 class="cath" data-cat="${cat}"><span>${label}</span><i>${doneN}/${list.length}</i>${plN && !isOpen ? `<em>${plN} planned</em>` : ''}<svg class="cv ${isOpen ? 'on' : ''}" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></h3><div class="list${locked ? ' lk' : ''}" ${isOpen ? '' : 'style="display:none"'}><div class="colh" style="display:none"></div>` + list.map(t => {
       const c = cur.items[t.id] || {s:'', r:''}, m = t.m || {items:[], pcl:[[10,'Just started'],[25,'Started'],[50,'Halfway'],[75,'Nearly done'],[90,'Final checks']], req:''};
       let raw = String(c.r || ''); const pm = raw.match(/^\[(\d+)%\]\s*/), pc = pm ? pm[1] : ''; if(pm) raw = raw.slice(pm[0].length);
       const km = raw.match(/^\[✓ ([^\]]*)\]\s*/), ticked = km ? km[1].split(';').map(x => x.trim()) : []; if(km) raw = raw.slice(km[0].length);
-      const needs = (m.items && m.items.length) || m.req === 'names' || m.pct, showR = raw || ticked.length || c.s === 'Deferred (Approved)' || (needs && c.s) || pc;
+      const needs = (m.items && m.items.length) || m.req === 'names' || m.pct, showR = raw || ticked.length || c.s === 'Deferred (Approved)' || (needs && c.s) || pc || m.pct;
       const ph = m.req === 'names' ? 'Names of the members you visited / followed up (required)' : 'Remark (required if deferred)';
       const pdIcon = planned.has(t.id) ? '<span class="pd" title="Planned for this day"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M9 15l2 2 4-4"/></svg></span>' : '';
       const ro = (locked && c.s && (pc || ticked.length || raw)) ? `<div class="ro">${pc ? `<span class="rc rp">${pc}%</span>` : ''}${ticked.length ? `<span class="rc">&#10003; ${esc(ticked.join(' · '))}</span>` : ''}${esc(raw)}</div>` : '';
@@ -180,26 +191,27 @@ function draw(){
         <select class="st"><option value="">Not worked on</option>${DEF.statuses.map(s => `<option ${c.s === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select>
         <label class="pl-pill"><input type="checkbox" class="pl" value="${esc(t.id)}" ${cur.plan.indexOf(t.id) >= 0 ? 'checked' : ''}>Plan ${esc(nxL)}</label>
         ${locked ? (ro ? `<div class="rmw show">${ro}</div>` : '') : `<div class="rmw ${showR ? 'show' : ''}">${ckHtml(m, ticked)}
-          <div style="display:flex;gap:6px"><select class="pg" style="width:190px;display:${c.s === 'In Progress' ? '' : 'none'}"><option value="">${m.pct ? '% done (required)' : '% done'}</option>${m.pcl.map(([n, l]) => `<option value="${n}" ${pc == n ? 'selected' : ''}>${n}% – ${esc(l)}</option>`).join('')}</select><input type="text" class="rm" placeholder="${esc(ph)}" value="${esc(raw)}"></div></div>`}</div>`;
+          <div style="display:flex;gap:6px"><select class="pg" style="width:190px;display:${(m.pct || c.s === 'In Progress') ? '' : 'none'}"><option value="">${m.pct ? '% progress' : '% done'}</option>${m.pcl.map(([n, l]) => `<option value="${n}" ${pc == n ? 'selected' : ''}>${n}% – ${esc(l)}</option>`).join('')}${m.pct ? `<option value="100" ${pc == 100 ? 'selected' : ''}>100% – Done</option>` : ''}</select><input type="text" class="rm" placeholder="${esc(ph)}" value="${esc(raw)}"></div></div>`}</div>`;
     }).join('') + '</div></div>';
   });
-  h += `</div><div>
-    <div class="card"><label class="f" style="margin-top:0">Other work done (not in the list) — also counts</label><textarea id="other" style="min-height:52px" placeholder="One item per line">${esc(cur.other)}</textarea></div>
-    <div class="card"><b>${nx ? dow(nx) + ' ' + nx.slice(8) + '/' + nx.slice(5,7) : 'Next working day'}: will you be working?</b><div class="seg" style="margin-top:8px"><label><input type="radio" name="pr" value="Yes" ${proceed === 'Yes' || !proceed ? 'checked' : ''}><span>Working</span></label><label><input type="radio" name="pr" value="No" ${proceed === 'No' ? 'checked' : ''}><span>On leave</span></label><label><input type="radio" name="pr" value="Rest & Recovery" ${proceed === 'Rest & Recovery' ? 'checked' : ''}><span>Rest &amp; Recovery</span></label></div>
+  h += `</div>
+    <div class="card other"><div class="ct">Other work done <span style="text-transform:none;letter-spacing:0;font-weight:500">— not in the list above, it also counts</span></div><textarea id="other" placeholder="One item per line">${esc(cur.other)}</textarea></div></div><div>
+    <div class="card" id="cNext"><div class="ct">${nx ? dow(nx) + ' ' + nx.slice(8) + '/' + nx.slice(5,7) : 'Next working day'}: will you be working? ${reqTag}</div><div class="seg"><label><input type="radio" name="pr" value="Yes" ${proceed === 'Yes' ? 'checked' : ''}><span>Working</span></label><label><input type="radio" name="pr" value="No" ${proceed === 'No' ? 'checked' : ''}><span>On leave</span></label><label><input type="radio" name="pr" value="Rest & Recovery" ${proceed === 'Rest & Recovery' ? 'checked' : ''}><span>Rest &amp; Recovery</span></label></div>
       <div class="hint" id="plHint">Your plan is for the next day you actually work. If you are off, tick what you plan for the day you are back.</div><div id="planBox"><label class="f">Other things planned (not in the list)</label><textarea id="planOther" style="min-height:44px">${esc(cur.planOther)}</textarea></div></div>
-    <div class="card"><label class="f" style="margin-top:0">General remarks (optional)</label><textarea id="remarks" style="min-height:44px">${esc(cur.remarks)}</textarea></div>
+    <div class="card"><div class="ct">General remarks <span style="text-transform:none;letter-spacing:0;font-weight:500">(optional)</span></div><textarea id="remarks" style="min-height:44px">${esc(cur.remarks)}</textarea></div>
   </div></div>`;
   if(locked) h += `<details class="chg" id="chg"><summary>Need to correct something?</summary><div class="card" style="margin-top:6px"><div class="hint">A sent report cannot be edited. You can ask leadership to review a change; it is only changed if they approve.</div><textarea id="chgT" style="min-height:48px;margin-top:6px" placeholder="What needs to change, and why?"></textarea><div style="margin-top:8px"><button class="sec" id="chgB">Request a change</button></div></div></details>`;
   else h += `<div class="bar"><div style="max-width:1060px;margin:0 auto"><button class="pri" id="send">${dn ? 'Update report (leadership)' : 'Send my report — final'}</button></div></div>`;
   $('app').innerHTML = h;
-  const toggle = () => { const dv = document.querySelector('input[name=day]:checked').value, lv = dv === 'Leave'; $('halfBox').style.display = dv === 'Half' ? '' : 'none'; $('work').style.opacity = lv ? .35 : 1; $('work').style.pointerEvents = lv ? 'none' : ''; $('other').disabled = lv;
+  const toggle = () => { const dc = document.querySelector('input[name=day]:checked'), dv = dc ? dc.value : '', lv = dv === 'Leave'; $('halfBox').style.display = dv === 'Half' ? '' : 'none'; $('work').style.opacity = lv ? .35 : 1; $('work').style.pointerEvents = lv ? 'none' : ''; $('other').disabled = lv;
     };
   document.querySelectorAll('input[name=day],input[name=pr],input[name=hf]').forEach(i => i.onchange = toggle); toggle();
   if(locked){ document.querySelectorAll('#app input:not(#dt),#app select,#app textarea').forEach(x => { if(!x.closest('#chg') && !x.closest('.strip')) x.disabled = true; }); document.querySelectorAll('.task .nt').forEach(x => x.style.display = 'none'); }
+  document.querySelectorAll('.cath').forEach(hh => hh.onclick = () => { const c = hh.dataset.cat, ls = hh.nextElementSibling, op = ls.style.display === 'none'; ls.style.display = op ? '' : 'none'; hh.querySelector('.cv').classList.toggle('on', op); catOpen[c] = op; const em = hh.querySelector('em'); if(em) em.style.display = op ? 'none' : ''; });
   document.querySelectorAll('.task').forEach(el => {
     const w = el.querySelector('.rmw'), st = el.querySelector('.st'); if(!el.querySelector('.nt')) return;
     el.querySelector('.nt').onclick = () => { w.classList.toggle('show'); if(w.classList.contains('show')) w.querySelector('input').focus(); };
-    st.onchange = () => { el.dataset.s = st.value; const pg = el.querySelector('.pg'); pg.style.display = st.value === 'In Progress' ? '' : 'none'; if(st.value === 'In Progress' || (st.value && (el.querySelector('.cx') || el.dataset.req === 'names'))) w.classList.add('show'); el.querySelector('.pg').style.borderColor = ''; if(st.value === 'Deferred (Approved)'){ w.classList.add('show'); w.querySelector('input').focus(); } };
+    st.onchange = () => { el.dataset.s = st.value; const pg = el.querySelector('.pg'); const always = pg.options[pg.options.length - 1].value === '100'; pg.style.display = (always || st.value === 'In Progress') ? '' : 'none'; if(always){ if(st.value === 'Completed' && !pg.value) pg.value = '100'; if(st.value === 'In Progress' && pg.value === '100') pg.value = ''; } if(st.value === 'In Progress' || (st.value && (el.querySelector('.cx') || el.dataset.req === 'names'))) w.classList.add('show'); el.querySelector('.pg').style.borderColor = ''; if(st.value === 'Deferred (Approved)'){ w.classList.add('show'); w.querySelector('input').focus(); } };
   });
   document.querySelectorAll('.mk').forEach(a => a.onclick = e => { e.preventDefault(); load(a.dataset.d); });
   document.querySelectorAll('.strip button').forEach(b => b.onclick = () => load(b.dataset.d));
@@ -209,17 +221,20 @@ function draw(){
     try{ const j = await call({action:'appRequestChange', date: DATE, text: t}); if(j.ok){ msg('ok', 'Your request was sent to leadership.'); $('chgT').value = ''; } else msg('err', esc(j.error || 'Not sent.')); }catch(e){ msg('err', 'Could not reach the service.'); } $('chgB').disabled = false; };
 }
 async function send(){
-  const dayR = document.querySelector('input[name=day]:checked').value, onLeave = dayR === 'Leave', dayV = onLeave ? 'Leave' : 'Working', hfEl = document.querySelector('input[name=hf]:checked'), half = (dayR === 'Half' && hfEl) ? hfEl.value : '';
+  const dayEl = document.querySelector('input[name=day]:checked'), prEl = document.querySelector('input[name=pr]:checked');
+  if(!dayEl){ msg('err', 'Please answer “Were you working this day?”.'); $('cDay').classList.add('need'); $('cDay').scrollIntoView({behavior:'smooth', block:'center'}); return; }
+  if(!prEl){ msg('err', 'Please answer “will you be working” for the next working day.'); $('cNext').classList.add('need'); $('cNext').scrollIntoView({behavior:'smooth', block:'center'}); return; }
+  const dayR = dayEl.value, onLeave = dayR === 'Leave', dayV = onLeave ? 'Leave' : 'Working', hfEl = document.querySelector('input[name=hf]:checked'), half = (dayR === 'Half' && hfEl) ? hfEl.value : '';
   if(dayR === 'Half' && !hfEl){ msg('err', 'Please choose morning or afternoon for your half-day leave.'); return; }
   const items = [];
-  if(!onLeave) document.querySelectorAll('#work .task').forEach(el => { const s = el.querySelector('.st').value; if(s) items.push({id: el.dataset.id, s, r: el.querySelector('.rm').value.trim(), p: s === 'In Progress' ? el.querySelector('.pg').value : '', c: Array.from(el.querySelectorAll('.cx:checked')).map(x => x.value)}); });
+  if(!onLeave) document.querySelectorAll('#work .task').forEach(el => { const s = el.querySelector('.st').value; if(s) items.push({id: el.dataset.id, s, r: el.querySelector('.rm').value.trim(), p: (s === 'In Progress' || s === 'Completed') ? el.querySelector('.pg').value : '', c: Array.from(el.querySelectorAll('.cx:checked')).map(x => x.value)}); });
   const bad = items.find(i => i.s === 'Deferred (Approved)' && i.r.length < 3);
   if(bad){ const t = DEF.tasks.find(x => x.id === bad.id); msg('err', 'Please type the reason for deferring “' + esc(t ? ttl(t) : '') + '”.'); return; }
   for(const i of items){ const t = DEF.tasks.find(x => x.id === i.id) || {}, m = t.m || {}, live = i.s === 'Completed' || i.s === 'In Progress';
     if(live && m.req === 'items' && !i.c.length){ msg('err', 'Please tick what you did for “' + esc(ttl(t)) + '” (' + esc((m.items || []).join(' / ')) + ').'); return; }
-    if(i.s === 'In Progress' && m.pct && !i.p){ msg('err', 'Please choose how far along “' + esc(ttl(t)) + '” is (% done).'); return; }
+    if(i.s === 'In Progress' && m.pct && (!i.p || i.p === '100')){ msg('err', 'Please choose how far along “' + esc(ttl(t)) + '” is (% done).'); return; }
     if(live && m.req === 'names' && i.r.length < 3){ msg('err', 'Please name the members you visited or followed up for “' + esc(ttl(t)) + '”.'); return; } }
-  const pr = document.querySelector('input[name=pr]:checked').value;
+  const pr = prEl.value;
   if(!DEF.done || !DEF.done[DATE]){ if(!confirm('Send this report? Once sent it is final and cannot be edited.')) return; }
   const body = {action:'appSubmit', date: DATE, day: dayV, half, proceed: pr, items,
     plan: Array.from(document.querySelectorAll('.pl:checked')).map(x => x.value),
