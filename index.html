@@ -774,11 +774,9 @@ async function fetchSheetGrid(sheetName){
   if(!res.ok) throw new Error('Failed to fetch sheet: ' + sheetName);
   return parseCsvLine(await res.text());
 }
-async function fetchRoster(){   // roster block only (I4:O70) so Google's column-type guessing cannot blank the Position column
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Settings&range=I4:O70&headers=1&cb=${Date.now()}`;
-  const res = await fetch(url); if(!res.ok) throw new Error('roster');
-  const rows = parseCsvLine(await res.text()), m = {};
-  rows.forEach(r => { const n = String(r[0] || '').trim(); if(n && !/^staff/i.test(n) && !/^STAFF ROSTER/i.test(n)) m[n] = String(r[6] || '').trim(); });
+async function fetchRoster(){   // clean 'Staff Positions' tab written by the script (Google's export can blank the Settings column)
+  const rows = await fetchSheetRows('Staff Positions', true), m = {};
+  rows.forEach(r => { const n = String(r['Staff'] || '').trim(); if(n) m[n] = String(r['Position'] || '').trim(); });
   return m;
 }
 async function fetchSheetRows(sheetName, bust){
